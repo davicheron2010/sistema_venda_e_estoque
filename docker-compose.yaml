@@ -1,0 +1,35 @@
+services:
+  # Serviço do banco de dados PostgreSQL
+  postgres:
+    # Imagem oficial do PostgreSQL baseada em Alpine Linux
+    image: postgres:17-alpine
+    # Nome fixo do container do banco
+    container_name: app_postgres
+    restart: unless-stopped
+    # Variáveis de ambiente usadas pelo PostgreSQL na inicialização
+    environment:
+      # Nome do banco de dados, vindo do arquivo .env
+      POSTGRES_DB: ${DB_NAME}
+      # Usuário do banco, vindo do arquivo .env
+      POSTGRES_USER: ${DB_USER}
+      # Senha do banco, vindo do arquivo .env
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      # Define o fuso horário do container
+      TZ: ${TZ}
+    # Volumes persistentes e scripts de inicialização
+    volumes:
+      # Volume nomeado para persistir os dados do banco
+      - ./storage/pgdata:/var/lib/postgresql/data
+      # Script SQL executado automaticamente na primeira inicialização
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    # Conecta o container à rede interna do projeto
+    networks:
+      - app_network
+
+# Definição das redes do projeto
+networks:
+  # Rede bridge interna para comunicação entre os containers
+  app_network:
+    driver: bridge
