@@ -1,0 +1,58 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
+
+        <!-- Logo -->
+        <a class="navbar-brand fw-semibold d-flex align-items-center gap-2" href="#">
+            <i class="fa-solid fa-layer-group"></i>
+            DESKIVO
+        </a>
+
+        <!-- Botão mobile -->
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarNavDropdown">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Menu -->
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav ms-auto">
+
+                <!-- Cadastro -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center gap-1" href="#" role="button"
+                        data-bs-toggle="dropdown">
+                        <i class="fa-solid fa-plus"></i>
+                        Cadastro
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
+
+                        <!-- Produtos -->
+                        <li>
+                            <button class="dropdown-item d-flex align-items-center gap-2"
+                                onclick="api.window.open('pages/list-product', { title: 'Produtos' })">
+                                <i class="fa-solid fa-box text-success"></i>
+                                Produtos
+                            </button>
+                        </li>
+
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <!-- Novo Produto -->
+                        <li>
+                            <button class="dropdown-item d-flex align-items-center gap-2"
+                                onclick="api.window.openModal('pages/product', { width: 900, height: 600, title: 'Novo Produto' })">
+                                <i class="fa-solid fa-plus text-secondary"></i>
+                                Novo Produto
+                            </button>
+                        </li>
+                    </ul>
+                </li>
+
+            </ul>
+        </div>
+
+    </div>
+</nav>

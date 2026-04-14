@@ -1,0 +1,84 @@
+{
+    "name": "deskivo",
+    "version": "1.0.0",
+    "main": "main.js",
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "start": "chcp 65001 >nul && electron .",
+        "build:win": "electron-builder --win",
+        "build:linux": "electron-builder --linux",
+        "build:mac": "electron-builder --mac",
+        "build:all": "electron-builder --win --linux --mac"
+    },
+    "build": {
+        "appId": "com.deskivo.app",
+        "productName": "Deskivo",
+        "copyright": "Copyright © 2026 Deskivo",
+        "directories": {
+            "output": "dist"
+        },
+        "asar": false,
+        "files": [
+            "app/**/*",
+            "index.js",
+            "package.json",
+            "!app/**/*.map",
+            "!app/**/test/**"
+        ],
+        "win": {
+            "target": [
+                "portable"
+            ],
+            "icon": "app/view/pages/assets/img/icon.ico"
+        },
+        "nsis": {
+            "oneClick": false,
+            "allowToChangeInstallationDirectory": true,
+            "createDesktopShortcut": true,
+            "createStartMenuShortcut": true,
+            "shortcutName": "Deskivo",
+            "installerIcon": "app/view/pages/assets/img/icon.ico",
+            "uninstallerIcon": "app/view/pages/assets/img/icon.ico",
+            "installerHeaderIcon": "app/view/pages/assets/img/icon.ico"
+        },
+        "linux": {
+            "target": [
+                {
+                    "target": "AppImage",
+                    "arch": [
+                        "x64"
+                    ]
+                },
+                {
+                    "target": "deb",
+                    "arch": [
+                        "x64"
+                    ]
+                }
+            ],
+            "icon": "app/view/pages/assets/img/icon.png",
+            "category": "Office"
+        }
+    },
+    "devDependencies": {
+        "electron": "^41.2.0",
+        "electron-builder": "^25.1.8",
+        "jest": "^30.3.0"
+    },
+    "dependencies": {
+        "@faker-js/faker": "^10.4.0",
+        "@fortawesome/fontawesome-free": "^7.2.0",
+        "bootstrap": "^5.3.8",
+        "datatables.net-bs5": "^2.3.7",
+        "datatables.net-responsive-bs5": "^3.0.8",
+        "dotenv": "^17.3.1",
+        "inputmask": "^5.0.9",
+        "jquery": "^4.0.0",
+        "knex": "^3.2.5",
+        "nunjucks": "^3.2.4",
+        "pg": "^8.20.0",
+        "puppeteer": "^24.40.0",
+        "sweetalert2": "^11.26.23"
+    }
+}

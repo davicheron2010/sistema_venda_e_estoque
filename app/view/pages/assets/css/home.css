@@ -1,0 +1,88 @@
+/* ===== DESKIVO HOME ===== */
+
+body {
+  background: #f5f7fb;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Arial,
+    sans-serif;
+  color: #1f2937;
+}
+
+/* Container principal */
+.container {
+  max-width: 1200px;
+}
+
+/* Título do painel */
+h4 {
+  font-size: 1.35rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+h4 i {
+  font-size: 1.2rem;
+}
+
+/* Grid spacing extra confortável */
+.row {
+  margin-top: 10px;
+}
+
+/* Cards base (caso você use depois dentro do row) */
+.card {
+  border: none;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  transition: all 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.1);
+}
+
+/* Espaçamento interno padrão */
+.card-body {
+  padding: 18px;
+}
+
+/* Ícones dentro de cards (caso use) */
+.card i {
+  font-size: 1.4rem;
+  opacity: 0.9;
+}
+
+/* Botões padrão mais modernos */
+.btn {
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+/* Pequenos textos */
+.text-muted {
+  color: #6b7280 !important;
+}
+
+/* Destaque primário */
+.text-primary {
+  color: #3b82f6 !important;
+}
+
+/* Responsividade suave */
+@media (max-width: 768px) {
+  h4 {
+    font-size: 1.1rem;
+  }
+
+  .card {
+    border-radius: 12px;
+  }
+}

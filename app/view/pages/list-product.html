@@ -1,0 +1,81 @@
+{% extends "layouts/main.html" %}
+{% block styles %}
+<link rel="stylesheet" href="file:///{{ assets }}//css/list-product.css">
+{% endblock %}
+{% block title %}Produtos{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h4 class="mb-4 fw-semibold">
+        <i class="fa-solid fa-box me-2 text-success"></i>
+        Lista de Produtos
+    </h4>
+
+    <div class="mb-3 d-flex gap-2">
+        <button class="btn btn-success d-flex align-items-center gap-2"
+            onclick="api.window.openModal('pages/product', { width: 900, height: 600, title: 'Novo Produto' })">
+            <i class="fa-solid fa-plus"></i>
+            Novo Produto
+        </button>
+
+        <button class="btn btn-outline-danger" onclick="gerarPDF()">
+            <i class="fa-solid fa-file-pdf"></i>
+            Gerar PDF
+        </button>
+    </div>
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <table id="table-products" class="table table-hover align-middle mb-0" style="width: 100%;">
+                <thead class="table-light">
+                    <tr>
+                        <th>Código</th>
+                        <th>Nome</th>
+                        <th>Cód. barra</th>
+                        <th>Unidade</th>
+                        <th>Preço</th>
+                        <th>Preço de venda</th>
+                        <th>Ativo</th>
+                        <th>Criado em</th>
+                        <th>Atualizado em</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>101</td>
+                        <td>Arroz 5kg</td>
+                        <td>789123456001</td>
+                        <td>UN</td>
+                        <td>18.50</td>
+                        <td>22.90</td>
+                        <td>Sim</td>
+                        <td>2026-04-01</td>
+                        <td>2026-04-10</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>102</td>
+                        <td>Feijão 1kg</td>
+                        <td>789123456002</td>
+                        <td>UN</td>
+                        <td>7.80</td>
+                        <td>9.50</td>
+                        <td>Sim</td>
+                        <td>2026-04-02</td>
+                        <td>2026-04-11</td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script defer type="module" src="file:///{{ assets }}/js/list-product.js"></script>
+<script defer type="module" src="file:///{{ assets }}/js/Print.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+{% endblock %}
