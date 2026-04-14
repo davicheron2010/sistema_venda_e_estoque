@@ -1,7 +1,7 @@
 import connection from '../database/Connection.js';
 
 export default class Company {
-
+    //teste
     static table = 'company';
 
     static #columns = ['id', 'nome', 'cnpj', 'email', 'telefone', 'ativo', null];
