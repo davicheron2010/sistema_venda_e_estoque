@@ -2,7 +2,7 @@ import connection from '../database/Connection.js';
 export default class Customer {
     // Tabela no banco
     static table = 'customer';
-
+    //teste
     // Mapeamento: índice da coluna no DataTable → nome no banco
     static #columns = ['id', 'nome', 'cpf', null];
 
