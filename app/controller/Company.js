@@ -138,7 +138,7 @@ export default class Company {
             if (value === 'false' || value === false) { clean[key] = false; continue; }
             clean[key] = value;
         }
-
+        //teste
         return clean;
     }
 }
