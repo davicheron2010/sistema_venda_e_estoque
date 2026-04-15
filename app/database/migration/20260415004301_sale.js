@@ -2,10 +2,10 @@ exports.up = function (knex) {
     return knex.schema.createTable('sale', (table) => {
         table.bigIncrements('id').primary();
         table.bigInteger('id_cliente');
-        table.numeric('total_bruto', 18, 4);
-        table.numeric('total_liquido', 18, 4);
-        table.numeric('desconto', 18, 4);
-        table.numeric('acrescimo', 18, 4);
+        table.decimal('total_bruto', 18, 4);
+        table.decimal('total_liquido', 18, 4);
+        table.decimal('desconto', 18, 4);
+        table.decimal('acrescimo', 18, 4);
         table.text('observacao');
         table.timestamps(true, true);
         table
