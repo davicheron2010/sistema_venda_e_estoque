@@ -15,7 +15,8 @@
                     <ul class="dropdown-menu">
                         <li>
                             <span class="dropdown-item"
-                                onclick="api.window.open('pages/listacustomer', { title: 'Clientes' })">
+                                onclick="api.window.open('pages/listacustomer', { title: 'Clientes' })"
+                                style="cursor: pointer;">
                                 <i class="fa-solid fa-users me-1"></i>
                                 Cliente
                             </span>
@@ -25,6 +26,14 @@
                                 onclick="api.window.open('pages/listaproduct', { title: 'Produtos' })">
                                 <i class="fa-solid fa-box me-1"></i>
                                 Produto
+                            </span>
+                        </li>
+                        <li>
+                            <span class="dropdown-item"
+                                onclick="api.window.open('pages/listsale', { title: 'Vendas' })"
+                                style="cursor: pointer;">
+                                <i class="fa-solid fa-receipt me-1"></i>
+                                Venda
                             </span>
                         </li>
                     </ul>
