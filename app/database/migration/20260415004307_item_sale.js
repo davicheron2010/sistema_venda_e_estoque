@@ -5,11 +5,11 @@ exports.up = function (knex) {
         table.bigInteger('id_venda');
         table.bigInteger('id_produto');
         table.text('descricao');
-        table.numeric('quantidade', 18, 4);
-        table.numeric('total_bruto', 18, 4);
-        table.numeric('total_liquido', 18, 4);
-        table.numeric('desconto', 18, 4);
-        table.numeric('acrescimo', 18, 4);
+        table.decimal('quantidade', 18, 4);
+        table.decimal('total_bruto', 18, 4);
+        table.decimal('total_liquido', 18, 4);
+        table.decimal('desconto', 18, 4);
+        table.decimal('acrescimo', 18, 4);
         table.text('nome');
         table.timestamps(true, true);
         table
