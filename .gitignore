@@ -3,3 +3,5 @@ package-lock.json
 storage/
 /storage/
 
+/config/preload.js
+/route/route.js
