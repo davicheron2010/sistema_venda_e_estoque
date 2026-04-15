@@ -7,7 +7,9 @@ exports.up = function (knex) {
         table.text('descricao');
         table.decimal('quantidade', 18, 4);
         table.decimal('total_bruto', 18, 4);
+        table.decimal('unitario_bruto', 18, 4);
         table.decimal('total_liquido', 18, 4);
+        table.decimal('unitario_liquido', 18, 4);
         table.decimal('desconto', 18, 4);
         table.decimal('acrescimo', 18, 4);
         table.text('nome');
