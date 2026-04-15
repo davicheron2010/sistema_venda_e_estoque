@@ -16,7 +16,7 @@ export function up(knex) {
             table.timestamps(true, true);
         });
 }
-
+//teste
 export function down(knex) {
     return knex.schema.dropTable('product');
 }
