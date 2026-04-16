@@ -2,3 +2,7 @@ node_modules/
 package-lock.json
 storage/
 /storage/
+/config/env.js
+/config/preload.js
+/.gitignore
+/app/route/

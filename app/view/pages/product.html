@@ -1,0 +1,122 @@
+{% extends "layouts/main.html" %}
+{% block styles %}
+	<link rel="stylesheet" href="file:///{{ assets }}//css/product.css">
+{% endblock %}
+{% block title %}Novo Produto
+{% endblock %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-12">
+			<h2>Cadastro de Produto</h2>
+		</div>
+	</div>
+	<form id="form">
+		<input type="hidden" id="id" name="id">
+		<input type="hidden" id="action" name="action">
+		<div class="row">
+			<div class="col-8">
+				<div class="form-floating mb-3">
+					<input type="text" class="form-control" id="nome" name="nome" placeholder="example" autofocus>
+					<label for="nome">Nome do produto</label>
+				</div>
+			</div>
+			<div class="col-4">
+				<div class="form-floating mb-4">
+					<input type="text" class="form-control" id="codigo_barra" name="codigo_barra" placeholder="example">
+					<label for="codigo_barra">Código de barras do produto</label>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-4">
+				<div class="form-floating mb-3">
+					<input type="text" class="form-control" id="preco_compra" name="preco_compra" placeholder="example">
+					<label for="preco_compra">Preço de compra</label>
+				</div>
+			</div>
+			<div class="col-4">
+				<div class="form-floating mb-3">
+					<input type="text" class="form-control" id="total_imposto" name="total_imposto" placeholder="example">
+					<label for="total_imposto">Total de imposto</label>
+				</div>
+			</div>
+			<div class="col-4">
+				<div class="form-floating mb-3">
+					<input type="text" class="form-control" id="margem_lucro" name="margem_lucro" placeholder="example">
+					<label for="margem_lucro">Margem de lucro</label>
+				</div>
+			</div>
+			<div class="col-4">
+				<div class="form-floating mb-3">
+					<input type="text" class="form-control" id="custo_operacional" name="custo_operacional" placeholder="example">
+					<label for="custo_operacional">Custo operacional</label>
+				</div>
+			</div>
+			<div class="col-4">
+				<div class="form-floating mb-3">
+					<input type="text" class="form-control" id="preco_venda" name="preco_venda" placeholder="example" autofocus>
+					<label for="preco_venda">Preço de venda</label>
+				</div>
+			</div>
+			<div class="col-2">
+				<span id="total_importo_value"></span>
+			</div>
+			<div class="col-2">
+				<div class="form-floating mb-3">
+					<input type="text" class="form-control" id="unidade" name="unidade" placeholder="example" autofocus>
+					<label for="unidade">Unidade do produto</label>
+				</div>
+			</div>
+			<div class="col-2">
+				<div class="form-check form-switch">
+					<input class="form-check-input" type="checkbox" role="switch" id="ativo" name="ativo" checked>
+					<label class="form-check-label" for="ativo">Produto ativo?</label>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12">
+				<div class="resultado-row mb-2 d-none" id="resultado-row">
+					<div class="metrica-col">
+						<span class="metrica-label">Total de imposto</span>
+						<span class="metrica-valor" id="val-imposto">—</span>
+					</div>
+					<div class="metrica-col">
+						<span class="metrica-label">Custo operacional</span>
+						<span class="metrica-valor" id="val-custo">—</span>
+					</div>
+					<div class="metrica-col">
+						<span class="metrica-label">Margem de lucro</span>
+						<span class="metrica-valor" id="val-margem">—</span>
+					</div>
+					<div class="metrica-col destaque">
+						<span class="metrica-label">Preço de venda sugerido</span>
+						<span class="metrica-valor" id="val-venda">—</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12">
+				<div class="form-floating">
+					<textarea class="form-control" placeholder="Leave a comment here" id="descricao" name="descricao" style="height: 100px"></textarea>
+					<label for="descricao">Descrição do produto</label>
+				</div>
+			</div>
+		</div>
+		<div class="row mt-2">
+			<div class="col-12 mt-2">
+				<button type="button" class="btn btn-outline-success" id="insert">
+					<i class="fa-solid fa-floppy-disk"></i>
+					Salvar
+				</button>
+			</div>
+		</div>
+	</form>
+
+{% endblock %}
+
+{% block scripts %}
+	<script type="module" src="file:///{{ assets }}/js/product.js"></script>
+{% endblock %}
