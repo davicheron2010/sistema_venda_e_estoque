@@ -14,38 +14,44 @@
                 <div class="row g-3 mb-3">
                     <div class="col-12">
                         <div class="form-floating">
-                            <input type="text" class="form-control" id="nome_fantasia" name="nome_fantasia" placeholder="nome_fantasia" autofocus>
-                            <label for="nome_fantasia"><i class="fa-solid fa-building me-1"></i>Nome do Fornecedor</label>
+                            <input type="text" class="form-control" id="nome_fantasia" name="nome_fantasia"
+                                placeholder="nome_fantasia" autofocus>
+                            <label for="nome_fantasia"><i class="fa-solid fa-building me-1"></i>Nome do
+                                Fornecedor</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-12">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="razao_social" name="razao_social"
+                                placeholder="razao_social">
+                            <label for="razao_social"><i class="fa-solid fa-file-signature me-1"></i>Razão
+                                Social</label>
                         </div>
                     </div>
                 </div>
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <input type="text" class="form-control" id="'razao_social'" name="'razao_social'" placeholder="'razao_social'">
-                            <label for="'razao_social'"><i class="fa-solid fa-file-invoice me-1"></i>Razão Social</label>
+                            <input type="text" class="form-control" id="cnpj_cpf" name="cnpj_cpf"
+                                placeholder="cnpj_cpf">
+                            <label for="cnpj_cpf"><i class="fa-solid fa-id-card me-1"></i>CNPJ/CPF</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <input type="text" class="form-control" id="telefone" name="cnpj_cpf" placeholder="cnpj_cpf">
-                            <label for="cnpj_cpf"><i class="fa-solid fa-phone me-1"></i>cnpj_cpf</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row g-3 mb-3">
-                    <div class="col-12">
-                        <div class="form-floating">
-                            <input type="email" class="form-control" id="email" name="email" placeholder="Email">
-                            <label for="email"><i class="fa-solid fa-envelope me-1"></i>Email</label>
+                            <input type="text" class="form-control" id="ie_rg" name="ie_rg" placeholder="ie_rg">
+                            <label for="ie_rg"><i class="fa-solid fa-address-card me-1"></i>Inscrição Estadual/RG</label>
                         </div>
                     </div>
                 </div>
                 <div class="row g-3 mb-4">
                     <div class="col-12">
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" name="ativo" id="ativo" value="true" checked>
-                            <label class="form-check-label fw-medium" for="ativo">Empresa Ativa</label>
+                            <input class="form-check-input" type="checkbox" name="ativo" id="ativo" value="true"
+                                checked>
+                            <label class="form-check-label fw-medium" for="ativo">Fornecedor Ativo</label>
                         </div>
                     </div>
                 </div>
@@ -63,5 +69,5 @@
 </div>
 {% endblock %}
 {% block scripts %}
-<script src="file:///{{ assets }}/js/company.js"></script>
+<script src="file:///{{ assets }}/js/supplier.js"></script>
 {% endblock %}

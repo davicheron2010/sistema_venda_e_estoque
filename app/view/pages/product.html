@@ -1,0 +1,124 @@
+{% extends "layouts/main.html" %}
+{% block title %}{{ action == 'edit' and 'Editar Produto' or 'Novo Produto' }}{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center gap-2 mb-4">
+        <i class="fa-solid fa-truck fa-lg text-success"></i>
+        <h4 class="mb-0 fw-semibold">{{ action == 'edit' and 'Editar Produto' or 'Novo Produto' }}</h4>
+    </div>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <form id="form">
+                <input type="hidden" id="id" name="id">
+                <input type="hidden" id="action" name="action">
+                <div class="row">
+                    <div class="col-8">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="nome" name="nome" placeholder="example"
+                                autofocus>
+                            <label for="nome">Nome do produto</label>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-floating mb-4">
+                            <input type="text" class="form-control" id="codigo_barra" name="codigo_barra"
+                                placeholder="example" autofocus>
+                            <label for="codigo_barra">Código de barras do produto</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="preco_compra" name="preco_compra"
+                                placeholder="example" autofocus>
+                            <label for="preco_compra">Preço de compra</label>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="preco_venda" name="preco_venda"
+                                placeholder="example" autofocus>
+                            <label for="preco_venda">Preço de venda</label>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="unidade" name="unidade" placeholder="unidade"
+                                autofocus>
+                            <label for="unidade">Unidade do produto</label>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="total_imposto" name="total_imposto"
+                                placeholder="total_imposto" autofocus>
+                            <label for="total_imposto">total_imposto</label>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="margem_lucro" name="margem_lucro"
+                                placeholder="margem_lucro" autofocus>
+                            <label for="margem_lucro"> margem_lucro</label>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="custo_operacional" name="custo_operacional"
+                                placeholder="custo_operacional" autofocus>
+                            <label for="custo_operacional">custo_operacional</label>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="valor_venda_sugerido"
+                                name="valor_venda_sugerido" placeholder="valor_venda_sugerido" autofocus>
+                            <label for="valor_venda_sugerido">valor_venda_sugerido</label>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="preco_venda" name="preco_venda"
+                                placeholder="preco_venda" autofocus>
+                            <label for="preco_venda">Preço de Venda</label>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="ativo" name="ativo"
+                                checked>
+                            <label class="form-check-label" for="ativo">Produto ativo?</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <textarea class="form-control" placeholder="Leave a comment here" id="descricao"
+                                name="descricao" style="height: 100px"></textarea>
+                            <label for="descricao">Descrição do produto</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12 mt-2">
+                        <button type="button" class="btn btn-outline-success" id="insert">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Salvar
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+<script src="file:///{{ assets }}/js/product.js"></script>
+{% endblock %}

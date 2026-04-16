@@ -1,9 +1,12 @@
 import connection from '../database/Connection.js';
+
+
+
 export default class Product {
     // Tabela no banco
     static table = 'product';
     // Mapeamento: índice da coluna no DataTable → nome no banco
-    static #columns = ['id', 'nome', 'codigo_barra', 'unidade', 'preco_compra', 'total_imposto','margem_lucro', 'custo_operacional','valor_venda_sugerido', 'preco_venda','descricao','ativo','excluido', null];
+    static #columns = ['id', 'nome', 'codigo_barra', 'unidade', 'preco_compra', 'total_imposto', 'margem_lucro', 'custo_operacional', 'valor_venda_sugerido', 'preco_venda', 'descricao', 'ativo', 'excluido', null];
     // Colunas pesquisáveis pelo termo de busca
     static #searchable = ['nome', 'codigo_barra', 'unidade', 'descricao', 'preco_compra', 'preco_venda'];
     //Implementamos a pesquisa completa para o produto
