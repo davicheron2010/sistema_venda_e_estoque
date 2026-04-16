@@ -4,7 +4,5 @@ storage/
 /storage/
 /config/preload.js
 /route/route.js
-app/database/migration/20260415004301_sale.js
 app/route/route.js
 app/config/preload.js
-app/database/migration/20260415004307_item_sale.js
