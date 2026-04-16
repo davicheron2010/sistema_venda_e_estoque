@@ -1,7 +1,8 @@
 exports.up = async function (knex) {
-  await knex.schema.createTable('installment_sale', (table) => {
+  await knex.schema.createTable('installment_sale_purchase', (table) => {
     table.bigIncrements('id').notNullable().primary();
     table.bigInteger('id_sale').notNullable();
+    table.bigInteger('id_purchase').notNullable();
     table.bigInteger('id_installment').notNullable();
     table.bigInteger('id_payment_terms').notNullable();
     table.integer('total_parcelas').notNullable();
@@ -19,7 +20,11 @@ exports.up = async function (knex) {
       .references('id')
       .inTable('sale')
       .onDelete('CASCADE');
-
+    table
+      .foreign('id_purchase')
+      .references('id')
+      .inTable('purchase')
+      .onDelete('CASCADE');
     table
       .foreign('id_installment')
       .references('id')
@@ -35,5 +40,5 @@ exports.up = async function (knex) {
 };
 
 exports.down = async function (knex) {
-  await knex.schema.dropTableIfExists('installment_sale');
+  await knex.schema.dropTableIfExists('installment_sale_purchase');
 };
