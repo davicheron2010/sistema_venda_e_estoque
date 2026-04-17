@@ -81,18 +81,18 @@ document.addEventListener('DOMContentLoaded', function () {
             unitPriceInput.value = parseFloat(data.preco).toFixed(2);
         }
         // Move o foco para a quantidade
-        const qtyInput = document.getElementById('quantidade') || document.getElementById('quantidade');
+        const qtyInput = document.getElementById('quantidade') || document.getElementById('quantity');
         if (qtyInput) qtyInput.focus();
     });
 }
     /**
      * ─── Gerenciamento da Tabela de Itens ────────────────────────────────────────
      */
-    function addItemToTable({ id, nome, supplier, grupo, quantidade, unitPrice }) {
+    function addItemToTable({ id, nome, supplier, grupo, quantity, unitPrice }) {
         const emptyRow = document.getElementById('empty-row');
         if (emptyRow) emptyRow.remove();
 
-        const total = (quantidade * unitPrice).toFixed(2);
+        const total = (quantity * unitPrice).toFixed(2);
         const row   = document.createElement('tr');
 
         row.dataset.productId = id; // Guardamos o ID no dataset para o loop de finalização
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <td><small class="text-muted">${supplier}</small></td>
             <td><small class="text-muted">${grupo}</small></td>
             <td class="text-end">
-                <input type="number" class="form-control form-control-sm text-end qty-input" value="${quantidade}" min="1" style="width: 80px; display: inline-block;">
+                <input type="number" class="form-control form-control-sm text-end qty-input" value="${quantity}" min="1" style="width: 80px; display: inline-block;">
             </td>
             <td class="text-end">
                 <input type="number" class="form-control form-control-sm text-end price-input" value="${unitPrice}" min="0" step="0.01" style="width: 110px; display: inline-block;">
@@ -196,23 +196,23 @@ document.addEventListener('DOMContentLoaded', function () {
     itemForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const selected = $('#product-id').select2('data')[0];
-        const quantidade = parseFloat(document.getElementById('quantidade').value);
+        const quantity = parseFloat(document.getElementById('quantity').value);
         const unitPrice = parseFloat(document.getElementById('unit-price').value);
 
         if (!selected || !selected.id) return alert('Selecione um produto.');
-        if (isNaN(quantidade) || quantidade <= 0) return alert('Informe uma quantidade válida.');
+        if (isNaN(quantity) || quantity <= 0) return alert('Informe uma quantidade válida.');
 
         addItemToTable({ 
             id: selected.id, 
             nome: selected.nome, 
             supplier: selected.supplier, 
             grupo: selected.grupo, 
-            quantidade, 
+            quantity, 
             unitPrice 
         });
 
         // Limpa campos de inserção
-        document.getElementById('quantidade').value = '';
+        document.getElementById('quantity').value = '';
         document.getElementById('unit-price').value = '';
         $('#product-id').val(null).trigger('change');
     });
@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Montando os itens com id_produto (conforme seu banco)
         const items = Array.from(rows).map(row => ({
             id_produto: row.dataset.productId,
-            quantidade:   parseFloat(row.querySelector('.qty-input').value),
+            quantity:   parseFloat(row.querySelector('.qty-input').value),
             unit_price: parseFloat(row.querySelector('.price-input').value),
         }));
 
