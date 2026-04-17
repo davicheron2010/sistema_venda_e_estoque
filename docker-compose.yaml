@@ -2,7 +2,7 @@ services:
   # Serviço do banco de dados PostgreSQL
   postgres:
     # Imagem oficial do PostgreSQL baseada em Alpine Linux
-    image: postgres:17-alpine
+    image: postgres:18.3-alpine3.23
     # Nome fixo do container do banco
     container_name: app_postgres
     restart: unless-stopped
@@ -19,7 +19,7 @@ services:
     # Volumes persistentes e scripts de inicialização
     volumes:
       # Volume nomeado para persistir os dados do banco
-      - ./storage/pgdata:/var/lib/postgresql/data
+      - ./storage/pgdata:/var/lib/postgresql/18/docker
       # Script SQL executado automaticamente na primeira inicialização
       - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:

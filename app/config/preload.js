@@ -14,6 +14,9 @@ contextBridge.exposeInMainWorld('api', {
         get(key) { return ipcRenderer.invoke('temp:get', key); },
     },
     product: {
+        insert(data) { return ipcRenderer.invoke('product:insert', data); },
+        update(id, data) { return ipcRenderer.invoke('product:update', id, data); } ,
+        delete(id) { return ipcRenderer.invoke('product:delete', id); },
         find(where) { return ipcRenderer.invoke('product:find', where); },
         findById(id) { return ipcRenderer.invoke('product:findById', id); },
         onReload(callback) {

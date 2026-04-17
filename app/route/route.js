@@ -52,7 +52,7 @@ ipcMain.handle('temp:get', (_e, key) => {
     return data;
 });
 //Product
-ipcMain.handle('product:insert', async (_e, data) => {
+   ipcMain.handle('product:insert', async (_e, data) => {
     const result = await Product.insert(data);
     if (result.status) broadcastReload('product:reload');
     return result;
