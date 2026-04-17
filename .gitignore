@@ -1,8 +1,0 @@
-node_modules/
-package-lock.json
-storage/
-/storage/
-/config/preload.js
-/route/route.js
-app/route/route.js
-app/config/preload.js
