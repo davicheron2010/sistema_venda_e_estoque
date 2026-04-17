@@ -22,9 +22,8 @@ export default class Purchase {
                 // 1. Inserir o cabeçalho da Compra na tabela 'purchase'
                 const [inserted] = await transaction(Purchase.table).insert({
                     id_fornecedor: data.id_fornecedor,
-                    status:        data.estado_compra || 'EM_ANDAMENTO',
-                    observation:   data.observacao || '',
-                    total:         data.total || 0,
+                    observacao:   data.observacao || '',
+                    total_bruto:   data.total_bruto || 0,
                     created_at:    new Date(),
                     updated_at:    new Date()
                 }).returning('id');
@@ -36,13 +35,13 @@ export default class Purchase {
                 const itensParaInserir = data.items.map(item => ({
                     id_compra:  purchaseId,      // FK para a compra que acabamos de criar
                     id_produto: item.id_produto, // FK vinda do dataset.productId do JS
-                    quantity:   item.quantity,
-                    unit_price: item.unit_price,
-                    total:      parseFloat((item.quantity * item.unit_price).toFixed(2))
+                    quantidade:   item.quantidade,
+                    unitario_bruto: item.unitario_bruto,
+                    total_bruto:      parseFloat((item.quantidade * item.unitario_bruto).toFixed(2))
                 }));
 
                 // 3. Inserir os itens na tabela 'purchase_item'
-                await transaction('purchase_item').insert(itensParaInserir);
+                await transaction('item_purchase').insert(itensParaInserir);
 
                 // Se chegou aqui sem erros, grava definitivamente no banco
                 await transaction.commit();

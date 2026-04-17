@@ -5,7 +5,9 @@ exports.up = async function (knex) {
     table.bigInteger('id_produto').nullable();
     table.decimal('quantidade', 18, 4).nullable();
     table.decimal('total_bruto', 18, 4).nullable();
+    table.decimal('unitario_bruto', 18, 4);
     table.decimal('total_liquido', 18, 4).nullable().comment('Valor a ser pago produto.');
+    table.decimal('unitario_liquido', 18, 4);
     table.decimal('desconto', 18, 4).nullable();
     table.decimal('acrescimo', 18, 4).nullable();
     table.text('nome').nullable();
