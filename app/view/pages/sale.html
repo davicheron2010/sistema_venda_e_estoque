@@ -7,7 +7,7 @@
     <div class="d-flex justify-content-between align-items-center">
         <div>
             <h1 class="h3">Venda</h1>
-            <p class="text-muted">Adicione itens à venda, defina a condição de pagamento e acompanhe a totalização.</p>
+            <p class="text-muted">Gerencie a saída de produtos e clientes.</p>
         </div>
         <span class="badge bg-primary">Status: <strong id="sale-status">Em edição</strong></span>
     </div>
@@ -15,53 +15,136 @@
 
 <div class="col-12">
     <div class="row gy-4">
-        <div class="col-lg-7">
+        <div class="col-lg-9">
             <div class="card shadow-sm mb-4">
-                <div class="card-body text-center">
-                    <h2 class="h5 mb-0">Adicionar itens à venda</h2>
-                    <p class="text-muted small mb-3">Clique no botão abaixo para adicionar um novo item</p>
-                    <button type="button" class="btn btn-success btn-lg" id="btn-open-form">
-                        <i class="fas fa-plus-circle me-2"></i>Adicionar item
-                    </button>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Cliente</label>
+                            <select class="form-select" id="id_cliente" name="id_cliente">
+                                <option value="">Selecione um cliente...</option>
+                                <!-- Populado dinamicamente via sale.js -->
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Estado da venda</label>
+                            <select class="form-select" id="estado_venda" name="estado_venda">
+                                <option value="EM_ANDAMENTO">Em andamento</option>
+                                <option value="FINALIZADA">Finalizada</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Observação</label>
+                            <textarea class="form-control" id="observacao" name="observacao" rows="2"
+                                placeholder="Observações sobre a venda..."></textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="card shadow-sm mt-4">
+            <div class="card shadow-sm mb-4 border-primary">
+                <div class="card-header bg-light">
+                    <h2 class="h6 mb-0 text-primary"><i class="bi bi-plus-circle me-1"></i> Adicionar Item</h2>
+                </div>
                 <div class="card-body">
-                    <h2 class="h5 mb-3">Itens da venda</h2>
+                    <form id="item-sale-form">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="product-id" class="form-label small fw-bold">Produto</label>
+                                <!-- Ajustado id para id_produto conforme migration -->
+                                <select id="id_produto" name="id_produto" class="form-select w-100" required>
+                                    <option value="">Buscar produto...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="quantity" class="form-label small fw-bold">Quantidade</label>
+                                <!-- step para aceitar decimais da migration -->
+                                <input type="number" id="quantidade" class="form-control" min="0.0001" step="0.0001"
+                                    required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="unit-price" class="form-label small fw-bold">Preço Unitário</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="number" id="unitario_liquido" class="form-control" step="0.01" min="0"
+                                        required>
+                                </div>
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="bi bi-plus-lg me-1"></i> Inserir na Lista
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="h5 mb-3">Itens da Venda</h2>
                     <div class="table-responsive">
                         <table class="table table-hover align-middle" id="sale-items-table">
                             <thead>
                                 <tr>
                                     <th>Produto</th>
+                                    <!-- Mantido colunas visuais, mas no JS você deve tratar os dados da migration -->
                                     <th>Fornecedor</th>
                                     <th>Grupo</th>
-                                    <th class="text-end">Quantidade</th>
-                                    <th class="text-end">Preço unit.</th>
+                                    <th class="text-end">Qtd</th>
+                                    <th class="text-end">Unit.</th>
                                     <th class="text-end">Total</th>
                                     <th class="text-center">Ações</th>
                                 </tr>
                             </thead>
-                            <tbody></tbody>
+                            <tbody>
+                                <tr id="empty-row">
+                                    <td colspan="7" class="text-center text-muted py-4">Nenhum item adicionado.</td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-5">
+        <div class="col-lg-3" style="position: sticky; top: 1rem; align-self: flex-start;">
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
-                    <h2 class="h5 mb-3">Resumo da venda</h2>
+                    <h2 class="h5 mb-3">Resumo da Venda</h2>
                     <dl class="row mb-0">
                         <dt class="col-7">Subtotal</dt>
-                        <dd class="col-5 text-end">R$ <span id="sale-subtotal">0.00</span></dd>
+                        <!-- ID para total_bruto da migration -->
+                        <dd class="col-5 text-end">R$ <span id="total_bruto">0.00</span></dd>
 
                         <dt class="col-7">Desconto</dt>
-                        <dd class="col-5 text-end">R$ <span id="sale-discount">0.00</span></dd>
+                        <dd class="col-5 text-end">
+                            <div class="input-group input-group-sm justify-content-end"
+                                style="max-width: 140px; margin-left: auto;">
+                                <span class="input-group-text">R$</span>
+                                <!-- ID para desconto da migration -->
+                                <input type="number" id="desconto" class="form-control text-end" value="0.00" min="0"
+                                    step="0.01">
+                            </div>
+                        </dd>
 
-                        <dt class="col-7">Total</dt>
-                        <dd class="col-5 text-end fw-bold">R$ <span id="sale-total">0.00</span></dd>
+                        <dt class="col-7 pt-2">Acréscimo</dt>
+                        <dd class="col-5 text-end pt-2">
+                            <div class="input-group input-group-sm justify-content-end"
+                                style="max-width: 140px; margin-left: auto;">
+                                <span class="input-group-text">R$</span>
+                                <!-- Adicionado campo acrescimo da migration -->
+                                <input type="number" id="acrescimo" class="form-control text-end" value="0.00" min="0"
+                                    step="0.01">
+                            </div>
+                        </dd>
+
+                        <dt class="col-7 pt-2 border-top">Total</dt>
+                        <!-- ID para total_liquido da migration -->
+                        <dd class="col-5 text-end pt-2 border-top fw-bold fs-5">R$ <span id="total_liquido">0.00</span>
+                        </dd>
                     </dl>
                 </div>
             </div>
@@ -79,8 +162,8 @@
                         </select>
                     </div>
                     <div id="installment-list"></div>
-                    <div class="mt-3">
-                        <span class="d-inline-block fw-semibold">Diferença:</span>
+                    <div class="mt-3 d-flex align-items-center gap-2">
+                        <span class="fw-semibold">Diferença:</span>
                         <span id="installment-difference" class="badge bg-secondary">R$ 0.00</span>
                     </div>
                 </div>
@@ -88,49 +171,16 @@
 
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h2 class="h5 mb-3">Ações</h2>
-                    <button id="finalize-sale" class="btn btn-primary w-100 mb-2">Finalizar venda</button>
-                    <button id="clear-sale" class="btn btn-outline-secondary w-100">Limpar venda</button>
+                    <button id="finalize-sale" class="btn btn-success w-100 mb-2 py-2">
+                        <i class="bi bi-check-lg me-1"></i> Finalizar Venda
+                    </button>
+                    <button id="clear-sale" class="btn btn-outline-danger w-100">
+                        <i class="bi bi-trash me-1"></i> Limpar Tudo
+                    </button>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
-
-<!-- Modal para adicionar item -->
-<div class="modal fade" id="itemModal" tabindex="-1" aria-labelledby="itemModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="itemModalLabel">Adicionar Item à Venda</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="item-sale-form">
-                    <div class="mb-3">
-                        <label for="product-select" class="form-label">Produto</label>
-                        <select id="product-select" class="form-select" required>
-                            <option value="">Selecione um produto</option>
-                            <!-- Opções serão carregadas dinamicamente -->
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="quantity" class="form-label">Quantidade</label>
-                        <input type="number" id="quantity" class="form-control" min="1" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="unit-price" class="form-label">Preço Unitário</label>
-                        <input type="number" id="unit-price" class="form-control" step="0.01" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Adicionar Item</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-{% endblock %}
-
-{% block scripts %}
-<script src="file:///{{ assets }}/components/sale.js"></script>
 {% endblock %}

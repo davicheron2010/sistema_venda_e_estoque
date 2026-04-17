@@ -1,4 +1,6 @@
-const table = Datatables.SetTable('#table-customers', [
+import { Datatables } from "../components/Datatables.js";
+
+Datatables.SetTable('#table-customers', [
     { data: 'id', className: 'text-center' },
     { data: 'nome' },
     { data: 'cpf', defaultContent: '-' },
