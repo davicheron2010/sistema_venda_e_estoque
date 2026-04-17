@@ -16,17 +16,18 @@
     
     <div class="row g-4 p-3 row-cols-1 row-cols-md-3 row-cols-lg-5">
         <div class="col">
-            <div class="small-box card-purchase shadow-sm" onclick="api.window.open('pages/purchase', { title: 'Clientes' })">
+            <div class="small-box card-purchase shadow-sm" onclick="api.window.open('pages/purchase', { title: 'Compras' })">
                 <div class="inner">
                     <h3 id="count-purchase">0</h3>
-                    <p>purchase</p>
+                    <p>Compras</p>
                 </div>
                 <div class="icon">
-                    <i class="fa-solid fa-user-group"></i>
+                    <i class="fa-solid fa-cart-shopping"></i>
                 </div>
                 <a href="#" class="small-box-footer">Mais informações <i class="fa-solid fa-arrow-right ms-1"></i></a>
             </div>
         </div>
+
         <div class="col">
             <div class="small-box card-empresas shadow-sm" onclick="api.window.open('pages/listacompany', { title: 'Empresas' })">
                 <div class="inner">
@@ -35,6 +36,32 @@
                 </div>
                 <div class="icon">
                     <i class="fa-solid fa-industry"></i>
+                </div>
+                <a href="#" class="small-box-footer">Mais informações <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="small-box card-produtos shadow-sm" onclick="api.window.open('pages/list-product', { title: 'Produtos' })">
+                <div class="inner">
+                    <h3 id="count-produtos">0</h3>
+                    <p>Produtos</p>
+                </div>
+                <div class="icon">
+                    <i class="fa-solid fa-box"></i>
+                </div>
+                <a href="#" class="small-box-footer">Mais informações <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="small-box card-fornecedores shadow-sm" onclick="api.window.open('pages/list-supplier', { title: 'Fornecedores' })">
+                <div class="inner">
+                    <h3 id="count-fornecedores">0</h3>
+                    <p>Fornecedores</p>
+                </div>
+                <div class="icon">
+                    <i class="fa-solid fa-truck"></i>
                 </div>
                 <a href="#" class="small-box-footer">Mais informações <i class="fa-solid fa-arrow-right ms-1"></i></a>
             </div>

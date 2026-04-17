@@ -14,27 +14,30 @@ export default class Purchase {
             try {
                 const [inserted] = await transaction(Purchase.table).insert({
                     id_fornecedor: data.id_fornecedor,
-                    estado_compra: data.estado_compra || 'EM_ANDAMENTO',  
-                    observacao:    data.observacao || '',
-                    total_bruto:   data.total_bruto || 0,                  
-                    total_liquido: data.total_liquido || 0,               
-                    desconto:      data.desconto || 0,                     
-                    acrescimo:     data.acrescimo || 0,                    
-                    created_at:    new Date(),
-                    updated_at:    new Date()
+                    estado_compra: data.estado_compra || 'RECEBIDO',
+                    observacao: data.observacao || '',
+                    total_bruto: data.total_bruto || 0,
+                    total_liquido: data.total_liquido || 0,
+                    desconto: data.desconto || 0,
+                    acrescimo: data.acrescimo || 0,
+                    created_at: new Date(),
+                    updated_at: new Date()
                 }).returning('id');
 
                 const purchaseId = typeof inserted === 'object' ? inserted.id : inserted;
 
                 const itensParaInserir = data.items.map(item => ({
-                    id_compra:      purchaseId,
-                    id_produto:     item.id_produto,
-                    quantidade:     item.quantidade,
+                    id_compra: purchaseId,
+                    id_produto: item.id_produto,
+                    quantidade: item.quantidade,
                     unitario_bruto: item.unitario_bruto,
-                    total: parseFloat((item.quantidade * item.unitario_bruto).toFixed(2))
+                    total_bruto: parseFloat((item.quantidade * item.unitario_bruto).toFixed(2)),
+                    total_liquido: parseFloat((item.quantidade * item.unitario_bruto).toFixed(2)),
+                    created_at: new Date(),
+                    updated_at: new Date()
                 }));
 
-                await transaction('purchase_item').insert(itensParaInserir);
+                await transaction('item_purchase').insert(itensParaInserir);
                 await transaction.commit();
 
                 return { status: true, msg: 'Compra registrada com sucesso!', id: purchaseId };

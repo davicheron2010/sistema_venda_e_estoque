@@ -4,10 +4,10 @@ export default class Supplier {
     static table = 'supplier';
 
     // 🔹 Colunas do DataTable
-    static #columns = ['id', 'nome_fantasia', 'sobrenome_razao', 'cpf_cnpj', 'rg_ie'];
+    static #columns = ['id', 'nome_fantasia', 'sobrenome_razao', 'cnpj_cpf', 'ie_rg', 'ativo', null];
 
     // 🔹 Campos pesquisáveis
-    static #searchable = ['nome_fantasia', 'sobrenome_razao', 'cpf_cnpj', 'rg_ie'];
+    static #searchable = ['nome_fantasia', 'sobrenome_razao', 'cnpj_cpf', 'ie_rg', 'ativo', null];
 
     // 🔹 INSERT
     static async insert(data) {

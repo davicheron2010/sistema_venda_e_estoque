@@ -5,10 +5,10 @@ export default class Product {
     static table = 'product';
 
     // Mapeamento: índice da coluna (DataTable) → nome no banco
-    static #columns = ['id', 'nome', 'codigo_barra', 'unidade', 'preco_compra', 'preco_venda', 'ativo', null];
+    static #columns = ['id', 'nome', 'codigo_barra', 'grupo',  'unidade', 'preco_compra', 'preco_venda', 'ativo', null];
 
     // Colunas pesquisáveis pelo termo de busca
-    static #searchable = ['nome', 'codigo_barra', 'unidade'];
+    static #searchable = ['nome', 'codigo_barra', 'grupo', 'unidade'];
 
     /**
      * Pesquisa de produtos (Compatível com Select2 e DataTables)

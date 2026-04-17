@@ -31,11 +31,13 @@
               <select class="form-select" id="estado_compra" name="estado_compra">
                 <option value="EM_ANDAMENTO">Em andamento</option>
                 <option value="RECEBIDO">Recebido</option>
+                <option value="CONCLUIDO">Concluído</option>
               </select>
             </div>
           </div>
         </div>
       </div>
+
       <div class="card shadow-sm mb-4 border-primary">
         <div class="card-header bg-light">
           <h2 class="h6 mb-0 text-primary"><i class="bi bi-plus-circle me-1"></i> Adicionar Item</h2>
@@ -123,10 +125,7 @@
           <div class="mb-3">
             <label for="payment-condition" class="form-label">Escolha a condição</label>
             <select id="payment-condition" class="form-select">
-              <option value="avista">À vista (1x)</option>
-              <option value="parcelado2">Parcelado (2x)</option>
-              <option value="parcelado3">Parcelado (3x)</option>
-              <option value="parcelado4">Parcelado (4x)</option>
+              <option value="">Carregando...</option>
             </select>
           </div>
           <div id="installment-list"></div>

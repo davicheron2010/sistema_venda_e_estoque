@@ -11,17 +11,17 @@ contextBridge.exposeInMainWorld('api', {
     report: {
         print(stringHtml, args = {}) { return ipcRenderer.invoke('print', stringHtml, args); }
     },
-        
+
     window: {
         open(name, opts) { return ipcRenderer.invoke('window:open', name, opts); },
         openModal(name, opts) { return ipcRenderer.invoke('window:openModal', name, opts); },
         close() { return ipcRenderer.invoke('window:close'); }
     },
-    
+
     dashboard: {
         getStats() { return ipcRenderer.invoke('dashboard:getStats'); }
     },
-    
+
     temp: {
         set(key, data) { return ipcRenderer.invoke('temp:set', key, data); },
         get(key) { return ipcRenderer.invoke('temp:get', key); },
@@ -92,5 +92,14 @@ contextBridge.exposeInMainWorld('api', {
         onReload(callback) {
             ipcRenderer.on('enterprise:reload', () => callback());
         },
+    },
+    paymentTerms: {
+        insert(data) { return ipcRenderer.invoke('paymentTerms:insert', data); },
+        find(where) { return ipcRenderer.invoke('paymentTerms:find', where); },
+        findById(id) { return ipcRenderer.invoke('paymentTerms:findById', id); },
+        update(id, data) { return ipcRenderer.invoke('paymentTerms:update', id, data); },
+        delete(id) { return ipcRenderer.invoke('paymentTerms:delete', id); },
+        onReload(callback) { ipcRenderer.on('paymentTerms:reload', () => callback()); },
+        findWithInstallments(id) { return ipcRenderer.invoke('paymentTerms:findWithInstallments', id); },
     },
 });

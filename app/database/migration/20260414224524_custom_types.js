@@ -20,6 +20,7 @@ exports.up = async function (knex) {
 
     CREATE TYPE stock_movement_compra AS ENUM (
       'EM_ANDAMENTO',
+      'CONCLUIDO',
       'RECEBIDO'
     );
   `);

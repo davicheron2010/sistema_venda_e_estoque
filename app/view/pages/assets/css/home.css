@@ -1,359 +1,253 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   SMALL BOX WIDGET - ENHANCED DESIGN SYSTEM
+   SMALL BOX WIDGET — DESKIVO DESIGN SYSTEM
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-    --warning-gradient-start: #ffc107;
-    --warning-gradient-end: #ff9800;
-    --warning-dark: #ff8c00;
-    --warning-light: #ffd663;
-
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
-    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.15);
-    --shadow-hover: 0 20px 50px rgba(255, 152, 0, 0.25);
-
-    --transition-fast: 0.2s ease-out;
     --transition-smooth: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-    --transition-ease: 0.3s ease-in-out;
+    --transition-ease:   0.3s ease-in-out;
+    --transition-fast:   0.2s ease-out;
+
+    --shadow-md:   0 8px 24px rgba(0, 0, 0, 0.12);
+    --shadow-lg:   0 16px 40px rgba(0, 0, 0, 0.15);
 }
 
+/* ───────────────────────────────────────────────
+   BASE CARD
+─────────────────────────────────────────────── */
 .small-box {
     position: relative;
     overflow: hidden;
-    border-radius: 16px;
-    padding: 28px;
-    min-height: 180px;
+    border-radius: 18px;
+    padding: 26px 28px 20px;
+    min-height: 170px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     cursor: pointer;
-    transition: all var(--transition-smooth);
     border: none;
-    background: linear-gradient(135deg, var(--warning-gradient-start) 0%, var(--warning-gradient-end) 100%) !important;
     box-shadow: var(--shadow-md);
-    backdrop-filter: blur(10px);
+    transition: transform var(--transition-smooth), box-shadow var(--transition-ease);
+
+    /* fallback — sobrescrito pelas classes de cor abaixo */
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
 }
 
+/* brilho sutil no topo */
 .small-box::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background:
-        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
-        linear-gradient(135deg,
-            rgba(255, 255, 255, 0.1) 0%,
-            rgba(255, 255, 255, 0) 50%,
-            rgba(0, 0, 0, 0.05) 100%);
+    inset: 0;
+    background: linear-gradient(
+        160deg,
+        rgba(255,255,255,0.14) 0%,
+        rgba(255,255,255,0)    55%,
+        rgba(0,0,0,0.06)      100%
+    );
+    border-radius: inherit;
     pointer-events: none;
-    border-radius: 16px;
+    z-index: 1;
 }
 
+/* reflexo de hover */
 .small-box::after {
     content: '';
     position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+    inset: -60%;
+    background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 65%);
     opacity: 0;
     transition: opacity var(--transition-ease);
     pointer-events: none;
+    z-index: 1;
 }
 
 .small-box:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: var(--shadow-hover);
+    transform: translateY(-7px) scale(1.02);
 }
 
 .small-box:hover::after {
     opacity: 1;
 }
 
+/* ───────────────────────────────────────────────
+   INNER CONTENT
+─────────────────────────────────────────────── */
 .small-box .inner {
     position: relative;
     z-index: 2;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .small-box h3 {
-    font-size: 52px;
+    font-size: 50px;
     font-weight: 800;
-    letter-spacing: -1px;
+    letter-spacing: -1.5px;
+    line-height: 1;
     margin: 0;
     color: #fff;
-    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    line-height: 1;
+    text-shadow: 0 3px 10px rgba(0,0,0,0.15);
 }
 
 .small-box p {
-    font-size: 16px;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.95);
-    margin: 0;
-    letter-spacing: 0.5px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
     text-transform: uppercase;
+    color: rgba(255,255,255,0.88);
+    margin: 0;
 }
 
-.small-box-icon {
-    width: 90px;
-    height: 90px;
-    color: rgba(255, 255, 255, 0.25);
+/* ───────────────────────────────────────────────
+   ÍCONE
+─────────────────────────────────────────────── */
+.small-box .icon {
     position: absolute;
-    right: 20px;
-    top: 15px;
-    opacity: 0.7;
-    transition: all var(--transition-ease);
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+    right: 18px;
+    top: 14px;
+    font-size: 62px;
+    color: rgba(255,255,255,0.22);
+    transition: transform var(--transition-smooth), color var(--transition-ease);
+    z-index: 1;
+    line-height: 1;
 }
 
-.small-box:hover .small-box-icon {
-    transform: rotate(-15deg) scale(1.15);
-    color: rgba(255, 255, 255, 0.35);
+.small-box:hover .icon {
+    transform: rotate(-12deg) scale(1.12);
+    color: rgba(255,255,255,0.38);
 }
 
+/* ───────────────────────────────────────────────
+   RODAPÉ
+─────────────────────────────────────────────── */
 .small-box-footer {
     position: relative;
     z-index: 2;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 2px solid rgba(255, 255, 255, 0.2);
-    color: rgba(255, 255, 255, 0.85) !important;
-    font-size: 14px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255,255,255,0.22);
+    color: rgba(255,255,255,0.82) !important;
+    font-size: 13px;
     font-weight: 600;
+    letter-spacing: 0.3px;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    transition: all var(--transition-ease);
-    letter-spacing: 0.3px;
+    gap: 6px;
+    transition: color var(--transition-fast), gap var(--transition-fast);
 }
 
 .small-box-footer:hover {
     color: #fff !important;
-    padding-right: 8px;
+    gap: 10px;
 }
 
 .small-box-footer i {
-    display: inline-block;
+    font-size: 12px;
     transition: transform var(--transition-ease);
-    opacity: 0.8;
+    opacity: 0.75;
 }
 
 .small-box-footer:hover i {
-    transform: translateX(4px) rotate(45deg);
+    transform: translateX(3px);
     opacity: 1;
 }
 
-.small-box-footer::before {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: rgba(255, 255, 255, 0.6);
-    transition: width var(--transition-ease);
+/* ───────────────────────────────────────────────
+   PALETA DE CARDS
+─────────────────────────────────────────────── */
+
+/* Compras — Âmbar/Laranja */
+.card-purchase {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+.card-purchase:hover {
+    box-shadow: 0 20px 48px rgba(217, 119, 6, 0.35);
 }
 
-.small-box-footer:hover::before {
-    width: 100%;
+/* Empresas — Ciano */
+.card-empresas {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+}
+.card-empresas:hover {
+    box-shadow: 0 20px 48px rgba(8, 145, 178, 0.35);
 }
 
-.text-bg-success.small-box {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+/* Produtos — Índigo */
+.card-produtos {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+}
+.card-produtos:hover {
+    box-shadow: 0 20px 48px rgba(79, 70, 229, 0.35);
 }
 
-.text-bg-success.small-box:hover {
-    box-shadow: 0 20px 50px rgba(40, 167, 69, 0.25);
+/* Fornecedores — Esmeralda */
+.card-fornecedores {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+.card-fornecedores:hover {
+    box-shadow: 0 20px 48px rgba(5, 150, 105, 0.35);
 }
 
-.text-bg-danger.small-box {
-    background: linear-gradient(135deg, #dc3545 0%, #ff6b6b 100%) !important;
+/* Clientes — Rosa/Magenta */
+.card-clientes {
+    background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+}
+.card-clientes:hover {
+    box-shadow: 0 20px 48px rgba(219, 39, 119, 0.35);
 }
 
-.text-bg-danger.small-box:hover {
-    box-shadow: 0 20px 50px rgba(220, 53, 69, 0.25);
+/* Usuários — Violeta */
+.card-usuarios {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+.card-usuarios:hover {
+    box-shadow: 0 20px 48px rgba(124, 58, 237, 0.35);
 }
 
-.text-bg-info.small-box {
-    background: linear-gradient(135deg, #17a2b8 0%, #00bcd4 100%) !important;
-}
+/* ───────────────────────────────────────────────
+   VARIANTES SEMÂNTICAS BOOTSTRAP (compatibilidade)
+─────────────────────────────────────────────── */
+.text-bg-success.small-box    { background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important; }
+.text-bg-danger.small-box     { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important; }
+.text-bg-info.small-box       { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%) !important; }
+.text-bg-primary.small-box    { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important; }
+.text-bg-secondary.small-box  { background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%) !important; }
+.text-bg-warning.small-box    { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important; }
 
-.text-bg-info.small-box:hover {
-    box-shadow: 0 20px 50px rgba(23, 162, 184, 0.25);
-}
-
-.text-bg-primary.small-box {
-    background: linear-gradient(135deg, #007bff 0%, #5dade2 100%) !important;
-}
-
-.text-bg-primary.small-box:hover {
-    box-shadow: 0 20px 50px rgba(0, 123, 255, 0.25);
-}
-
-.text-bg-secondary.small-box {
-    background: linear-gradient(135deg, #6c757d 0%, #a6acaf 100%) !important;
-}
-
-.text-bg-secondary.small-box:hover {
-    box-shadow: 0 20px 50px rgba(108, 117, 125, 0.25);
-}
-
+/* ───────────────────────────────────────────────
+   RESPONSIVO
+─────────────────────────────────────────────── */
 @media (max-width: 768px) {
-    .small-box {
-        padding: 24px;
-        min-height: 160px;
-    }
-
-    .small-box h3 {
-        font-size: 40px;
-    }
-
-    .small-box p {
-        font-size: 14px;
-    }
-
-    .small-box-icon {
-        width: 70px;
-        height: 70px;
-        right: 12px;
-        top: 12px;
-    }
-
-    .small-box:hover {
-        transform: translateY(-4px) scale(1.01);
-    }
+    .small-box            { padding: 22px 22px 16px; min-height: 150px; }
+    .small-box h3         { font-size: 40px; }
+    .small-box .icon      { font-size: 50px; right: 14px; top: 12px; }
+    .small-box:hover      { transform: translateY(-4px) scale(1.015); }
 }
 
 @media (max-width: 576px) {
-    .small-box {
-        padding: 20px;
-        min-height: 140px;
-    }
-
-    .small-box h3 {
-        font-size: 32px;
-    }
-
-    .small-box p {
-        font-size: 12px;
-    }
-
-    .small-box-icon {
-        width: 60px;
-        height: 60px;
-        right: 8px;
-        top: 8px;
-    }
-
-    .small-box-footer {
-        font-size: 12px;
-    }
+    .small-box            { padding: 18px 18px 14px; min-height: 132px; }
+    .small-box h3         { font-size: 32px; }
+    .small-box p          { font-size: 11px; }
+    .small-box .icon      { font-size: 42px; right: 10px; top: 10px; }
+    .small-box-footer     { font-size: 12px; }
 }
 
+/* ───────────────────────────────────────────────
+   ACESSIBILIDADE
+─────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-
     .small-box,
-    .small-box h3,
-    .small-box p,
-    .small-box-icon,
-    .small-box-footer {
+    .small-box::after,
+    .small-box .icon,
+    .small-box-footer,
+    .small-box-footer i {
         transition: none !important;
     }
 }
 
 .small-box-footer:focus-visible {
-    outline: 2px solid rgba(255, 255, 255, 0.5);
-    outline-offset: 2px;
-}
-
-@media (prefers-color-scheme: dark) {
-    .small-box {
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    }
-
-    .small-box:hover {
-        box-shadow: 0 20px 50px rgba(255, 152, 0, 0.35);
-    }
-
-    .small-box {
-        min-height: 130px;
-        padding: 18px;
-    }
-
-    .small-box h3 {
-        font-size: 36px;
-    }
-
-    .small-box p {
-        font-size: 13px;
-    }
-
-    .card-produtos {
-        background: linear-gradient(135deg, #007bff 0%, #5dade2 100%) !important;
-    }
-
-    .card-produtos:hover {
-        box-shadow: 0 20px 50px rgba(0, 123, 255, 0.3) !important;
-    }
-
-    /* Clientes - Amarelo/Laranja (Padrão do seu :root) */
-    .card-clientes {
-        background: linear-gradient(135deg, var(--warning-gradient-start) 0%, var(--warning-gradient-end) 100%) !important;
-    }
-
-    .card-clientes:hover {
-        box-shadow: var(--shadow-hover) !important;
-    }
-
-    /* Fornecedores - Verde */
-    .card-fornecedores {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
-    }
-
-    .card-fornecedores:hover {
-        box-shadow: 0 20px 50px rgba(40, 167, 69, 0.3) !important;
-    }
-
-    /* Empresas - Ciano/Info */
-    .card-empresas {
-        background: linear-gradient(135deg, #17a2b8 0%, #00bcd4 100%) !important;
-    }
-
-    .card-empresas:hover {
-        box-shadow: 0 20px 50px rgba(23, 162, 184, 0.3) !important;
-    }
-
-    /* Usuários - Roxo/Indigo */
-    .card-usuarios {
-        background: linear-gradient(135deg, #6610f2 0%, #a55eea 100%) !important;
-    }
-
-    .card-usuarios:hover {
-        box-shadow: 0 20px 50px rgba(102, 16, 242, 0.3) !important;
-    }
-
-    /* Ajuste fino para os ícones dentro do seu HTML atual */
-    .small-box .icon {
-        position: absolute;
-        right: 20px;
-        top: 15px;
-        font-size: 60px;
-        color: rgba(255, 255, 255, 0.25);
-        transition: all var(--transition-smooth);
-        z-index: 1;
-    }
-
-    .small-box:hover .icon {
-        transform: rotate(-15deg) scale(1.1);
-        color: rgba(255, 255, 255, 0.4);
-    }
+    outline: 2px solid rgba(255,255,255,0.6);
+    outline-offset: 3px;
+    border-radius: 4px;
 }

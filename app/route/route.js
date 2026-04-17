@@ -4,6 +4,8 @@ import Customer from '../controller/Customer.js';
 import Product from '../controller/Product.js';
 import Supplier from '../controller/Supplier.js';
 import Purchase from '../controller/Purchase.js';
+import PaymentTerms from '../controller/PaymentTerms.js';
+import { Print } from '../mixin/Print.js';
 function getWin(event) {
     return BrowserWindow.fromWebContents(event.sender);
 }
@@ -22,7 +24,7 @@ function broadcastReload(channel) {
 // --- DASHBOARD / ESTATÍSTICAS ---
 ipcMain.handle('dashboard:getStats', async () => {
     try {
-        
+
         const productsResult = await Product.find() || {};
         const customersResult = await Customer.find() || {};
         const usersResult = await Users.find() || {};
@@ -145,7 +147,7 @@ ipcMain.handle('product:delete', async (_e, id) => {
 ipcMain.handle('product:getAll', async () => {
     const result = await Product.find() || {};
     // Retornamos apenas a lista de registros para o frontend
-    return result.data || []; 
+    return result.data || [];
 });
 
 // --- FORNECEDORES ---
@@ -240,9 +242,38 @@ ipcMain.handle('purchase:insert', async (_e, data) => {
     try {
         const result = await Purchase.insert(data);
         // Se a compra mudar estoque ou precisar recarregar outras telas:
-        if (result.status) broadcastReload('purchase:reload'); 
+        if (result.status) broadcastReload('purchase:reload');
         return result;
     } catch (error) {
         return { status: false, msg: 'Erro ao salvar compra: ' + error.message };
     }
+});
+// --- CONDIÇÕES DE PAGAMENTO ---
+ipcMain.handle('paymentTerms:insert', async (_e, data) => {
+    const result = await PaymentTerms.insert(data);
+    if (result.status) broadcastReload('paymentTerms:reload');
+    return result;
+});
+
+ipcMain.handle('paymentTerms:find', async (_e, where = {}) => {
+    return await PaymentTerms.find(where);
+});
+
+ipcMain.handle('paymentTerms:findById', async (_e, id) => {
+    return await PaymentTerms.findById(id);
+});
+
+ipcMain.handle('paymentTerms:update', async (_e, id, data) => {
+    const result = await PaymentTerms.update(id, data);
+    if (result.status) broadcastReload('paymentTerms:reload');
+    return result;
+});
+
+ipcMain.handle('paymentTerms:delete', async (_e, id) => {
+    const result = await PaymentTerms.delete(id);
+    if (result.status) broadcastReload('paymentTerms:reload');
+    return result;
+});
+ipcMain.handle('paymentTerms:findWithInstallments', async (_e, id) => {
+        return await PaymentTerms.findWithInstallments(id);
 });
