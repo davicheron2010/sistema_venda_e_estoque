@@ -1,5 +1,7 @@
 {% extends "layouts/main.html" %}
+
 {% block title %}{{ action == 'edit' and 'Editar Cliente' or 'Novo Cliente' }}{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-4">
     <div class="d-flex align-items-center gap-2 mb-4">
@@ -55,6 +57,7 @@
     </div>
 </div>
 {% endblock %}
+
 {% block scripts %}
 <script src="file:///{{ assets }}/js/customer.js"></script>
 {% endblock %}

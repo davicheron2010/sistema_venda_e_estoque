@@ -1,28 +1,28 @@
-    <!DOCTYPE html>
-    <html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt-BR">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% block title %}DESKIVO{% endblock %}</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DESKIVO{% endblock %}</title>
 
-        {% include "partial/css.html" %}
-        {% block styles %}{% endblock %}
-    </head>
+    {% include "partial/css.html" %}
+    {% block styles %}{% endblock %}
+</head>
 
-    <body>
-        <main class="container-fluid">
-            <!--Cria um bloca para o menu da aplicação -->
-            <div class="row">
-                {% block menu %}{% endblock %}
-            </div>
-            <!--Criar um bloco para o conteúdo da aplicação-->
-            <div class="row">
-                {% block content %}{% endblock %}
-            </div>
-        </main>
-        {% include "partial/script.html" %}
-        {% block scripts %}{% endblock %}
-    </body>
+<body>
+    <main class="container-fluid">
+        <!--Cria um bloca para o menu da aplicação -->
+        <div class="row">
+            {% block menu %}{% endblock %}
+        </div>
+        <!--Criar um bloco para o conteúdo da aplicação-->
+        <div class="row">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    {% include "partial/script.html" %}
+    {% block scripts %}{% endblock %}
+</body>
 
-    </html>
+</html>
