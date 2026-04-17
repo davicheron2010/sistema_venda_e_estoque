@@ -60,35 +60,35 @@
         <div class="row g-4 justify-content-center">
             
             <div class="col-6 col-md-4 col-lg-2">
-                <button id="product-button" onclick="api.window.open('pages/list-product', { title: 'Produtos' })" class="btn btn-primary w-100 dashboard-btn shadow-sm">
+                <button id="product-button" onclick="api.window.open('pages/listaproduct', { title: 'Produtos' })" class="btn btn-primary w-100 dashboard-btn shadow-sm">
                     <h3 class="display-10 fw-bold mb-4" id="count-products">{{ totalProducts | default(0) }}</h3>
                     <i class="fa-solid fa-box-open"></i>Produto
                 </button>
             </div>
             
             <div class="col-6 col-md-4 col-lg-2">
-                <button id="customer-button" onclick="api.window.open('pages/list-customer', { title: 'Clientes' })" class="btn btn-success w-100 dashboard-btn shadow-sm">
+                <button id="customer-button" onclick="api.window.open('pages/listacustomer', { title: 'Clientes' })" class="btn btn-success w-100 dashboard-btn shadow-sm">
                     <h3 class="display-10 fw-bold mb-4" id="count-customers">{{ totalCustomers | default(0) }}</h3>
                     <i class="fa-solid fa-person-walking"></i>Cliente
                 </button>
             </div>
             
             <div class="col-6 col-md-4 col-lg-2">
-                <button id="users-button" onclick="api.window.open('pages/list-purchase', { title: 'Compra' })" class="btn btn-info text-white w-100 dashboard-btn shadow-sm">
+                <button id="users-button" onclick="api.window.open('pages/listapurchase', { title: 'Compra' })" class="btn btn-info text-white w-100 dashboard-btn shadow-sm">
                     <h3 class="display-10 fw-bold mb-4" id="count-users">{{ totalUsers | default(0) }}</h3>
                     <i class="fa-solid fa-users"></i>COMPRA
                 </button>
             </div>
             
             <div class="col-6 col-md-4 col-lg-2">
-                <button id="enterprise-button" onclick="api.window.open('pages/list-enterprise', { title: 'Empresas' })" class="btn btn-warning text-dark w-100 dashboard-btn shadow-sm">
+                <button id="enterprise-button" onclick="api.window.open('pages/listaenterprise', { title: 'Empresas' })" class="btn btn-warning text-dark w-100 dashboard-btn shadow-sm">
                     <h3 class="display-10 fw-bold mb-4" id="count-enterprises">{{ totalEnterprises | default(0) }}</h3>
                     <i class="fa-solid fa-building"></i>Empresa
                 </button>
             </div>
             
             <div class="col-6 col-md-4 col-lg-2">
-                <button id="supplier-button" onclick="api.window.open('pages/list-supplier', { title: 'Fornecedores' })" class="btn btn-danger w-100 dashboard-btn shadow-sm">
+                <button id="supplier-button" onclick="api.window.open('pages/listasupplier', { title: 'Fornecedores' })" class="btn btn-danger w-100 dashboard-btn shadow-sm">
                     <h3 class="display-10 fw-bold mb-4" id="count-suppliers">{{ totalSuppliers | default(0) }}</h3>
                     <i class="fa-solid fa-dolly"></i>Fornecedor
                 </button>

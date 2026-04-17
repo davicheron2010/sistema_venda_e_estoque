@@ -3,6 +3,7 @@ export function up(knex) {
             table.bigIncrements('id').primary();
             table.text('nome').notNullable();
             table.text('codigo_barra');
+            table.text('grupo');
             table.text('unidade');
             table.decimal('preco_compra', 18, 4).defaultTo(0);
             table.decimal('total_imposto', 18, 4).defaultTo(0);
