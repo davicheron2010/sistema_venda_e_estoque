@@ -22,7 +22,7 @@ function broadcastReload(channel) {
 // --- DASHBOARD / ESTATÍSTICAS ---
 ipcMain.handle('dashboard:getStats', async () => {
     try {
-        
+
         const productsResult = await Product.find() || {};
         const customersResult = await Customer.find() || {};
         const usersResult = await Users.find() || {};
@@ -145,7 +145,7 @@ ipcMain.handle('product:delete', async (_e, id) => {
 ipcMain.handle('product:getAll', async () => {
     const result = await Product.find() || {};
     // Retornamos apenas a lista de registros para o frontend
-    return result.data || []; 
+    return result.data || [];
 });
 
 // --- FORNECEDORES ---
@@ -161,6 +161,10 @@ ipcMain.handle('supplier:find', async (_e, where = {}) => {
 
 ipcMain.handle('supplier:findById', async (_e, id) => {
     return await Supplier.findById(id);
+});
+
+ipcMain.handle('supplier:supplierSearch', async (_e, term) => {
+    return await Supplier.supplierSearch(term);
 });
 
 ipcMain.handle('supplier:update', async (_e, id, data) => {
@@ -240,7 +244,7 @@ ipcMain.handle('purchase:insert', async (_e, data) => {
     try {
         const result = await Purchase.insert(data);
         // Se a compra mudar estoque ou precisar recarregar outras telas:
-        if (result.status) broadcastReload('purchase:reload'); 
+        if (result.status) broadcastReload('purchase:reload');
         return result;
     } catch (error) {
         return { status: false, msg: 'Erro ao salvar compra: ' + error.message };

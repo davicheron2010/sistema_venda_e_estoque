@@ -64,6 +64,7 @@ contextBridge.exposeInMainWorld('api', {
         insert(data) { return ipcRenderer.invoke('supplier:insert', data); },
         find(where) { return ipcRenderer.invoke('supplier:find', where); },
         findById(id) { return ipcRenderer.invoke('supplier:findById', id); },
+        supplierSearch(term) { return ipcRenderer.invoke('supplier:supplierSearch', term); },
         update(id, data) { return ipcRenderer.invoke('supplier:update', id, data); },
         delete(id) { return ipcRenderer.invoke('supplier:delete', id); },
         getAll() { return ipcRenderer.invoke('supplier:getAll'); }, // Adicionado getAll para facilitar
