@@ -1,10 +1,29 @@
-class Datatables {
+/**
+ * Classe estática Datatables
+ * 
+ * Uso:
+ *   Datatables.SetTable('#table-customers', columns, options).getData(filter => api.customer.find(filter));
+ * 
+ * Parâmetros de SetTable:
+ *   - selector  {string}  Seletor da tabela (ex: '#table-customers')
+ *   - columns   {Array}   Definição das colunas do DataTable
+ *   - options   {Object}  (Opcional) Sobrescrever configurações padrão
+ * 
+ */
+export class Datatables {
+    //Configura a tabela e retorna um objeto com o método getData para encadear.
     static SetTable(selector, columns, options = {}) {
+export class Datatables {
+    //Configura a tabela e retorna um objeto com o método getData para encadear.
+    static SetTable(selector, columns, option = {}) {
         return {
+            //Conecta a fonte de dados e inicializa o DataTable.
             getData(apiFn) {
+                // Destrói instância anterior se existir, para evitar re-inicialização
                 if ($.fn.DataTable.isDataTable(selector)) {
                     $(selector).DataTable().destroy();
                 }
+                // Configuração padrão completa
                 const defaultConfig = {
                     paging: true,
                     lengthChange: true,
@@ -34,7 +53,12 @@ class Datatables {
                             const response = await apiFn(filter);
                             callback(response);
                         } catch (error) {
-                            callback({ draw: data?.draw, recordsTotal: 0, recordsFiltered: 0, data: [] });
+                            callback({
+                                draw: data?.draw,
+                                recordsTotal: 0,
+                                recordsFiltered: 0,
+                                data: []
+                            });
                         }
                     },
                     columns: columns,
@@ -46,9 +70,13 @@ class Datatables {
                     },
                     initComplete: function () {
                         setTimeout(() => {
+                            // Remove o label "Pesquisar"
                             const label = document.querySelector(`${selector}_wrapper .dt-search label`);
-                            if (label) label.remove();
+                            if (label) {
+                                label.remove();
+                            }
 
+                            // Ajusta a div do campo de pesquisa
                             const searchDiv = document.querySelector(`${selector}_wrapper .row > div.dt-layout-start`);
                             if (searchDiv) {
                                 searchDiv.classList.remove('col-md-auto');
@@ -56,7 +84,9 @@ class Datatables {
                             }
 
                             const divSearch = document.querySelector(`${selector}_wrapper .dt-search`);
-                            if (divSearch) divSearch.classList.add('w-100');
+                            if (divSearch) {
+                                divSearch.classList.add('w-100');
+                            }
 
                             const input = document.querySelector(`${selector}_wrapper .dt-search input`);
                             if (input) {
@@ -67,12 +97,22 @@ class Datatables {
                             }
 
                             const pageLength = document.querySelector(`${selector}_wrapper .dt-length select`);
-                            if (pageLength) pageLength.classList.add('form-select-md');
+                            if (pageLength) {
+                                pageLength.classList.add('form-select-md');
+                            }
                         }, 100);
                     }
                 };
+                // Mescla configurações padrão com as opções extras (options sobrescreve o padrão)
                 const finalConfig = { ...defaultConfig, ...options };
-                if (!options.columns) finalConfig.columns = columns;
+                // Se options tiver 'columns', usa as options; senão mantém as passadas em SetTable
+                if (!options.columns) {
+                // Mescla configurações padrão com as opções extras (option sobrescreve o padrão)
+                const finalConfig = { ...defaultConfig, ...option };
+                // Se option tiver 'columns', usa as option; senão mantém as passadas em SetTable
+                if (!option.columns) {
+                    finalConfig.columns = columns;
+                }
                 return $(selector).DataTable(finalConfig);
             }
         };
