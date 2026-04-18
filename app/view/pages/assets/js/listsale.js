@@ -1,3 +1,5 @@
+import { Datatables } from "../components/Datatables.js";
+
 const table = Datatables.SetTable('#table-sales', [
     { data: 'id', className: 'text-center' },
     { data: 'id_cliente' },
@@ -21,7 +23,7 @@ const table = Datatables.SetTable('#table-sales', [
                 </button>
             `;
         }
-    }
+    } 
 ]).getData(filter => api.Sale.find(filter));
 
 api.Sale.onReload(() => {
@@ -50,3 +52,6 @@ async function deleteSale(id) {
 function editSale(id) {
     api.window.open('pages/sale', { width: 800, height: 600, title: 'Editar Venda', id: id });
 }
+
+window.deleteSale = deleteSale;
+window.editSale = editSale;
