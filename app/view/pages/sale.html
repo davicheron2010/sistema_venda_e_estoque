@@ -16,7 +16,7 @@
 <div class="col-12">
     <div class="row gy-4">
         <div class="col-lg-9">
-            <div class="card shadow-sm mb-4">
+            <div class="card shadow-sm mb-4"> 
                 <div class="card-body">
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -26,15 +26,6 @@
                                 <!-- Populado dinamicamente via sale.js -->
                             </select>
                         </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Estado da venda</label>
-                            <select class="form-select" id="estado_venda" name="estado_venda">
-                                <option value="EM_ANDAMENTO">Em andamento</option>
-                                <option value="FINALIZADA">Finalizada</option>
-                            </select>
-                        </div>
-                        
                         <div class="col-12">
                             <label class="form-label fw-bold">Observação</label>
                             <textarea class="form-control" id="observacao" name="observacao" rows="2"
@@ -59,7 +50,7 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label for="quantity" class="form-label small fw-bold">Quantidade</label>
+                                <label for="quantidade" class="form-label small fw-bold">Quantidade</label>
                                 <!-- step para aceitar decimais da migration -->
                                 <input type="number" id="quantidade" class="form-control" min="0.0001" step="0.0001"
                                     required>
@@ -91,7 +82,7 @@
                                 <tr>
                                     <th>Produto</th>
                                     <!-- Mantido colunas visuais, mas no JS você deve tratar os dados da migration -->
-                                    <th>Fornecedor</th>
+                                    <th>Cliente</th>
                                     <th>Grupo</th>
                                     <th class="text-end">Qtd</th>
                                     <th class="text-end">Unit.</th>
@@ -149,25 +140,7 @@
                 </div>
             </div>
 
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h2 class="h5 mb-3">Condição de pagamento</h2>
-                    <div class="mb-3">
-                        <label for="payment-condition" class="form-label">Escolha a condição</label>
-                        <select id="payment-condition" class="form-select">
-                            <option value="avista">À vista (1x)</option>
-                            <option value="parcelado2">Parcelado (2x)</option>
-                            <option value="parcelado3">Parcelado (3x)</option>
-                            <option value="parcelado4">Parcelado (4x)</option>
-                        </select>
-                    </div>
-                    <div id="installment-list"></div>
-                    <div class="mt-3 d-flex align-items-center gap-2">
-                        <span class="fw-semibold">Diferença:</span>
-                        <span id="installment-difference" class="badge bg-secondary">R$ 0.00</span>
-                    </div>
-                </div>
-            </div>
+     
 
             <div class="card shadow-sm">
                 <div class="card-body">
@@ -183,4 +156,7 @@
 
     </div>
 </div>
+{% endblock %}
+{% block scripts %}
+<script type="module" src="file:///{{ assets }}/js/sale.js"></script>
 {% endblock %}
