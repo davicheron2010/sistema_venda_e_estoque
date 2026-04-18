@@ -1,8 +1,11 @@
 import { ipcMain, BrowserWindow } from 'electron';
 import Template from '../mixin/Template.js';
+import Customer from '../controller/Customer.js';
 import Product from '../controller/Product.js';
 import Supplier from '../controller/Supplier.js';
-import Purchase from '../controller/Purchase.js';
+import Company from '../controller/Company.js';
+import Sale from '../controller/Sale.js';
+import ItemSale from '../controller/itemSale.js';
 
 
 function getWin(event) {
@@ -23,7 +26,7 @@ function broadcastReload(channel) {
 // --- DASHBOARD / ESTATÍSTICAS ---
 ipcMain.handle('dashboard:getStats', async () => {
     try {
-        
+
         const productsResult = await Product.find() || {};
         const customersResult = await Customer.find() || {};
         const usersResult = await Users.find() || {};
@@ -208,34 +211,73 @@ ipcMain.handle('users:delete', async (_e, id) => {
     return result;
 });
 // --- EMPRESAS ---
-ipcMain.handle('enterprise:insert', async (_e, data) => {
-    const result = await Enterprise.insert(data);
-    if (result.status) broadcastReload('enterprise:reload');
+ipcMain.handle('company:insert', async (_e, data) => {
+    const result = await Company.insert(data);
+    if (result.status) broadcastReload('company:reload');
     return result;
 });
 
-ipcMain.handle('enterprise:find', async (_e, where = {}) => {
-    return await Enterprise.find(where);
+ipcMain.handle('company:find', async (_e, where = {}) => {
+    return await Company.find(where);
 });
 
-ipcMain.handle('enterprise:findById', async (_e, id) => {
-    return await Enterprise.findById(id);
+ipcMain.handle('company:findById', async (_e, id) => {
+    return await Company.findById(id);
 });
 
-ipcMain.handle('enterprise:update', async (_e, id, data) => {
-    const result = await Enterprise.update(id, data);
-    if (result.status) broadcastReload('enterprise:reload');
+ipcMain.handle('company:update', async (_e, id, data) => {
+    const result = await Company.update(id, data);
+    if (result.status) broadcastReload('company:reload');
     return result;
 });
 
-ipcMain.handle('enterprise:delete', async (_e, id) => {
-    const result = await Enterprise.delete(id);
-    if (result.status) broadcastReload('enterprise:reload');
+ipcMain.handle('company:delete', async (_e, id) => {
+    const result = await Company.delete(id);
+    if (result.status) broadcastReload('company:reload');
     return result;
+});
+
+ipcMain.handle('company:count', async () => {
+    return await Company.count();
 });
 // Purchase
 
 ipcMain.handle('purchase:insert', async (_e, data) => {
     console.log('Dados da Compra Recebidos:', data);
     return { status: true, msg: 'Compra registrada com sucesso!' };
+});
+
+/////  Sale
+ipcMain.handle('sale:insert', async (_e, data) => {
+    const result = await Sale.insert(data);
+    if (result.status) broadcastReload('sale:reload');
+    return result;
+});
+
+ipcMain.handle('sale:find', async (_e, where = {}) => {
+    return await Sale.find(where);
+});
+
+ipcMain.handle('sale:findById', async (_e, id) => {
+    return await Sale.findById(id);
+});
+
+ipcMain.handle('sale:update', async (_e, id, data) => {
+    const result = await Sale.update(id, data);
+    if (result.status) broadcastReload('sale:reload');
+    return result;
+});
+
+ipcMain.handle('sale:delete', async (_e, id) => {
+    const result = await Sale.delete(id);
+    if (result.status) broadcastReload('sale:reload');
+    return result;
+});
+
+ipcMain.handle('sale:count', async () => {
+    return await Sale.count();
+});
+
+ipcMain.handle('itemSale:insert', async (_e, data) => {
+    return await ItemSale.insert(data);
 });
