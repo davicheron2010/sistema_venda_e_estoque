@@ -4,7 +4,7 @@ export default class Supplier {
     static table = 'supplier';
 
     // 🔹 Colunas do DataTable
-    static #columns = ['id', 'nome_fantasia', 'razao_social', 'cnpj_cpf', 'ie_rg'];
+    static #columns = ['id', 'nome_fantasia', 'razao_social', 'cnpj_cpf', 'ie_rg',null];
 
     // 🔹 Campos pesquisáveis
     static #searchable = ['nome_fantasia', 'razao_social', 'cnpj_cpf', 'ie_rg'];

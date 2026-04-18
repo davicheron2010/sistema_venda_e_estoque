@@ -10,6 +10,7 @@ Datatables.SetTable('#table-products', [
     { data: 'codigo_barra' },
     { data: 'grupo' },
     { data: 'unidade' },
+    { data: 'estq_atual' },
     {
         data: 'preco_compra',
         render: function (data) {
@@ -48,7 +49,7 @@ Datatables.SetTable('#table-products', [
             `;
         }
     }
-]).getData(filter => api.product.find(filter));
+]).getData(filter => api.product.productSearch(filter));
 
 async function deleteProduct(id) {
     const result = await Swal.fire({

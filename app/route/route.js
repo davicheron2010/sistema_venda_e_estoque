@@ -52,7 +52,7 @@ ipcMain.handle('temp:get', (_e, key) => {
     return data;
 });
 //Product
-   ipcMain.handle('product:insert', async (_e, data) => {
+ipcMain.handle('product:insert', async (_e, data) => {
     const result = await Product.insert(data);
     if (result.status) broadcastReload('product:reload');
     return result;
@@ -60,6 +60,10 @@ ipcMain.handle('temp:get', (_e, key) => {
 
 ipcMain.handle('product:find', async (_e, where = {}) => {
     return await Product.find(where);
+});
+
+ipcMain.handle('product:productSearch', async (_e, where = {}) => {
+    return await Product.productSearch(where);
 });
 
 ipcMain.handle('product:findById', async (_e, id) => {

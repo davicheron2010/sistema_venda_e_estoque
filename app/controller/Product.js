@@ -15,9 +15,9 @@ export default class Product {
      */
     static async find(data = {}) {
         const {
-            search = '', 
+            search = '',
             term = '',
-            q = '', 
+            q = '',
             limit = 10,
             offset = 0,
             orderType = 'asc',
@@ -55,7 +55,7 @@ export default class Product {
 
             const dataQ = connection(Product.table).select('*');
             applySearch(dataQ);
-            
+
             const rows = await dataQ
                 .orderBy(orderColumn, orderDir)
                 .limit(parseInt(limit))
@@ -150,5 +150,21 @@ export default class Product {
             clean[key] = value;
         }
         return clean;
+    }
+
+    static async productSearch(data = {}) {
+        const {
+            search = '',
+            term = '',
+            q = '',
+            limit = 10,
+            offset = 0,
+            orderType = 'asc',
+            column = 0,
+            draw = 1,
+        } = data;
+
+        console.log(term);
+
     }
 }
