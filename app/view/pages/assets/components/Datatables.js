@@ -13,6 +13,9 @@
 export class Datatables {
     //Configura a tabela e retorna um objeto com o método getData para encadear.
     static SetTable(selector, columns, options = {}) {
+export class Datatables {
+    //Configura a tabela e retorna um objeto com o método getData para encadear.
+    static SetTable(selector, columns, option = {}) {
         return {
             //Conecta a fonte de dados e inicializa o DataTable.
             getData(apiFn) {
@@ -104,6 +107,10 @@ export class Datatables {
                 const finalConfig = { ...defaultConfig, ...options };
                 // Se options tiver 'columns', usa as options; senão mantém as passadas em SetTable
                 if (!options.columns) {
+                // Mescla configurações padrão com as opções extras (option sobrescreve o padrão)
+                const finalConfig = { ...defaultConfig, ...option };
+                // Se option tiver 'columns', usa as option; senão mantém as passadas em SetTable
+                if (!option.columns) {
                     finalConfig.columns = columns;
                 }
                 return $(selector).DataTable(finalConfig);
