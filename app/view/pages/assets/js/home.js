@@ -15,4 +15,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     api.supplier.onReload(() => loadCounts());
     api.product.onReload(() => loadCounts());
-});
+}); 
