@@ -1,0 +1,125 @@
+/* ================================================
+   Card de Resultado — Cálculo de Preço de Venda
+   Compatível com Bootstrap 5 + Electron 41
+   ================================================ */
+
+.resultado-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    background: rgba(0, 0, 0, 0.12);
+    border: 0.5px solid rgba(0, 0, 0, 0.18);
+    border-radius: 12px;
+    overflow: hidden;
+    font-family: 'DM Mono', 'Fira Mono', 'Courier New', monospace;
+}
+
+.metrica-col {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 1.1rem 1.25rem;
+    background: #ffffff;
+    position: relative;
+    transition: background 0.15s ease;
+}
+
+/* Barra de acento no topo — aparece no hover */
+.metrica-col::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: transparent;
+    transition: background 0.15s ease;
+}
+
+.metrica-col:hover::before {
+    background: #378ADD;
+}
+
+.metrica-col:hover {
+    background: #f7f8fa;
+}
+
+/* Coluna destaque — preço sugerido */
+.metrica-col.destaque {
+    background: #f0faf6;
+}
+
+.metrica-col.destaque::before {
+    background: #1D9E75;
+}
+
+/* Labels */
+.metrica-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #888780;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Valores */
+.metrica-valor {
+    font-size: 22px;
+    font-weight: 400;
+    color: #2c2c2a;
+    letter-spacing: -0.02em;
+    line-height: 1;
+}
+
+/* Destaque: label e valor em verde */
+.metrica-col.destaque .metrica-label {
+    color: #0F6E56;
+}
+
+.metrica-col.destaque .metrica-valor {
+    font-size: 24px;
+    font-weight: 500;
+    color: #0F6E56;
+}
+
+/* ================================================
+   Dark mode — detectado automaticamente pelo SO
+   ================================================ */
+@media (prefers-color-scheme: dark) {
+    .resultado-row {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .metrica-col {
+        background: #1e1e1c;
+    }
+
+    .metrica-col:hover {
+        background: #252523;
+    }
+
+    .metrica-col.destaque {
+        background: #0d2a22;
+    }
+
+    .metrica-label {
+        color: #888780;
+    }
+
+    .metrica-valor {
+        color: #e8e6de;
+    }
+
+    .metrica-col.destaque .metrica-label {
+        color: #5DCAA5;
+    }
+
+    .metrica-col.destaque .metrica-valor {
+        color: #9FE1CB;
+    }
+}
+

@@ -10,6 +10,7 @@ Datatables.SetTable('#table-products', [
     { data: 'codigo_barra' },
     { data: 'grupo' },
     { data: 'unidade' },
+    { data: 'estq_atual' },
     {
         data: 'preco_compra',
         render: function (data) {
@@ -48,6 +49,7 @@ Datatables.SetTable('#table-products', [
             `;
         }
     }
+]).getData(filter => api.product.productSearch(filter));
 ]).getData(filter => api.product.find(filter));
 
 async function deleteProduct(id) {
@@ -159,6 +161,7 @@ async function printProduct(id) {
                             <th>ID</th>
                             <th>Nome</th>
                             <th>Código de Barra</th>
+                            <th>Grupo</th>
                             <th class="text-center">Unidade</th>
                             <th class="text-right">Preço Compra</th>
                             <th class="text-right">Preço Venda</th>

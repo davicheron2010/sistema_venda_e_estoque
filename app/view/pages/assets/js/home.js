@@ -3,6 +3,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function loadCounts() {
         const [totalClientes, totalEmpresas] = await Promise.all([
+            safe(() => api.supplier.count()),
+            safe(() => api.product.count()),
+        ]);
+
+        document.getElementById('count-fornecedore').textContent = totalfornecedor;
+        document.getElementById('count-produto').textContent = totalproduto;
             safe(() => api.customer.count()),
             safe(() => api.company.count()),
         ]);
@@ -13,6 +19,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await loadCounts();
 
+    api.supplier.onReload(() => loadCounts());
+    api.product.onReload(() => loadCounts());
+}); 
     api.customer.onReload(() => loadCounts());
     api.company.onReload(() => loadCounts());
 });
