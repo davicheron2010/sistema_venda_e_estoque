@@ -237,16 +237,26 @@ ipcMain.handle('enterprise:delete', async (_e, id) => {
 });
 // Purchase
 
-// No seu route.js
+// --- COMPRAS (PURCHASE) ---
 ipcMain.handle('purchase:insert', async (_e, data) => {
     try {
         const result = await Purchase.insert(data);
-        // Se a compra mudar estoque ou precisar recarregar outras telas:
         if (result.status) broadcastReload('purchase:reload');
         return result;
     } catch (error) {
         return { status: false, msg: 'Erro ao salvar compra: ' + error.message };
     }
+});
+
+// Adicione estes dois:
+ipcMain.handle('purchase:find', async (_e, where = {}) => {
+    return await Purchase.find(where);
+});
+
+ipcMain.handle('purchase:delete', async (_e, id) => {
+    const result = await Purchase.delete(id);
+    if (result.status) broadcastReload('purchase:reload');
+    return result;
 });
 // --- CONDIÇÕES DE PAGAMENTO ---
 ipcMain.handle('paymentTerms:insert', async (_e, data) => {

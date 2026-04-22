@@ -12,6 +12,7 @@ export default class Purchase {
             const transaction = await connection.transaction();
 
             try {
+                // 1. Inserir a Compra (Cabeçalho)
                 const [inserted] = await transaction(Purchase.table).insert({
                     id_fornecedor: data.id_fornecedor,
                     estado_compra: data.estado_compra || 'RECEBIDO',
@@ -24,20 +25,29 @@ export default class Purchase {
                     updated_at: new Date()
                 }).returning('id');
 
+                // Garante que pegamos o ID corretamente (Postgres retorna objeto, SQLite/MySQL retorna valor)
                 const purchaseId = typeof inserted === 'object' ? inserted.id : inserted;
 
-                const itensParaInserir = data.items.map(item => ({
-                    id_compra: purchaseId,
-                    id_produto: item.id_produto,
-                    quantidade: item.quantidade,
-                    unitario_bruto: item.unitario_bruto,
-                    total_bruto: parseFloat((item.quantidade * item.unitario_bruto).toFixed(2)),
-                    total_liquido: parseFloat((item.quantidade * item.unitario_bruto).toFixed(2)),
-                    created_at: new Date(),
-                    updated_at: new Date()
-                }));
+                // 2. Preparar os Itens para inserção em lote (Bulk Insert)
+                const itensParaInserir = data.items.map(item => {
+                    const totalItem = parseFloat((item.quantidade * item.unitario_bruto).toFixed(4));
+                    return {
+                        id_compra: purchaseId,
+                        id_produto: item.id_produto,
+                        nome: item.produto_nome || null, // Salva o nome histórico conforme sua migration
+                        quantidade: item.quantidade,
+                        unitario_bruto: item.unitario_bruto,
+                        total_bruto: totalItem,
+                        unitario_liquido: item.unitario_bruto, // Se não houver desconto por item
+                        total_liquido: totalItem,
+                        created_at: new Date(),
+                        updated_at: new Date()
+                    };
+                });
 
+                // Nome da tabela corrigido para bater com a Migration: 'item_purchase'
                 await transaction('item_purchase').insert(itensParaInserir);
+                
                 await transaction.commit();
 
                 return { status: true, msg: 'Compra registrada com sucesso!', id: purchaseId };
@@ -75,10 +85,12 @@ export default class Purchase {
         if (!id) return null;
         try {
             const purchase = await connection(Purchase.table).where({ id }).first();
-            const items = await connection('purchase_item as pi')
-                .select('pi.*', 'prod.nome as produto_nome')
-                .leftJoin('product as prod', 'pi.id_produto', 'prod.id')
-                .where('pi.id_compra', id);
+            
+            // Corrigido aqui: de 'purchase_item' para 'item_purchase'
+            const items = await connection('item_purchase as ip')
+                .select('ip.*', 'prod.nome as produto_original')
+                .leftJoin('product as prod', 'ip.id_produto', 'prod.id')
+                .where('ip.id_compra', id);
 
             return { ...purchase, items };
         } catch (error) {
@@ -90,6 +102,8 @@ export default class Purchase {
     static async delete(id) {
         if (!id) return { status: false, msg: 'ID necessário.' };
         try {
+            // Devido ao onDelete('CASCADE') na sua migration, 
+            // apagar a compra aqui já apaga os itens automaticamente no banco.
             await connection(Purchase.table).where({ id }).del();
             return { status: true, msg: 'Compra excluída com sucesso.' };
         } catch (error) {

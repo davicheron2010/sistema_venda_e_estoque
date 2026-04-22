@@ -29,10 +29,12 @@ contextBridge.exposeInMainWorld('api', {
 
     // --- NOVO MÓDULO DE COMPRAS ---
     purchase: {
-        insert(data) { return ipcRenderer.invoke('purchase:insert', data); },
-        update(id, data) { return ipcRenderer.invoke('purchase:update', { id, ...data }); },
-        getAll() { return ipcRenderer.invoke('purchase:getAll'); },
-        onReload(callback) {
+        insert: (data) => ipcRenderer.invoke('purchase:insert', data),
+        update: (id, data) => ipcRenderer.invoke('purchase:update', id, data),
+        find: (where) => ipcRenderer.invoke('purchase:find', where), 
+        findById: (id) => ipcRenderer.invoke('purchase:findById', id), 
+        delete: (id) => ipcRenderer.invoke('purchase:delete', id),
+        onReload: (callback) => {
             ipcRenderer.on('purchase:reload', () => callback());
         },
     },

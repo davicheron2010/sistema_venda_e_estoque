@@ -1,8 +1,8 @@
-//Lista de itens em memória
 let items = [];
 let currentPaymentTerm = null;
+let paymentModal = null;
 
-//Select2: Fornecedor
+// ─── Select2: Fornecedor ──────────────────────────────────────────────────────
 $('#fornecedor_id').select2({
     theme: 'bootstrap-5',
     placeholder: "Selecione um fornecedor",
@@ -29,7 +29,7 @@ $('#fornecedor_id').select2({
     }
 });
 
-//Select2: Produto
+// ─── Select2: Produto ─────────────────────────────────────────────────────────
 $('#product-id').select2({
     theme: 'bootstrap-5',
     placeholder: "Selecione um produto",
@@ -56,16 +56,6 @@ $('#product-id').select2({
     }
 });
 
-//Placeholder do campo de busca do Select2
-$('.form-select').on('select2:open', function () {
-    let inputElement = document.querySelector('.select2-search__field');
-    if (inputElement) {
-        inputElement.placeholder = 'Digite para pesquisar...';
-        inputElement.focus();
-    }
-});
-
-//Bloqueia preço unitário enquanto nenhum produto estiver selecionado
 $('#unit-price').prop('disabled', true);
 
 $('#product-id').on('select2:select', function () {
@@ -77,39 +67,41 @@ $('#product-id').on('select2:select', function () {
     } else {
         $('#unit-price').val('');
     }
-
-    $('#unit-price').focus();
+    $('#quantity').focus();
 });
 
-$('#product-id').on('select2:clear select2:unselect', function () {
-    $('#unit-price').prop('disabled', true).val('');
-});
-
-//Adicionar item à lista
+// ─── Gerenciamento de Itens ───────────────────────────────────────────────────
 $('#item-sale-form').on('submit', function (e) {
     e.preventDefault();
 
     const productSelect = $('#product-id');
     const productId     = productSelect.val();
     const productData   = productSelect.select2('data')[0];
-    const produto_nome  = productData?.text || '';
-    const grupo         = productData?.grupo || '—';
-    const quantidade    = parseFloat($('#quantity').val());
-    const unitario      = parseFloat($('#unit-price').val());
+    const quantidade    = parseFloat($('#quantity').val().replace(',', '.'));
+    const unitario      = parseFloat($('#unit-price').val().replace(',', '.'));
 
-    if (!productId)                      { alert('Selecione um produto.'); return; }
-    if (!quantidade || quantidade <= 0)  { alert('Informe uma quantidade válida.'); return; }
-    if (isNaN(unitario) || unitario < 0) { alert('Informe um preço unitário válido.'); return; }
+    if (!productId) { 
+        Swal.fire('Atenção', 'Selecione um produto.', 'warning'); 
+        return; 
+    }
+    if (!quantidade || quantidade <= 0) { 
+        Swal.fire('Atenção', 'Informe uma quantidade válida.', 'warning'); 
+        return; 
+    }
+    if (isNaN(unitario) || unitario < 0) { 
+        Swal.fire('Atenção', 'Informe um preço unitário válido.', 'warning'); 
+        return; 
+    }
 
     const total = parseFloat((quantidade * unitario).toFixed(2));
 
     items.push({
         id_produto:     parseInt(productId),
-        produto_nome,
-        grupo,
-        quantidade,
+        produto_nome:   productData.text,
+        grupo:          productData.grupo || '—',
+        quantidade:     quantidade,
         unitario_bruto: unitario,
-        total
+        total:          total
     });
 
     renderTable();
@@ -120,18 +112,13 @@ $('#item-sale-form').on('submit', function (e) {
     $('#unit-price').val('').prop('disabled', true);
 });
 
-//Renderiza a tabela de itens
 function renderTable() {
-    const tbody      = $('#sale-items-table tbody');
-    const fornecedor = $('#fornecedor_id').select2('data')[0]?.text || '—';
+    const tbody = $('#sale-items-table tbody');
+    const fornecedorNome = $('#fornecedor_id').select2('data')[0]?.text || '—';
     tbody.empty();
 
     if (items.length === 0) {
-        tbody.append(`
-            <tr id="empty-row">
-                <td colspan="7" class="text-center text-muted py-4">Nenhum item adicionado.</td>
-            </tr>
-        `);
+        tbody.append('<tr id="empty-row"><td colspan="7" class="text-center text-muted py-4">Nenhum item adicionado.</td></tr>');
         return;
     }
 
@@ -139,13 +126,13 @@ function renderTable() {
         tbody.append(`
             <tr>
                 <td>${item.produto_nome}</td>
-                <td>${fornecedor}</td>
+                <td>${fornecedorNome}</td>
                 <td>${item.grupo}</td>
                 <td class="text-end">${item.quantidade}</td>
                 <td class="text-end">R$ ${item.unitario_bruto.toFixed(2)}</td>
                 <td class="text-end">R$ ${item.total.toFixed(2)}</td>
                 <td class="text-center">
-                    <button class="btn btn-sm btn-outline-danger btn-remove" data-index="${index}">
+                    <button class="btn btn-sm btn-outline-danger" onclick="removeItem(${index})">
                         <i class="bi bi-trash"></i>
                     </button>
                 </td>
@@ -154,198 +141,177 @@ function renderTable() {
     });
 }
 
-//Remover item da lista
-$('#sale-items-table').on('click', '.btn-remove', function () {
-    const index = $(this).data('index');
+window.removeItem = (index) => {
     items.splice(index, 1);
     renderTable();
     updateSummary();
-});
+};
 
-//Atualiza resumo (subtotal, desconto, total)
 function updateSummary() {
     const subtotal = items.reduce((acc, item) => acc + item.total, 0);
-    const desconto = parseFloat($('#sale-discount').val()) || 0;
+    const desconto = parseFloat($('#sale-discount').val().replace(',', '.')) || 0;
     const total    = Math.max(0, subtotal - desconto);
 
     $('#sale-subtotal').text(subtotal.toFixed(2));
     $('#sale-total').text(total.toFixed(2));
 
-    renderInstallments();
+    if (paymentModal && $('#paymentModal').hasClass('show')) {
+        renderInstallments();
+    }
 }
 
 $('#sale-discount').on('input', updateSummary);
 
-//Limpar tudo
-$('#clear-sale').on('click', function () {
-    if (!confirm('Deseja limpar todos os itens?')) return;
-    items = [];
-    currentPaymentTerm = null;
-    $('#fornecedor_id').val(null).trigger('change');
-    $('#sale-discount').val('0.00');
-    $('#sale-status').text('Em edição');
-    renderTable();
-    updateSummary();
-});
-
-// ─── Condições de pagamento ───────────────────────────────────────────────────
-
+// ─── Pagamento e Parcelas (Dentro do Modal) ───────────────────────────────────
 async function loadPaymentTerms() {
     try {
         const result = await window.api.paymentTerms.find();
         const select = $('#payment-condition');
         select.empty().append('<option value="">Selecione...</option>');
-
-        if (!result.data || result.data.length === 0) {
-            select.append('<option value="" disabled>Nenhuma condição cadastrada</option>');
-            return;
-        }
-
         result.data.forEach(term => {
             select.append(`<option value="${term.id}">${term.titulo}</option>`);
         });
-
-    } catch (error) {
-        console.error('Erro ao carregar condições de pagamento:', error);
+    } catch (error) { 
+        console.error(error); 
     }
 }
 
 $('#payment-condition').on('change', async function () {
     const id = $(this).val();
-    if (!id) {
-        currentPaymentTerm = null;
-        renderInstallments();
-        return;
-    }
-
-    try {
-        const result = await window.api.paymentTerms.findWithInstallments(id);
-        currentPaymentTerm = result;
-        renderInstallments();
-    } catch (error) {
-        console.error('Erro ao buscar parcelas:', error);
-    }
+    if (!id) { currentPaymentTerm = null; renderInstallments(); return; }
+    currentPaymentTerm = await window.api.paymentTerms.findWithInstallments(id);
+    renderInstallments();
+    checkConfirmButton();
 });
 
-// ─── Parcelas ─────────────────────────────────────────────────────────────────
-
 function renderInstallments() {
-    const total = parseFloat($('#sale-total').text()) || 0;
-    const list  = $('#installment-list');
-    list.empty();
+    const totalGeral = parseFloat($('#sale-total').text()) || 0;
+    const list = $('#installment-list').empty();
 
-    if (total === 0) {
-        list.append(`<p class="text-muted small">Adicione itens para ver as parcelas.</p>`);
+    if (totalGeral === 0 || !currentPaymentTerm) {
         $('#installment-difference').text('R$ 0.00').removeClass('bg-danger bg-success').addClass('bg-secondary');
         return;
     }
 
-    if (!currentPaymentTerm || !currentPaymentTerm.installments || currentPaymentTerm.installments.length === 0) {
-        list.append(`<p class="text-muted small">Selecione uma condição de pagamento.</p>`);
-        $('#installment-difference').text('R$ 0.00').removeClass('bg-danger bg-success').addClass('bg-secondary');
-        return;
-    }
+    const numParcelas = currentPaymentTerm.installments.length;
+    const valorParcelaBase = (totalGeral / numParcelas).toFixed(2);
 
-    const numParcelas  = currentPaymentTerm.installments.length;
-    const valorParcela = parseFloat((total / numParcelas).toFixed(2));
-
-    currentPaymentTerm.installments
-        .sort((a, b) => a.parcela - b.parcela)
-        .forEach((inst) => {
-            const vencimento = new Date();
-            vencimento.setDate(vencimento.getDate() + (inst.intervalor || 0));
-            const vencimentoStr = vencimento.toLocaleDateString('pt-BR');
-
-            list.append(`
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <span class="text-muted small" style="min-width:70px;">Parcela ${inst.parcela}</span>
-                    <span class="text-muted small" style="min-width:80px;">${vencimentoStr}</span>
-                    <div class="input-group input-group-sm">
-                        <span class="input-group-text">R$</span>
-                        <input 
-                            type="number" 
-                            class="form-control installment-input" 
-                            step="0.01" 
-                            min="0" 
-                            value="${valorParcela.toFixed(2)}"
-                            data-parcela="${inst.parcela}"
-                        >
-                    </div>
+    currentPaymentTerm.installments.forEach((inst) => {
+        list.append(`
+            <div class="col-md-6 mb-2">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text small">P${inst.parcela}</span>
+                    <input type="number" class="form-control installment-input" step="0.01" value="${valorParcelaBase}">
                 </div>
-            `);
-        });
+            </div>
+        `);
+    });
 
-    updateDifference();
+    $('.installment-input').on('input', calculateDifference);
+    calculateDifference();
 }
 
-function updateDifference() {
-    const total          = parseFloat($('#sale-total').text()) || 0;
-    const somaParceladas = $('.installment-input').toArray()
-        .reduce((acc, el) => acc + (parseFloat(el.value) || 0), 0);
+function calculateDifference() {
+    const totalGeral = parseFloat($('#sale-total').text()) || 0;
+    let somaParcelas = 0;
+    
+    $('.installment-input').each(function() {
+        somaParcelas += parseFloat($(this).val()) || 0;
+    });
 
-    const diff  = parseFloat((somaParceladas - total).toFixed(2));
-    const badge = $('#installment-difference');
-
-    badge.text('R$ ' + Math.abs(diff).toFixed(2));
-
-    if (diff === 0) {
-        badge.removeClass('bg-danger bg-success').addClass('bg-secondary');
-    } else if (diff > 0) {
-        badge.removeClass('bg-danger bg-secondary').addClass('bg-success');
+    const diff = (totalGeral - somaParcelas).toFixed(2);
+    const diffElem = $('#installment-difference');
+    
+    diffElem.text(`R$ ${diff}`);
+    
+    if (Math.abs(diff) <= 0.01) {
+        diffElem.removeClass('bg-danger bg-secondary').addClass('bg-success');
     } else {
-        badge.removeClass('bg-success bg-secondary').addClass('bg-danger');
+        diffElem.removeClass('bg-success bg-secondary').addClass('bg-danger');
     }
+    
+    checkConfirmButton();
 }
 
-$('#installment-list').on('input', '.installment-input', updateDifference);
-
-// ─── Finalizar Compra ─────────────────────────────────────────────────────────
+// ─── Finalização e Modal ──────────────────────────────────────────────────────
 
 $('#finalize-sale').on('click', async function () {
+    if (!$('#fornecedor_id').val()) {
+        Swal.fire('Atenção', 'Selecione um fornecedor antes de continuar.', 'warning');
+        return;
+    }
+    if (items.length === 0) {
+        Swal.fire('Atenção', 'A lista de itens está vazia.', 'warning');
+        return;
+    }
 
-    const fornecedorData    = $('#fornecedor_id').select2('data')[0];
-    const fornecedorId      = $('#fornecedor_id').val();
-    const fornecedorNome    = fornecedorData?.text || '—';
-    const fornecedorRazao   = fornecedorData?.razao_social || '—';
-    const fornecedorCnpjCpf = fornecedorData?.cnpj_cpf || '—';
-    const estadoCompra      = 'CONCLUIDO'; // ✅ sempre finaliza como concluído
+    $('#modal-total').text($('#sale-total').text());
+    
+    if (!paymentModal) paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+    paymentModal.show();
 
-    if (!fornecedorId)       { alert('Selecione um fornecedor.'); return; }
-    if (items.length === 0)  { alert('Adicione pelo menos um item.'); return; }
-    if (!currentPaymentTerm) { alert('Selecione uma condição de pagamento.'); return; }
+    await loadPaymentTerms(); 
+});
 
-    const subtotal = items.reduce((acc, item) => acc + item.total, 0);
-    const desconto = parseFloat($('#sale-discount').val()) || 0;
-    const total    = Math.max(0, subtotal - desconto);
+function checkConfirmButton() {
+    const diffText = $('#installment-difference').text().replace('R$ ', '').replace(',', '.');
+    const diff = Math.abs(parseFloat(diffText));
+    const isReady = diff <= 0.01 && $('#payment-condition').val() !== "";
+    $('#confirm-payment').prop('disabled', !isReady);
+}
 
-    const parcelas = $('.installment-input').toArray().map((el, i) => ({
-        parcela: i + 1,
-        valor:   parseFloat(el.value) || 0
-    }));
+$(document).on('input', '.installment-input', checkConfirmButton);
+$('#payment-condition').on('change', checkConfirmButton);
 
+$('#confirm-payment').on('click', async function () {
     try {
-        // 1. Salva no banco
-        const payload = {
-            id_fornecedor: parseInt(fornecedorId),
-            estado_compra: estadoCompra,
-            total_bruto:   subtotal,
+        const total = parseFloat($('#sale-total').text()) || 0;
+        const subtotal = parseFloat($('#sale-subtotal').text()) || 0;
+        const desconto = parseFloat($('#sale-discount').val().replace(',', '.')) || 0;
+        
+        const fornecedorData = $('#fornecedor_id').select2('data')[0];
+        const fornecedorNome = fornecedorData.text;
+        const fornecedorRazao = fornecedorData.razao_social || '—';
+        const fornecedorCnpjCpf = fornecedorData.cnpj_cpf || '—';
+
+        const parcelas = [];
+        $('.installment-input').each(function(index) {
+            parcelas.push({
+                parcela: index + 1,
+                valor: parseFloat($(this).val()) || 0
+            });
+        });
+
+        // ─── 1. SALVAR NO BANCO (Controller) ──────────────────────────────────
+        const purchaseData = {
+            id_fornecedor: parseInt(fornecedorData.id),
+            id_condicao_pagamento: parseInt($('#payment-condition').val()) || null,
+            total_bruto: subtotal,
             total_liquido: total,
-            desconto:      desconto,
-            items:         items.map(item => ({
-                id_produto:     item.id_produto,
-                quantidade:     item.quantidade,
-                unitario_bruto: item.unitario_bruto,
+            desconto: desconto,
+            estado_compra: 'RECEBIDO',
+            items: items.map(item => ({
+                id_produto: item.id_produto,
+                quantidade: item.quantidade,
+                unitario_bruto: item.unitario_bruto
             }))
         };
 
-        const result = await window.api.purchase.insert(payload);
+        Swal.fire({
+            title: 'Processando...',
+            text: 'Salvando dados da compra',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
 
-        if (!result.status) {
-            alert('Erro ao salvar compra: ' + result.msg);
+        const saveResult = await window.api.purchase.insert(purchaseData);
+
+        if (!saveResult.status) {
+            Swal.fire('Erro', saveResult.msg, 'error');
             return;
         }
 
-        // 2. Gera o PDF
+        // ─── 2. GERAR O PDF ───────────────────────────────────────────────────
         const dataAtual = new Date().toLocaleDateString('pt-BR');
 
         const itensHtml = items.map(item => `
@@ -353,15 +319,15 @@ $('#finalize-sale').on('click', async function () {
                 <td>${item.produto_nome}</td>
                 <td>${item.grupo}</td>
                 <td class="text-center">${item.quantidade}</td>
-                <td class="text-right">${parseFloat(item.unitario_bruto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                <td class="text-right">${parseFloat(item.total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                <td class="text-right">${item.unitario_bruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                <td class="text-right">${item.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
             </tr>
         `).join('');
 
         const parcelasHtml = parcelas.map(p => `
             <tr>
                 <td class="text-center">${p.parcela}ª parcela</td>
-                <td class="text-right">${parseFloat(p.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                <td class="text-right">${p.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
             </tr>
         `).join('');
 
@@ -383,19 +349,16 @@ $('#finalize-sale').on('click', async function () {
         </head>
         <body>
             <div class="container">
-
                 <div class="header-box text-center">
-                    <h2>Relatório de Compra</h2>
-                    <p>Data: <strong>${dataAtual}</strong> &nbsp;|&nbsp; Status: <strong>Concluído</strong></p>
+                    <h2>Relatório de Compra #${saveResult.id}</h2>
+                    <p>Data: <strong>${dataAtual}</strong></p>
                 </div>
-
                 <div class="section-title">FORNECEDOR</div>
                 <div class="info-card">
                     <strong>${fornecedorNome}</strong><br>
                     Razão Social: ${fornecedorRazao}<br>
                     CNPJ/CPF: ${fornecedorCnpjCpf}
                 </div>
-
                 <div class="section-title">ITENS DA COMPRA</div>
                 <table class="table table-sm table-bordered">
                     <thead>
@@ -409,17 +372,6 @@ $('#finalize-sale').on('click', async function () {
                     </thead>
                     <tbody>${itensHtml}</tbody>
                 </table>
-
-                <div class="section-title">RESUMO</div>
-                <div class="info-card">
-                    <div class="row">
-                        <div class="col-6">Subtotal:</div>
-                        <div class="col-6 text-right">${subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                        <div class="col-6">Desconto:</div>
-                        <div class="col-6 text-right">- ${desconto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                    </div>
-                </div>
-
                 <div class="section-title">CONDIÇÃO DE PAGAMENTO: ${currentPaymentTerm.titulo}</div>
                 <table class="table table-sm table-bordered">
                     <thead>
@@ -430,32 +382,50 @@ $('#finalize-sale').on('click', async function () {
                     </thead>
                     <tbody>${parcelasHtml}</tbody>
                 </table>
-
                 <div class="total-final text-right">
                     TOTAL: ${total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </div>
-
             </div>
         </body>
         </html>
         `;
 
         await window.api.report.print(stringHtml);
+        
+        paymentModal.hide();
 
-        // 3. Limpa após finalizar
-        items = [];
-        currentPaymentTerm = null;
-        $('#fornecedor_id').val(null).trigger('change');
-        $('#sale-discount').val('0.00');
-        $('#sale-status').text('Concluído');
-        renderTable();
-        updateSummary();
-
-    } catch (err) {
-        console.error(err);
-        alert('Erro ao finalizar compra: ' + err.message);
+        Swal.fire({
+            icon: 'success',
+            title: 'Sucesso!',
+            text: `Compra #${saveResult.id} salva e impressa corretamente.`,
+            confirmButtonText: 'OK'
+        }).then(() => {
+            location.reload(); 
+        });
+        
+    } catch (error) {
+        console.error("Erro ao finalizar compra:", error);
+        Swal.fire('Erro Crítico', 'Não foi possível concluir a operação.', 'error');
     }
 });
 
-// Inicializa
-loadPaymentTerms();
+$('#clear-sale').on('click', function () {
+    Swal.fire({
+        title: 'Limpar tudo?',
+        text: "Isso removerá todos os itens da lista.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sim, limpar!',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            items = [];
+            $('#fornecedor_id').val(null).trigger('change');
+            $('#sale-discount').val('0.00');
+            renderTable();
+            updateSummary();
+        }
+    });
+});
