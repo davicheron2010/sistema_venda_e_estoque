@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "main": "index.js",
     "private": true,
+
     "scripts": {
         "start": "chcp 65001 >nul && electron .",
         "build:win": "electron-builder --win",
