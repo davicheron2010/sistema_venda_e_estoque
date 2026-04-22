@@ -50,6 +50,7 @@ Datatables.SetTable('#table-products', [
         }
     }
 ]).getData(filter => api.product.productSearch(filter));
+]).getData(filter => api.product.find(filter));
 
 async function deleteProduct(id) {
     const result = await Swal.fire({

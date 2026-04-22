@@ -5,3 +5,4 @@ storage/
 /config/preload.js
 /route/route.js
 index.js/
+/storage/

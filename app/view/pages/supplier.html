@@ -68,6 +68,75 @@
     </div>
 </div>
 {% endblock %}
+
+{% block title %}Novo Fornecedor{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
+    <div>
+        <h2 class="mb-0 fw-semibold">Cadastro de Fornecedor</h2>
+        <small class="text-muted">Preencha os dados do Fornecedor</small>
+    </div>
+</div>
+
+<form id="form">
+    <input type="hidden" id="id" name="id">
+    <input type="hidden" id="action" name="action">
+
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-header bg-dark text-white py-2 px-3">
+            <small class="fw-semibold"><i class="fa-solid fa-user me-2"></i>Dados Pessoais</small>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="nome_fantasia" name="nome_fantasia" placeholder="example" autofocus>
+                        <label for="nome_fantasia">Nome do Fornecedor</label>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="razao_social" name="razao_social" placeholder="example" autofocus>
+                        <label for="razao_social">Razão Social do Fornecedor</label>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="cnpj_cpf" name="cnpj_cpf" placeholder="example">
+                        <label for="cnpj_cpf">CPF/CNPJ do Fornecedor</label>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-floating mb-3 mb-0">
+                        <input type="text" class="form-control" id="ie_rg" name="ie_rg" placeholder="example">
+                        <label for="ie_rg">RG/IE do Fornecedor</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body py-2">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" name="ativo" id="ativo" value="true">
+                <label class="form-check-label" for="ativo">Fornecedor ativo</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <button type="button" class="btn btn-success" id="insert">
+                <i class="fa-solid fa-floppy-disk me-1"></i>
+                Salvar
+            </button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
 {% block scripts %}
 <script src="file:///{{ assets }}/js/supplier.js"></script>
 {% endblock %}

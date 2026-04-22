@@ -1,11 +1,10 @@
 export function up(knex) {
     return knex.schema.createTable('customer', (table) => {
         table.bigIncrements('id').primary();
-        table.text('nome').notNullable();
-        table.text('cpf');
-        table.text('rg');
+        table.string('nome', 255).notNullable();
+        table.string('cpf', 11).unique().index();
+        table.string('rg', 20);
         table.boolean('ativo').defaultTo(true);
-        table.boolean('excluido').defaultTo(false);
         table.timestamps(true, true);
     });
 }

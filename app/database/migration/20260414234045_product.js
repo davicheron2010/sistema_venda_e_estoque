@@ -3,6 +3,7 @@ export function up(knex) {
             table.bigIncrements('id').primary();
             table.text('nome').notNullable();
             table.text('codigo_barra');
+            table.text('grupo');
             table.text('unidade');
             table.text('grupo');
             table.decimal('preco_compra', 18, 4).defaultTo(0);
@@ -17,7 +18,7 @@ export function up(knex) {
             table.timestamps(true, true);
         });
 }
-
+//teste
 export function down(knex) {
     return knex.schema.dropTable('product');
 }

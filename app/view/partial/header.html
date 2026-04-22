@@ -1,6 +1,7 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">adriely</a>
+        <a class="navbar-brand" href="#">APP Do Cheron</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
             aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -15,6 +16,14 @@
                     <ul class="dropdown-menu">
                         <li>
                             <span class="dropdown-item"
+                                onclick="api.window.open('pages/listacustomer', { title: 'Clientes' })"
+                                style="cursor: pointer;">
+                                <i class="fa-solid fa-users me-1"></i>
+                                Cliente
+                            </span>
+                        </li>
+                        <li>
+                            <span class="dropdown-item"
                                 onclick="api.window.open('pages/listaproduct', { title: 'Produtos' })">
                                 <i class="fa-solid fa-box me-1"></i>
                                 Produto
@@ -25,6 +34,10 @@
                                 onclick="api.window.open('pages/listasupplier', { title: 'Forncedores' })">
                                 <i class="fa-solid fa-truck"></i>
                                 Fornecedor
+                                onclick="api.window.open('pages/listsale', { title: 'Vendas' })"
+                                style="cursor: pointer;">
+                                <i class="fa-solid fa-receipt me-1"></i>
+                                Venda
                             </span>
                         </li>
                     </ul>
@@ -32,4 +45,5 @@
             </ul>
         </div>
     </div>
+</nav>
 </nav>

@@ -6,6 +6,11 @@ block content %}
         <small class="text-muted">Gerencie o catálogo de produtos</small>
     </div>
     <button class="btn btn-success" onclick="
+  <div>
+    <h2 class="mb-0 fw-semibold">Lista de Produtos</h2>
+    <small class="text-muted">Gerencie o catálogo de produtos</small>
+  </div>
+  <button class="btn btn-success" onclick="
       api.window.openModal('pages/product', {
         width: 900,
         height: 600,
@@ -42,6 +47,35 @@ block content %}
             </div>
         </div>
     </div>
+    <i class="fa-solid fa-plus me-1"></i>
+    Novo produto
+  </button>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-0">
+        <table id="table-products" class="table table-striped table-hover table-bordered mb-0 align-middle"
+          style="width: 100%">
+          <thead class="table-dark">
+            <tr>
+              <th>Código</th>
+              <th>Nome</th>
+              <th>Cód. barra</th>
+              <th>Grupo</th>
+              <th>Unidade</th>
+              <th>Preço de compra</th>
+              <th>Preço de venda</th>
+              <th>Ativo</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 {% block scripts %}

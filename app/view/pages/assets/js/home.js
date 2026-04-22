@@ -9,6 +9,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         document.getElementById('count-fornecedore').textContent = totalfornecedor;
         document.getElementById('count-produto').textContent = totalproduto;
+            safe(() => api.customer.count()),
+            safe(() => api.company.count()),
+        ]);
+
+        document.getElementById('count-clientes').textContent = totalClientes;
+        document.getElementById('count-empresas').textContent = totalEmpresas;
     }
 
     await loadCounts();
@@ -16,3 +22,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     api.supplier.onReload(() => loadCounts());
     api.product.onReload(() => loadCounts());
 }); 
+    api.customer.onReload(() => loadCounts());
+    api.company.onReload(() => loadCounts());
+});

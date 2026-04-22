@@ -26,10 +26,48 @@
                 </thead>
                 <tbody></tbody>
             </table>
+
+{% block title %}Fornecedor{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
+    <div>
+        <h2 class="mb-0 fw-semibold">Lista de Fornecedor</h2>
+        <small class="text-muted">Gerencie o cadastro de Fornecedor</small>
+    </div>
+    <button class="btn btn-success"
+        onclick="api.window.openModal('pages/supplier', { width: 900, height: 600, title: 'Cadastrar Cliente' })">
+        <i class="fa-solid fa-plus me-1"></i>
+        Novo fornecedor
+    </button>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <table id="table-suppliers" class="table table-striped table-hover table-bordered mb-0 align-middle" style="width: 100%;">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="text-center" style="width: 80px;">Código</th>
+                            <th>Nome Fantasia</th>
+                            <th>Razão Social</th>
+                            <th class="text-center">CNPJ/CPF</th>
+                            <th class="text-center">IE/RG</th>
+                            <th class="text-center">Ativo</th>
+                            <th class="text-center" style="width: 90px;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 {% endblock %}
 {% block scripts %}
 <script defer type="module" src="file:///{{ assets }}/js/listasupplier.js"></script>
+
+{% block scripts %}
+<script type="module" src="file:///{{ assets }}/js/listasupplier.js"></script>
 {% endblock %}
