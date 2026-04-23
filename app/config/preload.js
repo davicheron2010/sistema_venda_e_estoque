@@ -11,17 +11,17 @@ contextBridge.exposeInMainWorld('api', {
     report: {
         print(stringHtml, args = {}) { return ipcRenderer.invoke('print', stringHtml, args); }
     },
-        
+
     window: {
         open(name, opts) { return ipcRenderer.invoke('window:open', name, opts); },
         openModal(name, opts) { return ipcRenderer.invoke('window:openModal', name, opts); },
         close() { return ipcRenderer.invoke('window:close'); }
     },
-    
+
     dashboard: {
         getStats() { return ipcRenderer.invoke('dashboard:getStats'); }
     },
-    
+
     temp: {
         set(key, data) { return ipcRenderer.invoke('temp:set', key, data); },
         get(key) { return ipcRenderer.invoke('temp:get', key); },
@@ -93,5 +93,13 @@ contextBridge.exposeInMainWorld('api', {
             ipcRenderer.on('enterprise:reload', () => callback());
         },
     },
-    
+
+    paymentTermsAPI: {
+        insert: (data) => ipcRenderer.invoke('paymentTerms:insert', data),
+        find: (where) => ipcRenderer.invoke('paymentTerms:find', where),
+        findById: (id) => ipcRenderer.invoke('paymentTerms:findById', id),
+        update: (id, data) => ipcRenderer.invoke('paymentTerms:update', id, data),
+        delete: (id) => ipcRenderer.invoke('paymentTerms:delete', id),
+        getAll: () => ipcRenderer.invoke('paymentTerms:getAll'),
+    },
 });

@@ -1,8 +1,6 @@
 import { ipcMain, BrowserWindow } from 'electron';
 import Template from '../mixin/Template.js';
-import Product from '../controller/Product.js';
-import Supplier from '../controller/Supplier.js';
-import Purchase from '../controller/Purchase.js';
+
 
 
 function getWin(event) {
@@ -240,18 +238,34 @@ ipcMain.handle('purchase:insert', async (_e, data) => {
     return { status: true, msg: 'Compra registrada com sucesso!' };
 });
 
-const express = require('express');
-const router = express.Router();
-const ctrl = require('../controller/paymentTermsController');
+// --- CONDIÇÕES DE PAGAMENTO ---
+ipcMain.handle('paymentTerms:insert', async (_e, data) => {
+    const result = await PaymentTerms.insert(data);
+    if (result.status) broadcastReload('paymentTerms:reload');
+    return result;
+});
 
-// ─── Render Views ─────────────────────────────────────────────────────────────
-router.get('/pagamento/novo',        ctrl.renderCreate);
-router.get('/pagamento/editar/:id',  ctrl.renderEdit);
+ipcMain.handle('paymentTerms:find', async (_e, where = {}) => {
+    return await PaymentTerms.find(where);
+});
 
-// ─── API REST ─────────────────────────────────────────────────────────────────
-router.get('/api/pagamento/lista',       ctrl.list);
-router.get('/api/pagamento/:id',         ctrl.findById);
-router.post('/api/pagamento/salvar',     ctrl.save);
-router.delete('/api/pagamento/:id',      ctrl.remove);
+ipcMain.handle('paymentTerms:findById', async (_e, id) => {
+    return await PaymentTerms.findById(id);
+});
 
-module.exports = router;
+ipcMain.handle('paymentTerms:update', async (_e, id, data) => {
+    const result = await PaymentTerms.update(id, data);
+    if (result.status) broadcastReload('paymentTerms:reload');
+    return result;
+});
+
+ipcMain.handle('paymentTerms:delete', async (_e, id) => {
+    const result = await PaymentTerms.delete(id);
+    if (result.status) broadcastReload('paymentTerms:reload');
+    return result;
+});
+
+ipcMain.handle('paymentTerms:getAll', async () => {
+    const result = await PaymentTerms.find({ limit: 99999, offset: 0 }) || {};
+    return result.data || [];
+});
