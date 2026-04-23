@@ -4,7 +4,6 @@
 
 {% block styles %}
 <link rel="stylesheet" href="file:///{{ assets }}/css/home.css">
-<link rel="stylesheet" href="{{ assets }}/css/home.css">
 {% endblock %}
 
 {% block menu %}
@@ -12,18 +11,6 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <h1 class="mt-4 mb-4 px-3 fw-bold">Painel Principal</h1>
-        <div class="col">
-            <div class="small-box card-product shadow-sm" onclick="api.window.open('pages/listaproduct', { title: 'Produtos' })">
-                <div class="inner">
-                    <h3 id="count-product">0</h3>
-                    <p>Produtos</p>
-                </div>
-                <div class="icon">
-                    <i class="fa-solid fa-box"></i>
-                </div>
-    
     <div class="row g-4 p-3 row-cols-1 row-cols-md-3 row-cols-lg-5">
 
         <!-- CLIENTES -->
@@ -87,26 +74,7 @@
         </div>
 
         <div class="col">
-            <div class="small-box card-produtos shadow-sm" onclick="api.window.open('pages/listaproduct', { title: 'Produtos' })">
-                <div class="inner">
-                    <h3 id="count-produtos">0</h3>
-                    <p>Produtos</p>
-                </div>
-                <div class="icon">
-                    <i class="fa-solid fa-boxes-packing"></i>
-                </div>
-                <a href="#" class="small-box-footer">Mais informações <i class="fa-solid fa-arrow-right ms-1"></i></a>
-            </div>
-        </div>
-        <div class="col">
-            <div class="small-box card-fornecedor shadow-sm" onclick="api.window.open('pages/listasupplier', { title: 'Fornecedor' })">
-                <div class="inner">
-                    <h3 id="count-fornecedor">0</h3>
-                    <p>Fornecedores</p>
-                </div>
-                <div class="icon">
-                    <i class="fa-solid fa-truck"></i>
-            <div class="small-box card-compras shadow-sm" onclick="api.window.open('pages/listapurchase', { title: 'Compras' })">
+             <div class="small-box card-compra shadow-sm" onclick="api.window.open('pages/listapurchase', { title: 'Compras' })">
                 <div class="inner">
                     <h3 id="count-compras">0</h3>
                     <p>Compras</p>
@@ -146,6 +114,4 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="file:///{{ assets }}/js/home.js"></script>
-<script src="{{ assets }}/js/home.js"></script>
 {% endblock %}
