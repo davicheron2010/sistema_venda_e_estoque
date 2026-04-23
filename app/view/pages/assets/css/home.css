@@ -301,11 +301,11 @@
         background: linear-gradient(135deg, #007bff 0%, #5dade2 100%) !important;
     }
 
-    .card-card-compra:hover {
+    .card-card-compra {
          background: linear-gradient(135deg, #3700ff 0%, #1726aa 100%) !important;
     }
 
-    /* Clientes - Amarelo/Laranja (Padrão do seu :root) */
+    
     .card-clientes {
         background: linear-gradient(135deg, #3700ff 0%, #1726aa 100%) !important;
     }
