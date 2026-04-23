@@ -1,87 +1,57 @@
-// =============================================================================
-// compra-lista.js — Página de listagem de compras
-// =============================================================================
+import { Datatables } from "../components/Datatables.js";
 
-// ─── Listar todas as compras na tabela ───────────────────────────────────────
-async function listPurchases() {
-    try {
-        const response = await window.electronAPI.invoke('compra:list', {});
-        if (!response.status) {
-            toast('error', 'Erro', response.msg, 3000);
-            return;
-        }
-
-        let trs = '';
-        response.data.forEach(compra => {
-            const totalLiquido = parseFloat(compra.total_liquido)
-                .toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-            trs += `
-                <tr>
-                    <td>${compra.id}</td>
-                    <td>${compra.fornecedor}</td>
-                    <td>${totalLiquido}</td>
-                    <td>${compra.data}</td>
-                    <td>
-                        <button class="btn btn-primary btn-sm" onclick="editPurchase(${compra.id})">
-                            Editar
-                        </button>
-                        <button class="btn btn-danger btn-sm" onclick="deletePurchase(${compra.id})">
-                            Excluir
-                        </button>
-                    </td>
-                </tr>
+const table = Datatables.SetTable('#table-sales', [
+    { data: 'id', className: 'text-center' },
+    { data: 'id_cliente' },
+    { data: 'total_bruto' },
+    { data: 'total_liquido' },
+    { data: 'desconto' },
+    { data: 'acrescimo' },
+    { data: 'observacao', defaultContent: '-' },
+    {
+        data: null,
+        className: 'text-center',
+        orderable: false,
+        searchable: false,
+        render: function (row) {
+            return `
+                <button onclick="editSale(${row.id})" class="btn btn-warning btn-sm">
+                    <i class="fa-solid fa-pen-to-square"></i> Editar
+                </button>
+                <button onclick="deleteSale(${row.id})" class="btn btn-danger btn-sm">
+                    <i class="fa-solid fa-trash"></i> Excluir
+                </button>
             `;
-        });
+        }
+    } 
+]).getData(filter => api.Sale.find(filter));
 
-        document.getElementById('purchases-table-tbody').innerHTML = trs;
+api.Sale.onReload(() => {
+    table.ajax.reload(null, false);
+});
 
-    } catch (error) {
-        toast('error', 'Erro', error.message, 3000);
-    }
-}
-
-// ─── Navegar para nova compra (acao = c) ──────────────────────────────────────
-function newPurchase() {
-    window.location.href = 'compra-form.html?acao=c';
-}
-
-// ─── Navegar para editar compra (acao = e) ────────────────────────────────────
-function editPurchase(id) {
-    window.location.href = `compra-form.html?acao=e&id=${id}`;
-}
-
-// ─── Excluir compra direto da lista ───────────────────────────────────────────
-async function deletePurchase(id) {
-    const confirm = await Swal.fire({
+async function deleteSale(id) {
+    const result = await Swal.fire({
+        title: 'Tem certeza?',
+        text: 'Esta ação não pode ser desfeita.',
         icon: 'warning',
-        title: 'Confirmar exclusão',
-        text: `Deseja excluir a compra #${id}?`,
         showCancelButton: true,
         confirmButtonText: 'Sim, excluir',
         cancelButtonText: 'Cancelar',
     });
-
-    if (!confirm.isConfirmed) return;
-
-    const response = await window.electronAPI.invoke('compra:delete', { id });
-    if (!response.status) {
-        toast('error', 'Erro', response.msg, 3000);
-        return;
+    if (result.isConfirmed) {
+        const response = await api.Sale.delete(id);
+        if (response.status) {
+            Swal.fire('Excluído!', 'A venda foi excluída.', 'success');
+        } else {
+            Swal.fire('Erro!', 'Não foi possível excluir a venda.', 'error');
+        }
     }
-
-    toast('success', 'Sucesso', `Compra #${id} excluída.`, 3000);
-    await listPurchases(); // recarrega a tabela
 }
 
-// Expõe funções usadas inline no HTML
-window.editPurchase   = editPurchase;
-window.deletePurchase = deletePurchase;
+function editSale(id) {
+    api.window.open('pages/sale', { width: 800, height: 600, title: 'Editar Venda', id: id });
+}
 
-// ─── Inicialização ────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', async () => {
-    await listPurchases();
-
-    document.getElementById('btnNova')
-        .addEventListener('click', newPurchase);
-});
+window.deleteSale = deleteSale;
+window.editSale = editSale;

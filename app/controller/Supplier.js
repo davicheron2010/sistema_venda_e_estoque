@@ -31,7 +31,7 @@ export default class Supplier {
             return { status: false, msg: 'Erro: ' + err.message, data: [] };
         }
     }
-
+    
     // 🔹 FIND (DataTable)
     static async find(data = {}) {
         const { term = '', limit = 20, offset = 0, orderType = 'desc', column = 0, draw = 1 } = data;

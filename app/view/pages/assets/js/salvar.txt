@@ -1,0 +1,19 @@
+async function InsertPurchase(formId) {
+    const form = document.getElementById(formId);
+    if (!form) {
+        throw new Error("Formulário não encontrado!");
+    }
+    const json = formToJson(form);
+    const response = await api.purchase.insert(json);
+    return response;
+}
+
+async function UpdatePurchase(id, formId) {
+    const form = document.getElementById(formId);
+    if (!form) {
+        throw new Error("Formulário não encontrado!");
+    }
+    const json = formToJson(form);
+    const response = await api.purchase.update(id, json);
+    return response;
+}

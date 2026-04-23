@@ -1,10 +1,10 @@
 // Calcula o preço de venda com base no preço de compra, impostos, custos operacionais 
 // e margem de lucro
 export class SellingPriceCalculator {
-    #purchasePrice = 0;  // Preço de compra do produto (valor absoluto)
-    #totalTax = 0;       // Percentual total de impostos (ex: 15 para 15%)
-    #profitMargin = 0;   // Percentual de margem de lucro desejada (ex: 20 para 20%)
-    #operatingCost = 0;  // Percentual de custo operacional (ex: 10 para 10%)
+    #purchasePrice  = 0;  // Preço de compra do produto (valor absoluto)
+    #totalTax       = 0;       // Percentual total de impostos (ex: 15 para 15%)
+    #profitMargin   = 0;   // Percentual de margem de lucro desejada (ex: 20 para 20%)
+    #operatingCost  = 0;  // Percentual de custo operacional (ex: 10 para 10%)
     // Instancia a classe via método estático (padrão Factory)
     static create() {
         return new SellingPriceCalculator();

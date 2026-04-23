@@ -27,16 +27,6 @@ contextBridge.exposeInMainWorld('api', {
         get(key) { return ipcRenderer.invoke('temp:get', key); },
     },
 
-    // --- NOVO MÓDULO DE COMPRAS ---
-    purchase: {
-        insert(data) { return ipcRenderer.invoke('purchase:insert', data); },
-        update(id, data) { return ipcRenderer.invoke('purchase:update', { id, ...data }); },
-        getAll() { return ipcRenderer.invoke('purchase:getAll'); },
-        onReload(callback) {
-            ipcRenderer.on('purchase:reload', () => callback());
-        },
-    },
-
     customer: {
         insert(data) { return ipcRenderer.invoke('customer:insert', data); },
         find(where) { return ipcRenderer.invoke('customer:find', where); },
@@ -47,7 +37,7 @@ contextBridge.exposeInMainWorld('api', {
             ipcRenderer.on('customer:reload', () => callback());
         },
     },
-
+    
     product: {
         insert(data) { return ipcRenderer.invoke('product:insert', data); },
         find(where) { return ipcRenderer.invoke('product:find', where); },
@@ -90,6 +80,16 @@ contextBridge.exposeInMainWorld('api', {
         findById(id) { return ipcRenderer.invoke('enterprise:findById', id); },
         update(id, data) { return ipcRenderer.invoke('enterprise:update', id, data); },
         delete(id) { return ipcRenderer.invoke('enterprise:delete', id); },
+        onReload(callback) {
+            ipcRenderer.on('enterprise:reload', () => callback());
+        },
+    },
+    purchase: {
+        insert(data) { return ipcRenderer.invoke('purchase:insert', data); },
+        find(where) { return ipcRenderer.invoke('purchase:find', where); },
+        findById(id) { return ipcRenderer.invoke('purchase:findById', id); },
+        update(id, data) { return ipcRenderer.invoke('purchase:update', id, data); },
+        delete(id) { return ipcRenderer.invoke('purchase:delete', id); },
         onReload(callback) {
             ipcRenderer.on('enterprise:reload', () => callback());
         },
