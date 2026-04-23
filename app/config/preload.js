@@ -93,4 +93,5 @@ contextBridge.exposeInMainWorld('api', {
             ipcRenderer.on('enterprise:reload', () => callback());
         },
     },
+    
 });

@@ -239,3 +239,19 @@ ipcMain.handle('purchase:insert', async (_e, data) => {
     console.log('Dados da Compra Recebidos:', data);
     return { status: true, msg: 'Compra registrada com sucesso!' };
 });
+
+const express = require('express');
+const router = express.Router();
+const ctrl = require('../controller/paymentTermsController');
+
+// ─── Render Views ─────────────────────────────────────────────────────────────
+router.get('/pagamento/novo',        ctrl.renderCreate);
+router.get('/pagamento/editar/:id',  ctrl.renderEdit);
+
+// ─── API REST ─────────────────────────────────────────────────────────────────
+router.get('/api/pagamento/lista',       ctrl.list);
+router.get('/api/pagamento/:id',         ctrl.findById);
+router.post('/api/pagamento/salvar',     ctrl.save);
+router.delete('/api/pagamento/:id',      ctrl.remove);
+
+module.exports = router;
