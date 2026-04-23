@@ -177,3 +177,5 @@ async function UpdatePurchase(id, formId) {
     const json = formToJson(form);
     return await api.purchase.update(id, json);
 }
+
+ok
