@@ -1,18 +1,3 @@
-/**
- * Classe estática Datatables
- * 
- * Uso:
- *   Datatables.SetTable('#table-customers', columns, options).getData(filter => api.customer.find(filter));
- * 
- * Parâmetros de SetTable:
- *   - selector  {string}  Seletor da tabela (ex: '#table-customers')
- *   - columns   {Array}   Definição das colunas do DataTable
- *   - options   {Object}  (Opcional) Sobrescrever configurações padrão
- * 
- */
-export class Datatables {
-    //Configura a tabela e retorna um objeto com o método getData para encadear.
-    static SetTable(selector, columns, options = {}) {
 export class Datatables {
     //Configura a tabela e retorna um objeto com o método getData para encadear.
     static SetTable(selector, columns, option = {}) {
@@ -103,10 +88,6 @@ export class Datatables {
                         }, 100);
                     }
                 };
-                // Mescla configurações padrão com as opções extras (options sobrescreve o padrão)
-                const finalConfig = { ...defaultConfig, ...options };
-                // Se options tiver 'columns', usa as options; senão mantém as passadas em SetTable
-                if (!options.columns) {
                 // Mescla configurações padrão com as opções extras (option sobrescreve o padrão)
                 const finalConfig = { ...defaultConfig, ...option };
                 // Se option tiver 'columns', usa as option; senão mantém as passadas em SetTable

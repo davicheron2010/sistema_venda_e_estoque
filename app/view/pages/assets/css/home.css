@@ -301,46 +301,26 @@
         background: linear-gradient(135deg, #007bff 0%, #5dade2 100%) !important;
     }
 
-    .card-produtos:hover {
-        box-shadow: 0 20px 50px rgba(0, 123, 255, 0.3) !important;
+    .card-card-compra:hover {
+         background: linear-gradient(135deg, #3700ff 0%, #1726aa 100%) !important;
     }
 
     /* Clientes - Amarelo/Laranja (Padrão do seu :root) */
     .card-clientes {
-        background: linear-gradient(135deg, var(--warning-gradient-start) 0%, var(--warning-gradient-end) 100%) !important;
+        background: linear-gradient(135deg, #3700ff 0%, #1726aa 100%) !important;
     }
 
-    .card-clientes:hover {
-        box-shadow: var(--shadow-hover) !important;
-    }
 
     /* Fornecedores - Verde */
     .card-fornecedores {
         background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
     }
 
-    .card-fornecedores:hover {
-        box-shadow: 0 20px 50px rgba(40, 167, 69, 0.3) !important;
-    }
-
     /* Empresas - Ciano/Info */
     .card-empresas {
         background: linear-gradient(135deg, #17a2b8 0%, #00bcd4 100%) !important;
     }
-
-    .card-empresas:hover {
-        box-shadow: 0 20px 50px rgba(23, 162, 184, 0.3) !important;
-    }
-
     /* Usuários - Roxo/Indigo */
-    .card-usuarios {
-        background: linear-gradient(135deg, #6610f2 0%, #a55eea 100%) !important;
-    }
-
-    .card-usuarios:hover {
-        box-shadow: 0 20px 50px rgba(102, 16, 242, 0.3) !important;
-    }
-
     /* Ajuste fino para os ícones dentro do seu HTML atual */
     .small-box .icon {
         position: absolute;
