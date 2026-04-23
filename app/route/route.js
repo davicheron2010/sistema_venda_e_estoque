@@ -252,6 +252,9 @@ ipcMain.handle('purchase:insert', async (_e, data) => {
 ipcMain.handle('purchase:find', async (_e, where = {}) => {
     return await Purchase.find(where);
 });
+ipcMain.handle('purchase:findPurchase', async (_e, where = {}) => {
+    return await Purchase.find(where);
+});
 
 ipcMain.handle('purchase:delete', async (_e, id) => {
     const result = await Purchase.delete(id);

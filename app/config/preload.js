@@ -32,6 +32,7 @@ contextBridge.exposeInMainWorld('api', {
         insert: (data) => ipcRenderer.invoke('purchase:insert', data),
         update: (id, data) => ipcRenderer.invoke('purchase:update', id, data),
         find: (where) => ipcRenderer.invoke('purchase:find', where), 
+        findPurchase: (where) => ipcRenderer.invoke('purchase:findPurchase', where), 
         findById: (id) => ipcRenderer.invoke('purchase:findById', id), 
         delete: (id) => ipcRenderer.invoke('purchase:delete', id),
         onReload: (callback) => {
