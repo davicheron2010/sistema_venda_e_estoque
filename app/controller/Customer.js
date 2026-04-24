@@ -4,10 +4,10 @@ export default class Customer {
     static table = 'customer';
     //teste
     // Mapeamento: índice da coluna no DataTable → nome no banco
-    static #columns = ['id', 'nome', 'cpf', null];
+    static #columns = ['id', 'nome', 'cpf', 'rg', null];
 
     // Colunas pesquisáveis pelo termo de busca
-    static #searchable = ['nome', 'cpf'];
+    static #searchable = ['nome', 'cpf', 'rg'];
 
     //Insere um novo cliente.
     static async insert(data) {
