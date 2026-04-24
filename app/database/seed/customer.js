@@ -12,7 +12,6 @@ export async function seed(knex) {
       cpf: faker.string.numeric(11),
       rg: faker.string.numeric(8),
       ativo: faker.datatype.boolean(),
-      excluido: false
     }));
     await knex('customer').insert(batch);
   }

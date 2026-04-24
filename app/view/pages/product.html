@@ -1,156 +1,141 @@
 {% extends "layouts/main.html" %}
-{% block styles %}
-<link rel="stylesheet" href="file:///{{ assets }}//css/product.css">
-{% endblock %}
-{% block title %}Novo Produto
-{% endblock %}
+{% block title %}{{ action == 'edit' and 'Editar Produto' or 'Novo Produto' }}{% endblock %}
 
 {% block content %}
-<div class="row">
-	<div class="col-12">
-		<h2>Cadastro de Produto</h2>
-	</div>
-</div>
-<form id="form">
-	<input type="hidden" id="id" name="id">
-	<input type="hidden" id="action" name="action">
-	<div class="row">
-		<div class="col-12">
-			<div class="form-floating mb-3">
-				<input type="text" class="form-control" id="nome" name="nome" placeholder="example" autofocus>
-				<label for="nome"><i class="fa-solid fa-box input-icon"></i>Nome do produto</label>
-		<div class="col-8">
-			<div class="form-floating mb-3">
-				<input type="text" class="form-control" id="nome" name="nome" placeholder="example" autofocus>
-				<label for="nome">Nome do produto</label>
-			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-4">
-			<div class="form-floating mb-4">
-				<input type="text" class="form-control" id="codigo_barra" name="codigo_barra" placeholder="example">
-				<label for="codigo_barra"><i class="fa-solid fa-barcode input-icon"></i>Código de barras do produto</label>
-			</div>
-		</div>
-		<div class="col-4">
-			<div class="form-floating mb-2">
-				<input type="text" class="form-control" id="grupo" name="grupo" placeholder="example">
-				<label for="grupo"><i class="fa-solid fa-layer-group input-icon"></i>Grupo</label>
-			</div>
-		</div>
-		<div class="col-4">
-			<div class="form-floating mb-6">
-				<input type="text" class="form-control" id="unidade" name="unidade" placeholder="example">
-				<label for="unidade"><i class="fa-solid fa-ruler input-icon"></i>Unidade do produto</label>
-				<label for="codigo_barra">Código de barras do produto</label>
-			</div>
-		</div>
-		<div class="col-2">
-			<div class="form-floating mb-3">
-				<input type="text" class="form-control" id="grupo" name="grupo" placeholder="example">
-				<label for="grupo">Grupo</label>
-			</div>
-		</div>
-		<div class="col-2">
-			<div class="form-floating mb-3">
-				<input type="text" class="form-control" id="unidade" name="unidade" placeholder="example">
-				<label for="unidade">Unidade do produto</label>
-			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-4">
-			<div class="form-floating mb-4">
-				<input type="text" class="form-control" id="preco_compra" name="preco_compra" placeholder="example">
-				<label for="preco_compra"><i class="fa-solid fa-cart-shopping input-icon"></i>Preço de compra</label>
-			<div class="form-floating mb-3">
-				<input type="text" class="form-control" id="preco_compra" name="preco_compra" placeholder="example">
-				<label for="preco_compra">Preço de compra</label>
-			</div>
-		</div>
-		<div class="col-4">
-			<div class="form-floating mb-3">
-				<input type="text" class="form-control" id="total_imposto" name="total_imposto" placeholder="example">
-				<label for="total_imposto"><i class="fa-solid fa-percent input-icon"></i>Total de imposto</label>
-				<label for="total_imposto">Total de imposto</label>
-			</div>
-		</div>
-		<div class="col-4">
-			<div class="form-floating mb-3">
-				<input type="text" class="form-control" id="margem_lucro" name="margem_lucro" placeholder="example">
-				<label for="margem_lucro"><i class="fa-solid fa-chart-line input-icon"></i>Margem de lucro</label>
-				<label for="margem_lucro">Margem de lucro</label>
-			</div>
-		</div>
-		<div class="col-4">
-			<div class="form-floating mb-3">
-				<input type="text" class="form-control" id="custo_operacional" name="custo_operacional"
-					placeholder="example">
-				<label for="custo_operacional"><i class="fa-solid fa-gears input-icon"></i>Custo operacional</label>
-				<label for="custo_operacional">Custo operacional</label>
-			</div>
-		</div>
-		<div class="col-4">
-			<div class="form-floating mb-3">
-				<input type="text" class="form-control" id="preco_venda" name="preco_venda" placeholder="example"
-					autofocus>
-				<label for="preco_venda"><i class="fa-solid fa-tag input-icon"></i>Preço de venda</label>
-				<label for="preco_venda">Preço de venda</label>
-			</div>
-		</div>
-		<div class="col-2">
-			<span id="total_importo_value"></span>
-		</div>
-		<div class="col-2">
-			<div class="form-check form-switch">
-				<input class="form-check-input" type="checkbox" role="switch" id="ativo" name="ativo" checked>
-				<label class="form-check-label" for="ativo">Produto ativo?</label>
-			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-12">
-			<div class="resultado-row mb-2 d-none" id="resultado-row">
-				<div class="metrica-col">
-					<span class="metrica-label">Total de imposto</span>
-					<span class="metrica-valor" id="val-imposto">—</span>
-				</div>
-				<div class="metrica-col">
-					<span class="metrica-label">Custo operacional</span>
-					<span class="metrica-valor" id="val-custo">—</span>
-				</div>
-				<div class="metrica-col">
-					<span class="metrica-label">Margem de lucro</span>
-					<span class="metrica-valor" id="val-margem">—</span>
-				</div>
-				<div class="metrica-col destaque">
-					<span class="metrica-label">Preço de venda sugerido</span>
-					<span class="metrica-valor" id="val-venda">—</span>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-12">
-			<div class="form-floating">
-				<textarea class="form-control" placeholder="Leave a comment here" id="descricao" name="descricao"
-					style="height: 100px"></textarea>
-				<label for="descricao"><i class="fa-solid fa-align-left input-icon"></i>Descrição do produto</label>
-				<label for="descricao">Descrição do produto</label>
-			</div>
-		</div>
-	</div>
-	<div class="row mt-2">
-		<div class="col-12 mt-2">
-			<button type="button" class="btn btn-outline-success" id="insert">
-				<i class="fa-solid fa-floppy-disk"></i>
-				Salvar
-			</button>
-		</div>
-	</div>
-</form>
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center gap-2 mb-4">
+        <i class="fa-solid fa-box fa-lg text-success"></i>
+        <h4 class="mb-0 fw-semibold">{{ action == 'edit' and 'Editar Produto' or 'Novo Produto' }}</h4>
+    </div>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <form id="form">
+                <input type="hidden" id="id" name="id">
+                <input type="hidden" id="action" name="action">
 
+                <!-- Identificação -->
+                <div class="row g-3 mb-3">
+                    <div class="col-8">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="nome" name="nome" placeholder="x" autofocus>
+                            <label for="nome">Nome do produto</label>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="codigo_barra" name="codigo_barra" placeholder="x">
+                            <label for="codigo_barra">Código de barras</label>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="grupo" name="grupo" placeholder="x">
+                            <label for="grupo">Grupo</label>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="unidade" name="unidade" placeholder="x">
+                            <label for="unidade">Unidade do produto</label>
+                        </div>
+                    </div>
+                    <div class="col-4 d-flex align-items-center">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="ativo" name="ativo" checked>
+                            <label class="form-check-label fw-medium" for="ativo">Produto ativo?</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Precificação -->
+                <div class="row g-3 mb-3">
+                    <div class="col-3">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="preco_compra" name="preco_compra" placeholder="x">
+                            <label for="preco_compra">Preço de compra</label>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="total_imposto" name="total_imposto" placeholder="x">
+                            <label for="total_imposto">Total de imposto</label>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="custo_operacional" name="custo_operacional" placeholder="x">
+                            <label for="custo_operacional">Custo operacional</label>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="margem_lucro" name="margem_lucro" placeholder="x">
+                            <label for="margem_lucro">Margem de lucro</label>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="preco_venda" name="preco_venda" placeholder="x">
+                            <label for="preco_venda">Preço de venda</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resultado do Cálculo -->
+                <div id="resultado-row" class="d-none mb-4">
+                    <div class="card border-0 bg-light">
+                        <div class="card-header bg-transparent border-bottom py-2">
+                            <span class="fw-semibold text-muted small text-uppercase">
+                                <i class="fa-solid fa-calculator me-1"></i>Resultado do Cálculo
+                            </span>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-borderless mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="text-muted small ps-3">Total de imposto</th>
+                                        <th class="text-muted small">Custo operacional</th>
+                                        <th class="text-muted small">Margem de lucro</th>
+                                        <th class="text-muted small">Preço de venda sugerido</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-semibold ps-3" id="val-imposto">—</td>
+                                        <td class="fw-semibold" id="val-custo">—</td>
+                                        <td class="fw-semibold" id="val-margem">—</td>
+                                        <td class="fw-semibold text-success fs-5" id="val-venda">—</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Descrição -->
+                <div class="row g-3 mb-4">
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <textarea class="form-control" placeholder="x" id="descricao" name="descricao" style="height: 100px"></textarea>
+                            <label for="descricao">Descrição do produto</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ações -->
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-success px-4" id="insert">
+                        <i class="fa-solid fa-floppy-disk me-2"></i>Salvar
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary px-4" onclick="window.close()">
+                        <i class="fa-solid fa-xmark me-2"></i>Cancelar
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}

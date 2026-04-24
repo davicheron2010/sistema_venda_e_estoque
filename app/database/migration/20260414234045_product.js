@@ -5,7 +5,6 @@ export function up(knex) {
             table.text('codigo_barra');
             table.text('grupo');
             table.text('unidade');
-            table.text('grupo');
             table.decimal('preco_compra', 18, 4).defaultTo(0);
             table.decimal('total_imposto', 18, 4).defaultTo(0);
             table.decimal('margem_lucro', 18, 4).defaultTo(0);

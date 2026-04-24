@@ -43,13 +43,9 @@ Datatables.SetTable('#table-products', [
                 <button onclick="deleteProduct(${row.id})" class="btn btn-xs btn-danger btn-sm">
                     <i class="fa-solid fa-trash"></i> Excluir
                 </button>
-                <button onclick="printProduct(${row.id})" class="btn btn-xs btn-info btn-sm">
-                    <i class="fa-solid fa-print"></i> Imprimir
-                </button>
             `;
         }
     }
-]).getData(filter => api.product.productSearch(filter));
 ]).getData(filter => api.product.find(filter));
 
 async function deleteProduct(id) {
@@ -125,14 +121,10 @@ async function printProduct(id) {
         </head>
         <body>
             <div class="container">
-
-                <!-- CABEÇALHO -->
                 <div class="header-box text-center">
                     <h2>Ficha do Produto</h2>
                     <p>Data: <strong>${dataAtual}</strong></p>
                 </div>
-
-                <!-- INFORMAÇÕES DO PRODUTO E PREÇOS -->
                 <div class="row">
                     <div class="col-7">
                         <div class="info-card">
@@ -152,8 +144,6 @@ async function printProduct(id) {
                         </div>
                     </div>
                 </div>
-
-                <!-- TABELA DO PRODUTO -->
                 <div class="mt-4"><strong>DETALHES: ${product.id} - ${product.nome}</strong></div>
                 <table class="table table-sm table-bordered">
                     <thead>
@@ -173,6 +163,7 @@ async function printProduct(id) {
                             <td>${product.id}</td>
                             <td>${product.nome}</td>
                             <td>${product.codigo_barra}</td>
+                            <td>${product.grupo}</td>
                             <td class="text-center">${product.unidade}</td>
                             <td class="text-right">${parseFloat(product.preco_compra).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                             <td class="text-right">${parseFloat(product.preco_venda).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
@@ -180,12 +171,9 @@ async function printProduct(id) {
                         </tr>
                     </tbody>
                 </table>
-
-                <!-- TOTAL -->
                 <div class="total-final text-right">
                     MARGEM DE LUCRO: ${(((product.preco_venda - product.preco_compra) / product.preco_compra) * 100).toFixed(2)}% &nbsp;|&nbsp; PREÇO DE VENDA: ${parseFloat(product.preco_venda).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </div>
-
             </div>
         </body>
         </html>

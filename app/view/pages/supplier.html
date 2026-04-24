@@ -1,5 +1,6 @@
 {% extends "layouts/main.html" %}
 {% block title %}{{ action == 'edit' and 'Editar Fornecedor' or 'Novo Fornecedor' }}{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-4">
     <div class="d-flex align-items-center gap-2 mb-4">
@@ -14,43 +15,37 @@
                 <div class="row g-3 mb-3">
                     <div class="col-12">
                         <div class="form-floating">
-                            <input type="text" class="form-control" id="nome_fantasia" name="nome_fantasia"
-                                placeholder="nome_fantasia" autofocus>
-                            <label for="nome_fantasia"><i class="fa-solid fa-building me-1"></i>Nome do
-                                Fornecedor</label>
+                            <input type="text" class="form-control" id="nome_fantasia" name="nome_fantasia" placeholder="x" autofocus>
+                            <label for="nome_fantasia">Nome do Fornecedor</label>
                         </div>
                     </div>
                 </div>
                 <div class="row g-3 mb-3">
-                    <div class="col-md-12">
+                    <div class="col-12">
                         <div class="form-floating">
-                            <input type="text" class="form-control" id="razao_social" name="razao_social"
-                                placeholder="razao_social">
-                            <label for="razao_social"><i class="fa-solid fa-file-signature me-1"></i>Razão
-                                Social</label>
+                            <input type="text" class="form-control" id="razao_social" name="razao_social" placeholder="x">
+                            <label for="razao_social">Razão Social</label>
                         </div>
                     </div>
                 </div>
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <input type="text" class="form-control" id="cnpj_cpf" name="cnpj_cpf"
-                                placeholder="cnpj_cpf">
-                            <label for="cnpj_cpf"><i class="fa-solid fa-id-card me-1"></i>CNPJ/CPF</label>
+                            <input type="text" class="form-control" id="cnpj_cpf" name="cnpj_cpf" placeholder="x">
+                            <label for="cnpj_cpf">CNPJ/CPF</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <input type="text" class="form-control" id="ie_rg" name="ie_rg" placeholder="ie_rg">
-                            <label for="ie_rg"><i class="fa-solid fa-address-card me-1"></i>Inscrição Estadual/RG</label>
+                            <input type="text" class="form-control" id="ie_rg" name="ie_rg" placeholder="x">
+                            <label for="ie_rg">Inscrição Estadual/RG</label>
                         </div>
                     </div>
                 </div>
                 <div class="row g-3 mb-4">
                     <div class="col-12">
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" name="ativo" id="ativo" value="true"
-                                checked>
+                            <input class="form-check-input" type="checkbox" name="ativo" id="ativo" value="true" checked>
                             <label class="form-check-label fw-medium" for="ativo">Fornecedor Ativo</label>
                         </div>
                     </div>
@@ -67,74 +62,6 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block title %}Novo Fornecedor{% endblock %}
-
-{% block content %}
-<div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
-    <div>
-        <h2 class="mb-0 fw-semibold">Cadastro de Fornecedor</h2>
-        <small class="text-muted">Preencha os dados do Fornecedor</small>
-    </div>
-</div>
-
-<form id="form">
-    <input type="hidden" id="id" name="id">
-    <input type="hidden" id="action" name="action">
-
-    <div class="card shadow-sm border-0 mb-3">
-        <div class="card-header bg-dark text-white py-2 px-3">
-            <small class="fw-semibold"><i class="fa-solid fa-user me-2"></i>Dados Pessoais</small>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-6">
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="nome_fantasia" name="nome_fantasia" placeholder="example" autofocus>
-                        <label for="nome_fantasia">Nome do Fornecedor</label>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="razao_social" name="razao_social" placeholder="example" autofocus>
-                        <label for="razao_social">Razão Social do Fornecedor</label>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="cnpj_cpf" name="cnpj_cpf" placeholder="example">
-                        <label for="cnpj_cpf">CPF/CNPJ do Fornecedor</label>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="form-floating mb-3 mb-0">
-                        <input type="text" class="form-control" id="ie_rg" name="ie_rg" placeholder="example">
-                        <label for="ie_rg">RG/IE do Fornecedor</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card shadow-sm border-0 mb-3">
-        <div class="card-body py-2">
-            <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" name="ativo" id="ativo" value="true">
-                <label class="form-check-label" for="ativo">Fornecedor ativo</label>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-12">
-            <button type="button" class="btn btn-success" id="insert">
-                <i class="fa-solid fa-floppy-disk me-1"></i>
-                Salvar
-            </button>
-        </div>
-    </div>
-</form>
 {% endblock %}
 
 {% block scripts %}
