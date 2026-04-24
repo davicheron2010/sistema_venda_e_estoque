@@ -2,14 +2,21 @@ import connection from '../database/Connection.js';
 
 export default class PaymentTerms {
     static table = 'payment_terms';
-
     static #columns = ['id', 'codigo', 'titulo', 'atalho'];
     static #searchable = ['codigo', 'titulo', 'atalho'];
 
     static async find(data = {}) {
-        const { term = '', q = '', limit = 100, offset = 0, orderType = 'asc', column = 0, draw = 1 } = data;
+        const {
+            term = '',
+            q = '',
+            limit = 100,
+            offset = 0,
+            orderType = 'asc',
+            column = 0,
+            draw = 1
+        } = data;
 
-        const searchTerm = (term || q || '').trim();
+        const searchTerm = String(term || q || '').trim();
 
         try {
             const [{ count: total }] = await connection(PaymentTerms.table).count('id as count');
@@ -18,7 +25,7 @@ export default class PaymentTerms {
                 if (searchTerm) {
                     query.where(function () {
                         for (const col of PaymentTerms.#searchable) {
-                            this.orWhere(col, 'like', `%${searchTerm}%`);
+                            this.orWhereRaw(`CAST("${col}" AS TEXT) ILIKE ?`, [`%${searchTerm}%`]);
                         }
                     });
                 }
@@ -32,36 +39,59 @@ export default class PaymentTerms {
             const orderColumn = PaymentTerms.#columns[column] || 'titulo';
             const orderDir = orderType === 'desc' ? 'desc' : 'asc';
 
-            const dataQ = connection(PaymentTerms.table).select('*');
-            applySearch(dataQ);
-            const rows = await dataQ.orderBy(orderColumn, orderDir).limit(parseInt(limit)).offset(parseInt(offset));
+            const rows = await applySearch(connection(PaymentTerms.table).select('*'))
+                .orderBy(orderColumn, orderDir)
+                .limit(parseInt(limit) || 100)
+                .offset(parseInt(offset) || 0);
 
             return {
-                draw: parseInt(draw),
-                recordsTotal: parseInt(total),
-                recordsFiltered: parseInt(filtered),
+                draw: parseInt(draw) || 1,
+                recordsTotal: Number(total) || 0,
+                recordsFiltered: Number(filtered) || 0,
                 data: rows,
+                status: true
             };
         } catch (error) {
             console.error('Erro no PaymentTerms.find:', error);
-            return { draw: 1, recordsTotal: 0, recordsFiltered: 0, data: [] };
+            return {
+                draw: parseInt(draw) || 1,
+                recordsTotal: 0,
+                recordsFiltered: 0,
+                data: [],
+                status: false,
+                msg: error.message
+            };
         }
     }
 
     static async insert(data) {
-        if (!data.titulo || data.titulo.trim() === '') {
+        const titulo = String(data.titulo || '').trim();
+        if (!titulo) {
             return { status: false, msg: 'O campo título é obrigatório' };
         }
+
         try {
-            await connection(PaymentTerms.table).insert({
-                codigo:           data.codigo || '',
-                titulo:           data.titulo,
-                atalho:           data.atalho || '',
-                data_cadastro:    new Date(),
+            const payload = {
+                codigo: data.codigo ?? null,
+                titulo,
+                atalho: data.atalho ?? null,
+                data_cadastro: new Date(),
                 data_atualizacao: new Date(),
-            });
-            const result = await connection(PaymentTerms.table).orderBy('id', 'desc').first();
-            return { status: true, msg: 'Salvo com sucesso!', id: result.id, data: [result] };
+            };
+
+            const result = await connection(PaymentTerms.table).insert(payload).returning('id');
+            const id = Array.isArray(result)
+                ? (result[0]?.id ?? result[0] ?? null)
+                : (result?.id ?? result ?? null);
+
+            const row = await connection(PaymentTerms.table).where({ id }).first();
+
+            return {
+                status: true,
+                msg: 'Salvo com sucesso!',
+                id: Number(id),
+                data: row || null
+            };
         } catch (err) {
             return { status: false, msg: 'Erro: ' + err.message };
         }
@@ -69,15 +99,32 @@ export default class PaymentTerms {
 
     static async update(id, data) {
         if (!id) return { status: false, msg: 'ID é obrigatório' };
+
+        const titulo = String(data.titulo || '').trim();
+        if (!titulo) {
+            return { status: false, msg: 'O campo título é obrigatório' };
+        }
+
         try {
-            await connection(PaymentTerms.table).where({ id }).update({
-                codigo:           data.codigo || '',
-                titulo:           data.titulo,
-                atalho:           data.atalho || '',
+            const affectedRows = await connection(PaymentTerms.table).where({ id }).update({
+                codigo: data.codigo ?? null,
+                titulo,
+                atalho: data.atalho ?? null,
                 data_atualizacao: new Date(),
             });
-            const result = await connection(PaymentTerms.table).where({ id }).first();
-            return { status: true, msg: 'Atualizado com sucesso!', id: result.id, data: [result] };
+
+            if (!affectedRows) {
+                return { status: false, msg: 'Nenhum registro foi atualizado' };
+            }
+
+            const row = await connection(PaymentTerms.table).where({ id }).first();
+
+            return {
+                status: true,
+                msg: 'Atualizado com sucesso!',
+                id: Number(id),
+                data: row || null
+            };
         } catch (err) {
             return { status: false, msg: 'Erro: ' + err.message };
         }
@@ -85,9 +132,13 @@ export default class PaymentTerms {
 
     static async delete(id) {
         if (!id) return { status: false, msg: 'ID é obrigatório' };
+
         try {
-            await connection(PaymentTerms.table).where({ id }).del();
-            return { status: true, msg: 'Excluído com sucesso!' };
+            const affectedRows = await connection(PaymentTerms.table).where({ id }).del();
+            return {
+                status: affectedRows > 0,
+                msg: affectedRows > 0 ? 'Excluído com sucesso!' : 'Nenhum registro encontrado'
+            };
         } catch (err) {
             return { status: false, msg: 'Erro: ' + err.message };
         }
@@ -95,22 +146,30 @@ export default class PaymentTerms {
 
     static async findById(id) {
         if (!id) return null;
-        return await connection(PaymentTerms.table).where({ id }).first() || null;
+
+        try {
+            return await connection(PaymentTerms.table).where({ id }).first() || null;
+        } catch (error) {
+            console.error('Erro no PaymentTerms.findById:', error);
+            return null;
+        }
     }
+
     static async findWithInstallments(id) {
-    if (!id) return null;
-    try {
-        const term = await connection(PaymentTerms.table).where({ id }).first();
-        if (!term) return null;
+        if (!id) return null;
 
-        const installments = await connection('installment')
-            .where({ id_pagamento: id })
-            .orderBy('parcela', 'asc');
+        try {
+            const term = await connection(PaymentTerms.table).where({ id }).first();
+            if (!term) return null;
 
-        return { ...term, installments };
-    } catch (error) {
-        console.error('Erro no findWithInstallments:', error);
-        return null;
+            const installments = await connection('installment')
+                .where({ id_pagamento: id })
+                .orderBy('parcela', 'asc');
+
+            return { ...term, installments };
+        } catch (error) {
+            console.error('Erro no findWithInstallments:', error);
+            return null;
+        }
     }
-}
 }

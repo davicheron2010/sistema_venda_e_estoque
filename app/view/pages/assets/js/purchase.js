@@ -1,335 +1,342 @@
-let items = [];
-let currentPaymentTerm = null;
-let paymentModal = null;
+(() => {
+    const inputDesconto = document.getElementById('purchase-discount');
+    const finalizePurchaseButton = document.getElementById('finalize-sale');
+    const clearPurchaseButton = document.getElementById('clear-sale');
+    const confirmPaymentButton = document.getElementById('confirm-payment');
+    const paymentTermsButtons = document.getElementById('payment-terms-buttons');
+    const paymentInstallments = document.getElementById('payment-installments');
+    const cardInstallmentsWrap = document.getElementById('card-installments-wrap');
+    const installmentList = document.getElementById('installment-list');
+    const installmentDifference = document.getElementById('installment-difference');
+    const paymentSplitWrap = document.getElementById('payment-split-wrap');
+    const paymentSplitList = document.getElementById('payment-split-list');
+    const purchaseAction = document.getElementById('acao');
+    const purchaseId = document.getElementById('id');
 
-// ─── Select2: Fornecedor ──────────────────────────────────────────────────────
-$('#fornecedor_id').select2({
-    theme: 'bootstrap-5',
-    placeholder: "Selecione um fornecedor",
-    language: "pt-BR",
-    ajax: {
-        transport: async function (params, success, failure) {
-            try {
-                const searchTerm = params.data.q || '';
-                const result = await window.api.supplier.find({ term: searchTerm });
-                success({
-                    results: result.data.map(item => ({
-                        id:           item.id,
-                        text:         item.nome_fantasia,
-                        razao_social: item.razao_social || '—',
-                        cnpj_cpf:     item.cnpj_cpf || '—'
-                    }))
-                });
-            } catch (error) {
-                console.error(error);
-                failure();
-            }
-        },
-        delay: 250
-    }
-});
+    let paymentModalInstance = null;
+    let selectedPaymentTerms = [];
+    let paymentTermsCache = [];
+    let currentPurchaseData = null;
 
-// ─── Select2: Produto ─────────────────────────────────────────────────────────
-$('#product-id').select2({
-    theme: 'bootstrap-5',
-    placeholder: "Selecione um produto",
-    language: "pt-BR",
-    ajax: {
-        transport: async function (params, success, failure) {
-            try {
-                const searchTerm = params.data.q || '';
-                const result = await window.api.product.find({ q: searchTerm });
-                success({
-                    results: result.data.map(item => ({
-                        id:           item.id,
-                        text:         item.nome,
-                        preco_compra: item.preco_compra,
-                        grupo:        item.grupo || '—'
-                    }))
-                });
-            } catch (error) {
-                console.error(error);
-                failure();
-            }
-        },
-        delay: 250
-    }
-});
-
-$('#unit-price').prop('disabled', true);
-
-$('#product-id').on('select2:select', function () {
-    const data = $(this).select2('data')[0];
-    $('#unit-price').prop('disabled', false);
-
-    if (data && data.preco_compra) {
-        $('#unit-price').val(parseFloat(data.preco_compra).toFixed(2));
-    } else {
-        $('#unit-price').val('');
-    }
-    $('#quantity').focus();
-});
-
-// ─── Gerenciamento de Itens ───────────────────────────────────────────────────
-$('#item-sale-form').on('submit', function (e) {
-    e.preventDefault();
-
-    const productSelect = $('#product-id');
-    const productId     = productSelect.val();
-    const productData   = productSelect.select2('data')[0];
-    const quantidade    = parseFloat($('#quantity').val().replace(',', '.'));
-    const unitario      = parseFloat($('#unit-price').val().replace(',', '.'));
-
-    if (!productId) { 
-        Swal.fire('Atenção', 'Selecione um produto.', 'warning'); 
-        return; 
-    }
-    if (!quantidade || quantidade <= 0) { 
-        Swal.fire('Atenção', 'Informe uma quantidade válida.', 'warning'); 
-        return; 
-    }
-    if (isNaN(unitario) || unitario < 0) { 
-        Swal.fire('Atenção', 'Informe um preço unitário válido.', 'warning'); 
-        return; 
+    function parseMoney(value) {
+        if (value === null || value === undefined || value === '') return 0;
+        return Number(String(value)
+            .replace(/R\$\s?/g, '')
+            .replace(/\./g, '')
+            .replace(',', '.')) || 0;
     }
 
-    const total = parseFloat((quantidade * unitario).toFixed(2));
-
-    items.push({
-        id_produto:     parseInt(productId),
-        produto_nome:   productData.text,
-        grupo:          productData.grupo || '—',
-        quantidade:     quantidade,
-        unitario_bruto: unitario,
-        total:          total
-    });
-
-    renderTable();
-    updateSummary();
-
-    productSelect.val(null).trigger('change');
-    $('#quantity').val('');
-    $('#unit-price').val('').prop('disabled', true);
-});
-
-function renderTable() {
-    const tbody = $('#sale-items-table tbody');
-    const fornecedorNome = $('#fornecedor_id').select2('data')[0]?.text || '—';
-    tbody.empty();
-
-    if (items.length === 0) {
-        tbody.append('<tr id="empty-row"><td colspan="7" class="text-center text-muted py-4">Nenhum item adicionado.</td></tr>');
-        return;
-    }
-
-    items.forEach((item, index) => {
-        tbody.append(`
-            <tr>
-                <td>${item.produto_nome}</td>
-                <td>${fornecedorNome}</td>
-                <td>${item.grupo}</td>
-                <td class="text-end">${item.quantidade}</td>
-                <td class="text-end">R$ ${item.unitario_bruto.toFixed(2)}</td>
-                <td class="text-end">R$ ${item.total.toFixed(2)}</td>
-                <td class="text-center">
-                    <button class="btn btn-sm btn-outline-danger" onclick="removeItem(${index})">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `);
-    });
-}
-
-window.removeItem = (index) => {
-    items.splice(index, 1);
-    renderTable();
-    updateSummary();
-};
-
-function updateSummary() {
-    const subtotal = items.reduce((acc, item) => acc + item.total, 0);
-    const desconto = parseFloat($('#sale-discount').val().replace(',', '.')) || 0;
-    const total    = Math.max(0, subtotal - desconto);
-
-    $('#sale-subtotal').text(subtotal.toFixed(2));
-    $('#sale-total').text(total.toFixed(2));
-
-    if (paymentModal && $('#paymentModal').hasClass('show')) {
-        renderInstallments();
-    }
-}
-
-$('#sale-discount').on('input', updateSummary);
-
-// ─── Pagamento e Parcelas (Dentro do Modal) ───────────────────────────────────
-async function loadPaymentTerms() {
-    try {
-        const result = await window.api.paymentTerms.find();
-        const select = $('#payment-condition');
-        select.empty().append('<option value="">Selecione...</option>');
-        result.data.forEach(term => {
-            select.append(`<option value="${term.id}">${term.titulo}</option>`);
+    function formatMoney(value) {
+        return Number(value || 0).toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
         });
-    } catch (error) { 
-        console.error(error); 
-    }
-}
-
-$('#payment-condition').on('change', async function () {
-    const id = $(this).val();
-    if (!id) { currentPaymentTerm = null; renderInstallments(); return; }
-    currentPaymentTerm = await window.api.paymentTerms.findWithInstallments(id);
-    renderInstallments();
-    checkConfirmButton();
-});
-
-function renderInstallments() {
-    const totalGeral = parseFloat($('#sale-total').text()) || 0;
-    const list = $('#installment-list').empty();
-
-    if (totalGeral === 0 || !currentPaymentTerm) {
-        $('#installment-difference').text('R$ 0.00').removeClass('bg-danger bg-success').addClass('bg-secondary');
-        return;
     }
 
-    const numParcelas = currentPaymentTerm.installments.length;
-    const valorParcelaBase = (totalGeral / numParcelas).toFixed(2);
-
-    currentPaymentTerm.installments.forEach((inst) => {
-        list.append(`
-            <div class="col-md-6 mb-2">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text small">P${inst.parcela}</span>
-                    <input type="number" class="form-control installment-input" step="0.01" value="${valorParcelaBase}">
-                </div>
-            </div>
-        `);
-    });
-
-    $('.installment-input').on('input', calculateDifference);
-    calculateDifference();
-}
-
-function calculateDifference() {
-    const totalGeral = parseFloat($('#sale-total').text()) || 0;
-    let somaParcelas = 0;
-    
-    $('.installment-input').each(function() {
-        somaParcelas += parseFloat($(this).val()) || 0;
-    });
-
-    const diff = (totalGeral - somaParcelas).toFixed(2);
-    const diffElem = $('#installment-difference');
-    
-    diffElem.text(`R$ ${diff}`);
-    
-    if (Math.abs(diff) <= 0.01) {
-        diffElem.removeClass('bg-danger bg-secondary').addClass('bg-success');
-    } else {
-        diffElem.removeClass('bg-success bg-secondary').addClass('bg-danger');
-    }
-    
-    checkConfirmButton();
-}
-
-// ─── Finalização e Modal ──────────────────────────────────────────────────────
-
-$('#finalize-sale').on('click', async function () {
-    if (!$('#fornecedor_id').val()) {
-        Swal.fire('Atenção', 'Selecione um fornecedor antes de continuar.', 'warning');
-        return;
-    }
-    if (items.length === 0) {
-        Swal.fire('Atenção', 'A lista de itens está vazia.', 'warning');
-        return;
-    }
-
-    $('#modal-total').text($('#sale-total').text());
-    
-    if (!paymentModal) paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
-    paymentModal.show();
-
-    await loadPaymentTerms(); 
-});
-
-function checkConfirmButton() {
-    const diffText = $('#installment-difference').text().replace('R$ ', '').replace(',', '.');
-    const diff = Math.abs(parseFloat(diffText));
-    const isReady = diff <= 0.01 && $('#payment-condition').val() !== "";
-    $('#confirm-payment').prop('disabled', !isReady);
-}
-
-$(document).on('input', '.installment-input', checkConfirmButton);
-$('#payment-condition').on('change', checkConfirmButton);
-
-$('#confirm-payment').on('click', async function () {
-    try {
-        const total = parseFloat($('#sale-total').text()) || 0;
-        const subtotal = parseFloat($('#sale-subtotal').text()) || 0;
-        const desconto = parseFloat($('#sale-discount').val().replace(',', '.')) || 0;
-        
-        const fornecedorData = $('#fornecedor_id').select2('data')[0];
-        const fornecedorNome = fornecedorData.text;
-        const fornecedorRazao = fornecedorData.razao_social || '—';
-        const fornecedorCnpjCpf = fornecedorData.cnpj_cpf || '—';
-
-        const parcelas = [];
-        $('.installment-input').each(function(index) {
-            parcelas.push({
-                parcela: index + 1,
-                valor: parseFloat($(this).val()) || 0
-            });
+    function formatNumberBR(value) {
+        return Number(value || 0).toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
         });
+    }
 
-        // ─── 1. SALVAR NO BANCO (Controller) ──────────────────────────────────
-        const purchaseData = {
-            id_fornecedor: parseInt(fornecedorData.id),
-            id_condicao_pagamento: parseInt($('#payment-condition').val()) || null,
-            total_bruto: subtotal,
-            total_liquido: total,
-            desconto: desconto,
-            estado_compra: 'RECEBIDO',
-            items: items.map(item => ({
-                id_produto: item.id_produto,
-                quantidade: item.quantidade,
-                unitario_bruto: item.unitario_bruto
-            }))
-        };
+    function calcPurchaseTotal() {
+        const subtotal = parseMoney(document.getElementById('total_liquido')?.innerText || '0');
+        const desconto = parseMoney(inputDesconto?.value || '0');
+        const total = Math.max(subtotal - desconto, 0);
 
-        Swal.fire({
-            title: 'Processando...',
-            text: 'Salvando dados da compra',
-            allowOutsideClick: false,
-            didOpen: () => { Swal.showLoading(); }
-        });
+        const el = document.getElementById('total_bruto');
+        if (el) el.innerText = formatNumberBR(total);
 
-        const saveResult = await window.api.purchase.insert(purchaseData);
+        const modalTotal = document.getElementById('modal-total');
+        if (modalTotal) modalTotal.innerText = formatNumberBR(total);
 
-        if (!saveResult.status) {
-            Swal.fire('Erro', saveResult.msg, 'error');
+        return total;
+    }
+
+    function getSelectedPaymentTerms() {
+        return Array.from(document.querySelectorAll('.payment-method:checked'))
+            .map(el => paymentTermsCache.find(t => String(t.codigo) === String(el.value)))
+            .filter(Boolean);
+    }
+
+    function renderPaymentSplit() {
+        if (!paymentSplitWrap || !paymentSplitList) return;
+
+        if (selectedPaymentTerms.length !== 2) {
+            paymentSplitWrap.classList.add('d-none');
+            paymentSplitList.innerHTML = '';
             return;
         }
 
-        // ─── 2. GERAR O PDF ───────────────────────────────────────────────────
-        const dataAtual = new Date().toLocaleDateString('pt-BR');
+        const total = calcPurchaseTotal();
+        paymentSplitWrap.classList.remove('d-none');
 
-        const itensHtml = items.map(item => `
+        paymentSplitList.innerHTML = selectedPaymentTerms.map((term, index) => {
+            const defaultValue = index === 0 ? total : 0;
+            return `
+                <div class="col-12">
+                    <label class="form-label small fw-bold">${term.titulo}</label>
+                    <div class="input-group">
+                        <span class="input-group-text">R$</span>
+                        <input type="text" class="form-control payment-split-value text-end" data-index="${index}" value="${formatNumberBR(defaultValue)}">
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        document.querySelectorAll('.payment-split-value').forEach(input => {
+            Inputmask('currency', {
+                radixPoint: ',',
+                groupSeparator: '.',
+                allowMinus: false,
+                prefix: 'R$ ',
+                autoGroup: true,
+                rightAlign: false
+            }).mask(input);
+
+            input.addEventListener('input', updatePaymentSplitValidation);
+        });
+
+        updatePaymentSplitValidation();
+    }
+
+    function updatePaymentSplitValidation() {
+        const total = calcPurchaseTotal();
+        const splitInputs = Array.from(document.querySelectorAll('.payment-split-value'));
+        const sum = splitInputs.reduce((acc, input) => acc + parseMoney(input.value), 0);
+        const diff = total - sum;
+
+        if (installmentDifference) {
+            installmentDifference.innerText = formatNumberBR(diff);
+            installmentDifference.classList.toggle('bg-success', Math.abs(diff) < 0.01);
+            installmentDifference.classList.toggle('bg-secondary', Math.abs(diff) >= 0.01);
+        }
+
+        if (confirmPaymentButton) {
+            const hasSelected = selectedPaymentTerms.length > 0;
+            const splitValid = selectedPaymentTerms.length === 2 ? Math.abs(diff) < 0.01 : true;
+            const hasCard = selectedPaymentTerms.some(t => t?.codigo === 'cartao');
+            const parcels = Number(paymentInstallments?.value || 0);
+
+            confirmPaymentButton.disabled = !hasSelected || !splitValid || (hasCard && !parcels);
+        }
+    }
+
+    function toggleCardInstallments() {
+        const hasCard = selectedPaymentTerms.some(t => t?.codigo === 'cartao');
+
+        if (cardInstallmentsWrap) {
+            cardInstallmentsWrap.classList.toggle('d-none', !hasCard);
+        }
+
+        if (!hasCard && paymentInstallments) {
+            paymentInstallments.value = '';
+        }
+
+        renderPaymentSplit();
+        renderInstallmentPreview();
+    }
+
+    function renderInstallmentPreview() {
+        if (!installmentList) return;
+
+        installmentList.innerHTML = '';
+
+        const hasCard = selectedPaymentTerms.some(t => t?.codigo === 'cartao');
+
+        if (!hasCard) {
+            if (installmentDifference && selectedPaymentTerms.length !== 2) {
+                installmentDifference.innerText = formatNumberBR(0);
+            }
+            updatePaymentSplitValidation();
+            return;
+        }
+
+        const total = calcPurchaseTotal();
+        const parcelas = Number(paymentInstallments?.value || 0);
+
+        if (!parcelas) {
+            if (installmentDifference && selectedPaymentTerms.length !== 2) {
+                installmentDifference.innerText = formatNumberBR(0);
+            }
+            updatePaymentSplitValidation();
+            return;
+        }
+
+        const base = total / parcelas;
+        const rounded = Number(base.toFixed(2));
+        const diff = total - (rounded * parcelas);
+
+        installmentList.innerHTML = Array.from({ length: parcelas }, (_, i) => {
+            const valor = i === parcelas - 1 ? rounded + diff : rounded;
+            return `
+                <div class="col-12">
+                    <div class="border rounded p-2 d-flex justify-content-between">
+                        <span>${i + 1}ª parcela</span>
+                        <strong>${formatMoney(valor)}</strong>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        if (installmentDifference && selectedPaymentTerms.length !== 2) {
+            installmentDifference.innerText = formatNumberBR(diff);
+        }
+
+        updatePaymentSplitValidation();
+    }
+
+    function openPaymentModal() {
+        const total = calcPurchaseTotal();
+        const modalEl = document.getElementById('paymentModal');
+        if (!modalEl || !window.bootstrap) return;
+
+        const modalTotal = document.getElementById('modal-total');
+        if (modalTotal) modalTotal.innerText = formatNumberBR(total);
+
+        paymentModalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+        paymentModalInstance.show();
+    }
+
+    async function loadPaymentTerms() {
+        try {
+            const response = await window.api.paymentTerms.find();
+            if (!response?.status) return;
+
+            const terms = response.data || [];
+            paymentTermsCache = terms;
+
+            if (!paymentTermsButtons) return;
+
+            paymentTermsButtons.innerHTML = terms.map((term) => {
+                const id = `payment-${term.codigo}`;
+                return `
+                    <input type="checkbox" class="btn-check payment-method" id="${id}" value="${term.codigo}" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="${id}">${term.titulo}</label>
+                `;
+            }).join('');
+
+            document.querySelectorAll('.payment-method').forEach(input => {
+                input.addEventListener('change', function () {
+                    const checked = Array.from(document.querySelectorAll('.payment-method:checked'));
+                    if (checked.length > 2) {
+                        this.checked = false;
+                        if (window.Swal) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Atenção',
+                                text: 'Selecione no máximo 2 formas de pagamento.'
+                            });
+                        } else {
+                            alert('Selecione no máximo 2 formas de pagamento.');
+                        }
+                        return;
+                    }
+
+                    selectedPaymentTerms = getSelectedPaymentTerms();
+                    toggleCardInstallments();
+                    updatePaymentSplitValidation();
+                });
+            });
+
+            selectedPaymentTerms = [];
+            toggleCardInstallments();
+            updatePaymentSplitValidation();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async function Insertpurchase() {
+        try {
+            const payload = {
+                id_fornecedor: $('#fornecedor_id').val() || null,
+                observacao: null,
+                desconto: parseMoney(inputDesconto?.value || 0),
+                acrescimo: 0,
+                total_bruto: 0,
+                total_liquido: 0
+            };
+
+            const response = purchaseAction?.value === 'c'
+                ? await window.api.purchase.insert(payload)
+                : await window.api.purchase.update(purchaseId?.value, payload);
+
+            if (!response?.status) {
+                return { status: false, msg: response?.msg || 'Erro ao salvar compra' };
+            }
+
+            const returnedId = Number(response.id ?? response.data?.id ?? response.insertId ?? 0);
+            if (returnedId > 0 && purchaseId) purchaseId.value = returnedId;
+            if (purchaseAction) purchaseAction.value = 'e';
+
+            return { status: true, id: returnedId };
+        } catch (error) {
+            console.error('Insertpurchase error:', error);
+            return { status: false, msg: error.message };
+        }
+    }
+
+    async function loadCurrentPurchaseData() {
+        try {
+            const id = Number(purchaseId?.value || 0);
+            if (!id) return;
+
+            const response = await window.api.purchase.listItemPurchase({ id });
+            if (response?.status) {
+                currentPurchaseData = response.purchase || null;
+            }
+        } catch (error) {
+            console.error('loadCurrentPurchaseData error:', error);
+        }
+    }
+
+    async function generatePurchasePdf(saveResult) {
+        const dataAtual = new Date().toLocaleString('pt-BR');
+        const fornecedorOption = document.querySelector('#fornecedor_id option:checked');
+
+        const fornecedorNome =
+            currentPurchaseData?.fornecedor_nome ||
+            fornecedorOption?.dataset?.nomeFantasia ||
+            fornecedorOption?.textContent?.trim() ||
+            '-';
+
+        const fornecedorRazao =
+            currentPurchaseData?.fornecedor_razao_social ||
+            fornecedorOption?.dataset?.razaoSocial ||
+            fornecedorNome;
+
+        const fornecedorCnpjCpf =
+            currentPurchaseData?.fornecedor_documento ||
+            fornecedorOption?.dataset?.cnpjCpf ||
+            fornecedorOption?.dataset?.cnpj_cpf ||
+            '-';
+
+        const itensHtml = Array.from(document.querySelectorAll('#products-table-tbody tr'))
+            .filter(tr => tr.id !== 'empty-row')
+            .map(tr => {
+                const tds = tr.querySelectorAll('td');
+                return `
+                    <tr>
+                        <td>${tds[0]?.innerText || '-'}</td>
+                        <td>${tds[2]?.innerText || '-'}</td>
+                        <td class="text-center">${tds[3]?.innerText || '0'}</td>
+                        <td class="text-right">${tds[4]?.innerText || '0,00'}</td>
+                        <td class="text-right">${tds[5]?.innerText || '0,00'}</td>
+                    </tr>
+                `;
+            }).join('');
+
+        const parcelasHtml = Array.from(document.querySelectorAll('.payment-split-value')).map((input, index) => `
             <tr>
-                <td>${item.produto_nome}</td>
-                <td>${item.grupo}</td>
-                <td class="text-center">${item.quantidade}</td>
-                <td class="text-right">${item.unitario_bruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                <td class="text-right">${item.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                <td class="text-center">${index + 1}</td>
+                <td class="text-right">${formatMoney(parseMoney(input.value))}</td>
             </tr>
         `).join('');
 
-        const parcelasHtml = parcelas.map(p => `
-            <tr>
-                <td class="text-center">${p.parcela}ª parcela</td>
-                <td class="text-right">${p.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-            </tr>
-        `).join('');
+        const currentPaymentTerm = selectedPaymentTerms[0] || { titulo: 'Não informado' };
+        const total = parseMoney(document.getElementById('total_bruto')?.innerText || '0');
 
         const stringHtml = `
         <!DOCTYPE html>
@@ -391,41 +398,120 @@ $('#confirm-payment').on('click', async function () {
         `;
 
         await window.api.report.print(stringHtml);
-        
-        paymentModal.hide();
-
-        Swal.fire({
-            icon: 'success',
-            title: 'Sucesso!',
-            text: `Compra #${saveResult.id} salva e impressa corretamente.`,
-            confirmButtonText: 'OK'
-        }).then(() => {
-            location.reload(); 
-        });
-        
-    } catch (error) {
-        console.error("Erro ao finalizar compra:", error);
-        Swal.fire('Erro Crítico', 'Não foi possível concluir a operação.', 'error');
     }
-});
 
-$('#clear-sale').on('click', function () {
-    Swal.fire({
-        title: 'Limpar tudo?',
-        text: "Isso removerá todos os itens da lista.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Sim, limpar!',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            items = [];
-            $('#fornecedor_id').val(null).trigger('change');
-            $('#sale-discount').val('0.00');
-            renderTable();
-            updateSummary();
+    document.addEventListener('DOMContentLoaded', async function () {
+        if (inputDesconto) {
+            Inputmask('currency', {
+                radixPoint: ',',
+                groupSeparator: '.',
+                allowMinus: false,
+                prefix: 'R$ ',
+                autoGroup: true,
+                rightAlign: false
+            }).mask(inputDesconto);
+
+            inputDesconto.addEventListener('input', () => {
+                calcPurchaseTotal();
+                renderPaymentSplit();
+                updatePaymentSplitValidation();
+            });
         }
+
+        if (finalizePurchaseButton) {
+            finalizePurchaseButton.addEventListener('click', openPaymentModal);
+        }
+
+        if (clearPurchaseButton) {
+            clearPurchaseButton.addEventListener('click', () => location.reload());
+        }
+
+        if (paymentInstallments) {
+            paymentInstallments.addEventListener('change', renderInstallmentPreview);
+        }
+
+        if (confirmPaymentButton) {
+            confirmPaymentButton.addEventListener('click', async () => {
+                const hasSelected = selectedPaymentTerms.length > 0;
+                const hasCard = selectedPaymentTerms.some(t => t?.codigo === 'cartao');
+                const parcels = Number(paymentInstallments?.value || 0);
+
+                if (!hasSelected) return;
+
+                if (selectedPaymentTerms.length === 2) {
+                    const splitInputs = Array.from(document.querySelectorAll('.payment-split-value'));
+                    const total = calcPurchaseTotal();
+                    const sum = splitInputs.reduce((acc, input) => acc + parseMoney(input.value), 0);
+
+                    if (Math.abs(total - sum) >= 0.01) {
+                        if (window.Swal) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Divisão inválida',
+                                text: 'A soma da divisão precisa ser igual ao total da compra.'
+                            });
+                        } else {
+                            alert('A soma da divisão precisa ser igual ao total da compra.');
+                        }
+                        return;
+                    }
+                }
+
+                if (hasCard && !parcels) {
+                    if (window.Swal) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Parcelas',
+                            text: 'Selecione as parcelas do cartão.'
+                        });
+                    } else {
+                        alert('Selecione as parcelas do cartão.');
+                    }
+                    return;
+                }
+
+                const saveResult = await Insertpurchase();
+                if (!saveResult?.status) {
+                    if (window.Swal) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: saveResult?.msg || 'Erro ao salvar compra.'
+                        });
+                    } else {
+                        alert(saveResult?.msg || 'Erro ao salvar compra.');
+                    }
+                    return;
+                }
+
+                await loadCurrentPurchaseData();
+                await generatePurchasePdf(saveResult);
+
+                if (window.Swal) {
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Compra finalizada',
+                        text: 'O PDF foi gerado com sucesso.',
+                        confirmButtonText: 'OK'
+                    });
+                } else {
+                    alert('O PDF foi gerado com sucesso.');
+                }
+
+                if (paymentModalInstance) {
+                    paymentModalInstance.hide();
+                }
+
+                setTimeout(() => {
+                    location.reload();
+                }, 800);
+            });
+        }
+
+        await loadPaymentTerms();
+        await loadCurrentPurchaseData();
     });
-});
+
+    window.calcPurchaseTotal = calcPurchaseTotal;
+    window.Insertpurchase = Insertpurchase;
+})();

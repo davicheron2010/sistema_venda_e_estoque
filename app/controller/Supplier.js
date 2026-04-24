@@ -4,10 +4,10 @@ export default class Supplier {
     static table = 'supplier';
 
     // 🔹 Colunas do DataTable
-    static #columns = ['id', 'nome_fantasia', 'sobrenome_razao', 'cnpj_cpf', 'ie_rg', 'ativo', null];
+    static #columns = ['id', 'nome_fantasia', 'razao_social', 'cnpj_cpf', 'ie_rg'];
 
     // 🔹 Campos pesquisáveis
-    static #searchable = ['nome_fantasia', 'sobrenome_razao', 'cnpj_cpf', 'ie_rg', 'ativo', null];
+    static #searchable = ['nome_fantasia', 'razao_social', 'cnpj_cpf', 'ie_rg'];
 
     // 🔹 INSERT
     static async insert(data) {
@@ -31,10 +31,10 @@ export default class Supplier {
             return { status: false, msg: 'Erro: ' + err.message, data: [] };
         }
     }
-
+    
     // 🔹 FIND (DataTable)
     static async find(data = {}) {
-        const { term = '', limit = 10, offset = 0, orderType = 'asc', column = 0, draw = 1 } = data;
+        const { term = '', limit = 20, offset = 0, orderType = 'desc', column = 0, draw = 1 } = data;
 
         const [{ count: total }] = await connection(Supplier.table).count('id as count');
 
@@ -44,7 +44,7 @@ export default class Supplier {
             if (search) {
                 query.where(function () {
                     for (const col of Supplier.#searchable) {
-                        this.orWhere(col, 'like', `%${search}%`);
+                        this.orWhere(col, 'ilike', `%${search}%`);
                     }
                 });
             }
@@ -134,6 +134,29 @@ export default class Supplier {
             .first();
 
         return row || null;
+    }
+
+    static async supplierSearch({ q = '' }) {
+        const search = q.trim();
+
+        const query = connection(Supplier.table).select('id', 'razao_social', 'nome_fantasia');
+
+        if (search !== '') {
+            data: await query.where(function () {
+                this.where('razao_social', 'ilike', `%${search}%`)
+                    .orWhere('nome_fantasia', 'ilike', `%${search}%`);
+            })
+        }
+        query.limit(10).offset(0).orderBy('nome_fantasia', 'asc');
+
+        const rows = await query;
+
+        return {
+            draw: 10,
+            recordsTotal: 10,
+            recordsFiltered: 10,
+            data: rows,
+        };
     }
 
     // 🔹 SANITIZE

@@ -7,8 +7,8 @@ exports.up = async function (knex) {
     table.decimal('quantidade_entrada', 18, 4).nullable();
     table.decimal('quantidade_saida', 18, 4).nullable();
     table.text('observacao').nullable();
-    table.datetime('data_cadastro').nullable().defaulclstTo(knex.fn.now());
-    table.datetime('data_atualizacao').nullable().defaultTo(knex.fn.now());
+    table.datetime('data_cadastro').defaultTo(knex.fn.now());
+    table.datetime('data_atualizacao').defaultTo(knex.fn.now());
 
     table
       .foreign('id_item_compra')

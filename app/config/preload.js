@@ -30,12 +30,16 @@ contextBridge.exposeInMainWorld('api', {
     // --- NOVO MÓDULO DE COMPRAS ---
     purchase: {
         insert: (data) => ipcRenderer.invoke('purchase:insert', data),
+        insertItem: (data) => ipcRenderer.invoke('purchase:insertItem', data),
+        listItemPurchase: (data) => ipcRenderer.invoke('purchase:listItemPurchase', data),
         update: (id, data) => ipcRenderer.invoke('purchase:update', id, data),
-        find: (where) => ipcRenderer.invoke('purchase:find', where), 
-        findPurchase: (where) => ipcRenderer.invoke('purchase:findPurchase', where), 
-        findById: (id) => ipcRenderer.invoke('purchase:findById', id), 
+        find: (where) => ipcRenderer.invoke('purchase:find', where),
+        findPurchase: (where) => ipcRenderer.invoke('purchase:findPurchase', where),
+        findById: (id) => ipcRenderer.invoke('purchase:findById', id),
+        deleteItem: (data) => ipcRenderer.invoke('purchase:deleteItem', data),
         delete: (id) => ipcRenderer.invoke('purchase:delete', id),
         onReload: (callback) => {
+            ipcRenderer.removeAllListeners('purchase:reload');
             ipcRenderer.on('purchase:reload', () => callback());
         },
     },
@@ -67,6 +71,7 @@ contextBridge.exposeInMainWorld('api', {
         insert(data) { return ipcRenderer.invoke('supplier:insert', data); },
         find(where) { return ipcRenderer.invoke('supplier:find', where); },
         findById(id) { return ipcRenderer.invoke('supplier:findById', id); },
+        supplierSearch(term) { return ipcRenderer.invoke('supplier:supplierSearch', term); },
         update(id, data) { return ipcRenderer.invoke('supplier:update', id, data); },
         delete(id) { return ipcRenderer.invoke('supplier:delete', id); },
         getAll() { return ipcRenderer.invoke('supplier:getAll'); }, // Adicionado getAll para facilitar

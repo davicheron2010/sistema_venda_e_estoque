@@ -164,7 +164,9 @@ ipcMain.handle('supplier:find', async (_e, where = {}) => {
 ipcMain.handle('supplier:findById', async (_e, id) => {
     return await Supplier.findById(id);
 });
-
+ipcMain.handle('supplier:supplierSearch', async (_e, term) => {
+    return await Supplier.supplierSearch(term);
+});
 ipcMain.handle('supplier:update', async (_e, id, data) => {
     const result = await Supplier.update(id, data);
     if (result.status) broadcastReload('supplier:reload');
@@ -237,25 +239,43 @@ ipcMain.handle('enterprise:delete', async (_e, id) => {
 });
 // Purchase
 
-// --- COMPRAS (PURCHASE) ---
 ipcMain.handle('purchase:insert', async (_e, data) => {
-    try {
-        const result = await Purchase.insert(data);
-        if (result.status) broadcastReload('purchase:reload');
-        return result;
-    } catch (error) {
-        return { status: false, msg: 'Erro ao salvar compra: ' + error.message };
-    }
+    const result = await Purchase.insert(data);
+    if (result.status) broadcastReload('purchase:reload');
+    return result;
 });
 
-// Adicione estes dois:
+ipcMain.handle('purchase:insertItem', async (_e, data) => {
+    const result = await Purchase.insertItem(data);
+    if (result.status) broadcastReload('purchase:reload');
+    return result;
+});
+
 ipcMain.handle('purchase:find', async (_e, where = {}) => {
     return await Purchase.find(where);
 });
-ipcMain.handle('purchase:findPurchase', async (_e, where = {}) => {
-    return await Purchase.find(where);
+
+ipcMain.handle('purchase:findById', async (_e, id) => {
+    return await Purchase.findById(id);
 });
 
+ipcMain.handle('purchase:listItemPurchase', async (_e, data) => {
+    return await Purchase.listItemPurchase(data);
+});
+
+ipcMain.handle('purchase:update', async (_e, id, data) => {
+    const result = await Purchase.update(id, data);
+    if (result.status) broadcastReload('purchase:reload');
+    return result;
+});
+ipcMain.handle('purchase:deleteItem', async (_e, data) => {
+    try {
+        return await Purchase.deleteItem(data);
+    } catch (error) {
+        console.error('Erro ao excluir item da compra:', error);
+        return { status: false, msg: error.message };
+    }
+});
 ipcMain.handle('purchase:delete', async (_e, id) => {
     const result = await Purchase.delete(id);
     if (result.status) broadcastReload('purchase:reload');
