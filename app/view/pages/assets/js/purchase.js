@@ -9,6 +9,9 @@ const inputQuantidade = document.getElementById('quantidade');
 const inputTotal = document.getElementById('valor-total');
 const fornecedorSelect = $('#fornecedor_id');
 const produtoSelect2 = $('#produto');
+const insertListItemButton = document.getElementById('insert-item');
+const Action = document.getElementById('acao');
+const Id = document.getElementById('id');
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -217,6 +220,7 @@ async function Insertpurchase() {
         });
     }
 }
+
 // ─── Função insert item
 async function InsertItemPurchase() {
     const valid = Validate.SetForm('form').Validate();
@@ -335,11 +339,60 @@ async function listItemPurchase() {
     }
 }
 
-
-
 async function UpdatePurchase(id, formId) {
     const form = document.getElementById(formId);
     if (!form) throw new Error("Formulário não encontrado!");
     const json = formToJson(form);
     return await api.purchase.update(id, json);
 }
+
+insertListItemButton.addEventListener("click", async () => {
+    let timer = 3000;
+    const btn = $(insertListItemButton);
+    btn.prop("disabled", true);
+
+    const form = document.getElementById('form');
+    const data = formToJson(form);
+
+    // Função auxiliar para limpar máscaras antes de enviar ao banco
+    const cleanInput = (val) => String(val).replace(/[R$%\s.]/g, "").replace(".", "").replace(",", ".");
+    //Converte os dados para do form para decimal, limpando as máscaras de moeda e porcentagem
+
+    data.inputPreco = cleanInput(data.preco_compra);
+    data.inputQuantidade = cleanInput(data.quantidade);
+    data.inputTotal = cleanInput(data.valor_total);
+
+
+    let id = (Action.value !== "c") ? Id.value : null;
+
+    try {
+        console.log("Dados enviados para o backend:", data);
+        const response = (Action.value === "c")
+            ? await api.purchase.insert(data)
+            : await api.purchase.update(id, data);
+
+        if (!response.status) {
+            toast("error", "Erro", response.msg, timer);
+            return;
+        }
+        //Insere o item na tabela item compra
+
+        const responseItem = await api.purchase.insertItem(data);
+
+        //Atualizar os campos de total da compra
+        document.getElementById('total_liquido').innerHTML = parseFloat(responseItem.data.total_liquido).toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        });
+
+        document.getElementById('total_bruto').innerHTML = parseFloat(responseItem.data.total_bruto).toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        });
+
+    } catch (err) {
+        toast("error", "Falha", "Erro interno: " + err.message, timer);
+    } finally {
+        btn.prop("disabled", false);
+    }
+});

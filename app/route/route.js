@@ -178,6 +178,16 @@ ipcMain.handle('purchase:insert', async (_e, data) => {
         return { status: false, msg: 'Erro ao salvar compra: ' + error.message };
     }
 });
+ipcMain.handle('purchase:insertItem', async (_e, data) => {
+    try {
+        const result = await Purchase.insertItem(data);
+        // Se a compra mudar estoque ou precisar recarregar outras telas:
+        if (result.status) broadcastReload('purchase:reload');
+        return result;
+    } catch (error) {
+        return { status: false, msg: 'Erro ao salvar compra: ' + error.message };
+    }
+});
 ipcMain.handle('purchase:find', async (_e, where = {}) => {
     return await Purchase.find(where);
 });

@@ -43,7 +43,7 @@
       </div>
 
       <div class="card-body">
-        <form id="item-sale-form">
+        <form id="form">
           <div class="row g-3">
             <div class="col-12">
               <label for="produto" class="form-label small fw-bold">Produto</label>
@@ -66,7 +66,7 @@
             </div>
           </div>
           <div class="col-12 text-end">
-            <button type="submit" class="btn btn-primary px-4" id="insert-item">
+            <button type="submit" class="btn btn-primary px-4" id="insert-item" name="insert-item">
               <i class="bi bi-plus-lg me-1"></i> Inserir na Lista
             </button>
           </div>
@@ -107,16 +107,16 @@
         <h2 class="h5 mb-3">Resumo da Compra</h2>
         <dl class="row mb-0">
           <dt class="col-7">Subtotal</dt>
-          <dd class="col-5 text-end">R$ <span id="sale-subtotal">0.00</span></dd>
+          <dd class="col-5 text-end">R$ <span id="total_liquido">R$ 0,00</span></dd>
           <dt class="col-7">Desconto</dt>
           <dd class="col-5 text-end">
             <div class="input-group input-group-sm justify-content-end" style="max-width: 140px; margin-left: auto;">
               <span class="input-group-text">R$</span>
-              <input type="text" id="sale-discount" class="form-control text-end" value="0.00" min="0" step="0.01">
+              <input type="text" id="purchase-discount" class="form-control text-end" value="0.00" min="0" step="0.01">
             </div>
           </dd>
           <dt class="col-7 pt-2 border-top">Total</dt>
-          <dd class="col-5 text-end pt-2 border-top fw-bold fs-5">R$ <span id="sale-total">0.00</span></dd>
+          <dd class="col-5 text-end pt-2 border-top fw-bold fs-5">R$ <span id="total_bruto">R$ 0,00</span></dd>
         </dl>
       </div>
     </div>

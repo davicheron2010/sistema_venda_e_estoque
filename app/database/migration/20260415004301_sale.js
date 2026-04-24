@@ -14,7 +14,7 @@ exports.up = function (knex) {
             .inTable('customer')
             .onDelete('CASCADE')
             .onUpdate('NO ACTION');
-
+        
         return knex.schema.raw('ALTER TABLE sale ADD COLUMN estado_venda stock_movement_venda;');
     });
 };

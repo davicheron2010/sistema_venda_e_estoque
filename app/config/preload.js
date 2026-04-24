@@ -11,17 +11,17 @@ contextBridge.exposeInMainWorld('api', {
     report: {
         print(stringHtml, args = {}) { return ipcRenderer.invoke('print', stringHtml, args); }
     },
-        
+
     window: {
         open(name, opts) { return ipcRenderer.invoke('window:open', name, opts); },
         openModal(name, opts) { return ipcRenderer.invoke('window:openModal', name, opts); },
         close() { return ipcRenderer.invoke('window:close'); }
     },
-    
+
     dashboard: {
         getStats() { return ipcRenderer.invoke('dashboard:getStats'); }
     },
-    
+
     temp: {
         set(key, data) { return ipcRenderer.invoke('temp:set', key, data); },
         get(key) { return ipcRenderer.invoke('temp:get', key); },
@@ -37,7 +37,7 @@ contextBridge.exposeInMainWorld('api', {
             ipcRenderer.on('customer:reload', () => callback());
         },
     },
-    
+
     product: {
         insert(data) { return ipcRenderer.invoke('product:insert', data); },
         find(where) { return ipcRenderer.invoke('product:find', where); },
@@ -84,8 +84,10 @@ contextBridge.exposeInMainWorld('api', {
             ipcRenderer.on('enterprise:reload', () => callback());
         },
     },
+
     purchase: {
         insert(data) { return ipcRenderer.invoke('purchase:insert', data); },
+        insertItem(data) { return ipcRenderer.invoke('purchase:insertItem', data); },
         find(where) { return ipcRenderer.invoke('purchase:find', where); },
         findById(id) { return ipcRenderer.invoke('purchase:findById', id); },
         update(id, data) { return ipcRenderer.invoke('purchase:update', id, data); },

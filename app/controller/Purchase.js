@@ -65,22 +65,23 @@ export default class purchase {
         }
     }
 
-    // Insere um item na venda
+    // Insere um item na compra, atualizando os totais da compra
     static async insertItem(data) {
-        const id = data['id'] ?? null;
-        const id_produto = data['pesquisa'] ?? null;
+        const id = data.id ?? null;
+        const id_produto = data.pesquisa ?? null;
+        const quantidade = data.quantidade ?? 1;
 
-        // Verifica se o id da venda está vazio ou nulo
-        if (!id) {
+        // Verifica se o id da compra está vazio ou nulo
+        if (id === null || id === undefined) {
             return {
                 status: false,
-                msg: 'Restrição: O ID da venda é obrigatório!',
+                msg: 'Restrição: O ID da compra é obrigatório!',
                 id: 0
             };
         }
 
         // Verifica se o id do produto está vazio ou nulo
-        if (!id_produto) {
+        if (id_produto === null || id_produto === undefined) {
             return {
                 status: false,
                 msg: 'Restrição: O ID do produto é obrigatório!',
@@ -103,19 +104,20 @@ export default class purchase {
             }
 
             const FieldAndValue = {
-                id_venda: id,
+                id_compra: id,
                 id_produto: id_produto,
-                quantidade: 1,
+                quantidade: quantidade,
                 total_bruto: produto.valor,
                 total_liquido: produto.valor,
                 desconto: 0,
                 acrescimo: 0,
                 nome: produto.nome
             };
+            console.log(FieldAndValue);
 
-            // Insere o item na venda
-            const isInserted = await connection(Purchase.tableItem)
-                .insert(FieldAndValue);
+            // Insere o item na compra
+            const isInserted = await connection('item_purchase')
+                .insert(FieldAndValue).returning('id');
 
             if (!isInserted) {
                 return {
@@ -125,24 +127,24 @@ export default class purchase {
                 };
             }
 
-            // Soma os totais de todos os itens da venda
-            const sale = await connection(Sale.tableItem)
-                .where({ id_venda: id })
-                .sum({ total_bruto: 'total_bruto', total_liquido: 'total_liquido' })
+            // Soma os totais de todos os itens da compra para atualizar o total da compra
+            const total_purchase = await connection('vw_item_purchase')
+                .where({ id_compra: id })
                 .first();
 
-            // Atualiza o total da venda
-            await connection(Sale.table)
+            // Atualiza o total da compra
+            await connection('purchase')
                 .where({ id })
                 .update({
-                    total_bruto: sale.total_bruto,
-                    total_liquido: sale.total_liquido
+                    total_bruto: total_purchase.total_bruto,
+                    total_liquido: total_purchase.total_liquido
                 });
 
             return {
                 status: true,
                 msg: 'Item inserido com sucesso!',
-                id: 0
+                id: isInserted[0],
+                data: total_purchase
             };
 
         } catch (error) {
