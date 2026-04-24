@@ -3,12 +3,12 @@
 // =============================================================================
 
 // ─── Referências DOM 
-const selectProduct     = document.getElementById("produto");
-const inputPreco        = document.getElementById('preco_compra');
-const inputQuantidade   = document.getElementById('quantidade');
-const inputTotal        = document.getElementById('valor-total');
-const fornecedorSelect  = $('#fornecedor_id');
-const produtoSelect2    = $('#produto');
+const selectProduct = document.getElementById("produto");
+const inputPreco = document.getElementById('preco_compra');
+const inputQuantidade = document.getElementById('quantidade');
+const inputTotal = document.getElementById('valor-total');
+const fornecedorSelect = $('#fornecedor_id');
+const produtoSelect2 = $('#produto');
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -36,11 +36,11 @@ document.addEventListener('DOMContentLoaded', function () {
     function executarCalculo() {
         try {
             // Tenta pegar o valor "desmascarado" do Inputmask primeiro, se não conseguir, limpa a string
-            const precoBruto   = inputPreco.inputmask ? inputPreco.inputmask.unmaskedvalue() : inputPreco.value;
-            const qtdBruta     = inputQuantidade.inputmask ? inputQuantidade.inputmask.unmaskedvalue() : inputQuantidade.value;
+            const precoBruto = inputPreco.inputmask ? inputPreco.inputmask.unmaskedvalue() : inputPreco.value;
+            const qtdBruta = inputQuantidade.inputmask ? inputQuantidade.inputmask.unmaskedvalue() : inputQuantidade.value;
 
             const preco = stringParaFloat(precoBruto);
-            const qtd   = stringParaFloat(qtdBruta);
+            const qtd = stringParaFloat(qtdBruta);
 
             const total = preco * qtd;
 
@@ -164,12 +164,178 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // ─── Funções de Persistência 
 
-async function InsertPurchase(formId) {
-    const form = document.getElementById(formId);
-    if (!form) throw new Error("Formulário não encontrado!");
-    const json = formToJson(form);
-    return await api.purchase.insert(json);
+
+async function Insertpurchase() {
+    const valid = Validate.SetForm('form').Validate();
+    if (!valid) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: 'Por favor, preencha os campos corretamente.',
+            time: 2000,
+            progressBar: true,
+        });
+        return;
+    }
+
+    try {
+        const form = document.getElementById('form');
+        if (!form) throw new Error('Formulário não encontrado!');
+        const json = formToJson(form);
+
+        // Chama insert ou update dependendo da ação atual
+        const response = Action.value === 'c'
+            ? await api.purchase.insert(json)
+            : await api.purchase.update({ id: Id.value, ...json });
+
+        if (!response.status) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: response.msg || 'Ocorreu um erro ao inserir a venda.',
+                time: 3000,
+                progressBar: true,
+            });
+            return;
+        }
+
+        // Altera a ação do formulário para 'e' (editar) após a venda ser inserida com sucesso
+        Action.value = 'e';
+        // Seta o ID da última venda inserida no banco de dados
+        Id.value = response.id;
+
+        // Lista todos os itens vendidos, quantidade e total da venda
+        await listItemPurchase();
+
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: error.message || 'Ocorreu um erro ao inserir a venda.',
+            time: 3000,
+            progressBar: true,
+        });
+    }
 }
+// ─── Função insert item
+async function InsertItemPurchase() {
+    const valid = Validate.SetForm('form').Validate();
+    if (!valid) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: 'Por favor, preencha os campos corretamente.',
+            time: 2000,
+            progressBar: true,
+        });
+        return;
+    }
+
+    try {
+        const form = document.getElementById('form');
+        if (!form) throw new Error('Formulário não encontrado!');
+        const json = formToJson(form);
+
+        const response = await api.purchase.insertItem(json);
+
+        if (!response.status) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: response.msg || 'Ocorreu um erro ao inserir o item da venda.',
+                time: 3000,
+                progressBar: true,
+            });
+            return;
+        }
+
+        // Atualiza a tabela de itens da venda
+        await listItemPurchase();
+
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: error.message || 'Ocorreu um erro ao inserir o item da venda.',
+            time: 3000,
+            progressBar: true,
+        });
+    }
+}
+
+// ─── Função listar itens da compra
+async function listItemPurchase() {
+    try {
+        const form = document.getElementById('form');
+        if (!form) throw new Error('Formulário não encontrado!');
+        const json = formToJson(form);
+
+        const response = await api.purchase.listItemSale(json);
+
+        if (!response.status) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: response.msg || 'Não foi possivel listar os dados da venda',
+                time: 2000,
+                progressBar: true,
+            });
+            return;
+        }
+
+        let total_liquido = parseFloat(response?.sale?.total_liquido);
+        let total_bruto = parseFloat(response?.sale?.total_bruto);
+
+        document.getElementById('total-amount').innerText = total_liquido
+            .toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            });
+
+        document.getElementById('amount').innerText = total_bruto
+            .toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            });
+
+        let trs = '';
+        response.data.forEach(item => {
+            let total_liquido = parseFloat(item?.total_liquido)
+                .toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                });
+            trs += `
+                <tr id="tritem${item.id}">
+                    <td>${item.id}</td>
+                    <td>${item.nome}</td>
+                    <td>${total_liquido}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteItem(${item.id})">
+                            Excluir cód: ${item.id} (Del)
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        // Atualiza os itens da venda na tabela
+        document.getElementById('products-table-tbody').innerHTML = trs;
+        // Atualiza o total de itens da venda
+        document.getElementById('product-count').innerText = `Itens ${response.data.length}`;
+
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: error.message || 'Ocorreu um erro ao listar os itens da venda.',
+            time: 3000,
+            progressBar: true,
+        });
+    }
+}
+
+
 
 async function UpdatePurchase(id, formId) {
     const form = document.getElementById(formId);
@@ -177,5 +343,3 @@ async function UpdatePurchase(id, formId) {
     const json = formToJson(form);
     return await api.purchase.update(id, json);
 }
-
-ok
