@@ -298,7 +298,7 @@
     }
 
     .card-produtos {
-        background: linear-gradient(135deg, #007bff 0%, #5dade2 100%) !important;
+        background: linear-gradient(135deg, #007bff 0%, #dbe25d 100%) !important;
     }
 
     .card-produtos:hover {
@@ -333,12 +333,20 @@
     }
 
     /* Usuários - Roxo/Indigo */
-    .card-usuarios {
-        background: linear-gradient(135deg, #6610f2 0%, #a55eea 100%) !important;
+    .card-compra {
+        background: linear-gradient(135deg, #c8c0d6 0%, #b7b2bd 100%) !important;
     }
 
-    .card-usuarios:hover {
-        box-shadow: 0 20px 50px rgba(102, 16, 242, 0.3) !important;
+    .card-compra:hover {
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3) !important;
+    }
+    /* Usuários - Roxo/Indigo */
+    .card-vendas {
+        background: linear-gradient(135deg, #cf0f39 0%, #c04b60 100%) !important;
+    }
+
+    .card-vendas:hover {
+        box-shadow: 0 20px 50px rgba(209, 3, 3, 0.3) !important;
     }
 
     /* Ajuste fino para os ícones dentro do seu HTML atual */
