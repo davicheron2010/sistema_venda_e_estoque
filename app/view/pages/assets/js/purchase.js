@@ -344,6 +344,7 @@ async function UpdatePurchase(id, formId) {
     if (!form) throw new Error("Formulário não encontrado!");
     const json = formToJson(form);
     return await api.purchase.update(id, json);
+<<<<<<< Updated upstream
 }
 
 insertListItemButton.addEventListener("click", async () => {
@@ -396,3 +397,6 @@ insertListItemButton.addEventListener("click", async () => {
         btn.prop("disabled", false);
     }
 });
+=======
+}
+>>>>>>> Stashed changes
