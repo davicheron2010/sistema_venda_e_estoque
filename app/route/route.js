@@ -1,6 +1,8 @@
 import { ipcMain, BrowserWindow } from 'electron';
 import Template from '../mixin/Template.js';
 import Product from '../controller/Product.js';
+import Customer from '../controller/Customer.js';
+import Sale from '../controller/Sale.js';
 import Supplier from '../controller/Supplier.js';
 import Purchase from '../controller/Purchase.js';
 
@@ -231,6 +233,32 @@ ipcMain.handle('enterprise:update', async (_e, id, data) => {
 ipcMain.handle('enterprise:delete', async (_e, id) => {
     const result = await Enterprise.delete(id);
     if (result.status) broadcastReload('enterprise:reload');
+    return result;
+});
+// --- Venda ---
+ipcMain.handle('sale:insert', async (_e, data) => {
+    const result = await Sale.insert(data);
+    if (result.status) broadcastReload('sale:reload');
+    return result;
+});
+
+ipcMain.handle('sale:find', async (_e, where = {}) => {
+    return await Sale.find(where);
+});
+
+ipcMain.handle('sale:findById', async (_e, id) => {
+    return await Sale.findById(id);
+});
+
+ipcMain.handle('sale:update', async (_e, id, data) => {
+    const result = await Sale.update(id, data);
+    if (result.status) broadcastReload('sale:reload');
+    return result;
+});
+
+ipcMain.handle('sale:delete', async (_e, id) => {
+    const result = await Sale.delete(id);
+    if (result.status) broadcastReload('sale:reload');
     return result;
 });
 // Purchase

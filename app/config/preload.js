@@ -93,4 +93,15 @@ contextBridge.exposeInMainWorld('api', {
             ipcRenderer.on('enterprise:reload', () => callback());
         },
     },
+
+    sale: {
+        insert(data) { return ipcRenderer.invoke('sale:insert', data); },
+        find(where) { return ipcRenderer.invoke('sale:find', where); },
+        findById(id) { return ipcRenderer.invoke('sale:findById', id); },
+        update(id, data) { return ipcRenderer.invoke('sale:update', id, data); },
+        delete(id) { return ipcRenderer.invoke('sale:delete', id); },
+        onReload(callback) {
+            ipcRenderer.on('sale:reload', () => callback());
+        },
+    },
 });
