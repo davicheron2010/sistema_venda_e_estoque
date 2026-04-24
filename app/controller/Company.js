@@ -1,5 +1,4 @@
-import connection from '../database/Connection.js';
-
+import Connection from '../database/Connection.js'
 export default class Company {
     //teste
     static table = 'company';

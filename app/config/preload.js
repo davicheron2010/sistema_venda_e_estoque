@@ -3,7 +3,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
-    // Adicionado para suportar chamadas diretas ipcRenderer.invoke se necessário
+    // Suporte para chamadas diretas se necessário
     ipcRenderer: {
         invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args),
     },
@@ -27,14 +27,11 @@ contextBridge.exposeInMainWorld('api', {
         get(key) { return ipcRenderer.invoke('temp:get', key); },
     },
 
-    // --- NOVO MÓDULO DE COMPRAS ---
     purchase: {
         insert(data) { return ipcRenderer.invoke('purchase:insert', data); },
         update(id, data) { return ipcRenderer.invoke('purchase:update', { id, ...data }); },
         getAll() { return ipcRenderer.invoke('purchase:getAll'); },
-        onReload(callback) {
-            ipcRenderer.on('purchase:reload', () => callback());
-        },
+        onReload(callback) { ipcRenderer.on('purchase:reload', () => callback()); },
     },
 
     customer: {
@@ -53,10 +50,8 @@ contextBridge.exposeInMainWorld('api', {
         findById(id) { return ipcRenderer.invoke('product:findById', id); },
         update(id, data) { return ipcRenderer.invoke('product:update', id, data); },
         delete(id) { return ipcRenderer.invoke('product:delete', id); },
-        getAll() { return ipcRenderer.invoke('product:getAll'); }, // Adicionado getAll para facilitar
-        onReload(callback) {
-            ipcRenderer.on('product:reload', () => callback());
-        },
+        getAll() { return ipcRenderer.invoke('product:getAll'); },
+        onReload(callback) { ipcRenderer.on('product:reload', () => callback()); },
     },
 
     supplier: {
@@ -65,10 +60,8 @@ contextBridge.exposeInMainWorld('api', {
         findById(id) { return ipcRenderer.invoke('supplier:findById', id); },
         update(id, data) { return ipcRenderer.invoke('supplier:update', id, data); },
         delete(id) { return ipcRenderer.invoke('supplier:delete', id); },
-        getAll() { return ipcRenderer.invoke('supplier:getAll'); }, // Adicionado getAll para facilitar
-        onReload(callback) {
-            ipcRenderer.on('supplier:reload', () => callback());
-        },
+        getAll() { return ipcRenderer.invoke('supplier:getAll'); },
+        onReload(callback) { ipcRenderer.on('supplier:reload', () => callback()); },
     },
 
     users: {
@@ -77,9 +70,7 @@ contextBridge.exposeInMainWorld('api', {
         findById(id) { return ipcRenderer.invoke('users:findById', id); },
         update(id, data) { return ipcRenderer.invoke('users:update', id, data); },
         delete(id) { return ipcRenderer.invoke('users:delete', id); },
-        onReload(callback) {
-            ipcRenderer.on('users:reload', () => callback());
-        },
+        onReload(callback) { ipcRenderer.on('users:reload', () => callback()); },
     },
 
     company: {
@@ -88,9 +79,7 @@ contextBridge.exposeInMainWorld('api', {
         findById(id) { return ipcRenderer.invoke('company:findById', id); },
         update(id, data) { return ipcRenderer.invoke('company:update', id, data); },
         delete(id) { return ipcRenderer.invoke('company:delete', id); },
-        onReload(callback) {
-            ipcRenderer.on('company:reload', () => callback());
-        },
+        onReload(callback) { ipcRenderer.on('company:reload', () => callback()); },
     },
 
     sale: {
@@ -99,8 +88,12 @@ contextBridge.exposeInMainWorld('api', {
         findById(id) { return ipcRenderer.invoke('sale:findById', id); },
         update(id, data) { return ipcRenderer.invoke('sale:update', id, data); },
         delete(id) { return ipcRenderer.invoke('sale:delete', id); },
-        onReload(callback) {
-            ipcRenderer.on('sale:reload', () => callback());
-        },
+        onReload(callback) { ipcRenderer.on('sale:reload', () => callback()); },
+    },
+
+    stock: {
+        getByProduct(id_produto) { return ipcRenderer.invoke('stock:getByProduct', id_produto); },
+        getMovements(id_produto) { return ipcRenderer.invoke('stock:getMovements', id_produto); },
+        adjust(data) { return ipcRenderer.invoke('stock:adjust', data); },
     },
 });

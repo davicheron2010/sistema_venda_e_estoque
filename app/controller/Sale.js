@@ -91,8 +91,8 @@ export default class Sale {
     static async insertItem(data) {
         const id = data['id'] ?? null;
         const id_produto = data['id_produto'] ?? null;
-        const quantidade = parseFloat(data['quantidade']) || 1;
-        const preco_unitario = parseFloat(data['preco_unitario']) || 0;
+        const quantidade = parseFloat(document.getElementById('stock_quantidade').value) || 0;
+         const preco_unitario = parseFloat(data['preco_unitario']) || 0;
 
         // Verifica se o id da venda está vazio ou nulo
         if (!id) {

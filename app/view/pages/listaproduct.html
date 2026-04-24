@@ -1,43 +1,124 @@
 {% extends "layouts/main.html" %}
 {% block title %}Produtos{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-4">
+
+    <!-- HEADER -->
     <div class="d-flex align-items-center justify-content-between mb-4">
         <div class="d-flex align-items-center gap-2">
             <i class="fa-solid fa-box fa-lg text-success"></i>
             <h4 class="mb-0 fw-semibold">Produtos</h4>
         </div>
+
         <button class="btn btn-success px-4"
             onclick="api.window.openModal('pages/product', { width: 900, height: 600, title: 'Cadastrar Produto' })">
             <i class="fa-solid fa-plus me-2"></i>Novo Produto
         </button>
     </div>
+
+    <!-- TABLE -->
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm border-0">
                 <div class="card-body p-0">
-                    <table id="table-products" class="table table-striped table-hover table-bordered mb-0 align-middle" style="width: 100%">
+
+                    <table id="table-products"
+                        class="table table-striped table-hover table-bordered mb-0 align-middle"
+                        style="width: 100%">
+
                         <thead class="table-dark">
                             <tr>
-                                <th>Código</th>
+                                <th>ID</th>
                                 <th>Nome</th>
                                 <th>Cód. Barra</th>
                                 <th>Grupo</th>
                                 <th>Unidade</th>
-                                <th>Preço de Compra</th>
-                                <th>Preço de Venda</th>
-                                <th class="text-center">Ativo</th>
+                                <th>Preço Compra</th>
+                                <th>Preço Venda</th>
+                                <th class="text-center">Status</th>
                                 <th class="text-center">Ações</th>
                             </tr>
                         </thead>
+
                         <tbody></tbody>
                     </table>
+
                 </div>
             </div>
         </div>
     </div>
+
 </div>
+
+<!-- MODAL ESTOQUE -->
+<div class="modal fade" id="modalStockAdjust" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+
+            <div class="modal-header bg-success text-white border-0">
+                <h5 class="modal-title">
+                    <i class="fa-solid fa-boxes-stacked me-2"></i>
+                    Ajuste de Estoque
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <form id="form-stock-adjust">
+
+                    <input type="hidden" id="stock_product_id">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted small text-uppercase">Produto</label>
+                        <input type="text" id="stock_product_name" class="form-control bg-light fw-semibold" readonly>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+
+                        <div class="col-6">
+                            <label class="form-label fw-bold text-muted small text-uppercase">Tipo</label>
+                            <select class="form-select border-2" id="stock_tipo">
+                                <option value="ENTRADA">Entrada (+)</option>
+                                <option value="SAIDA">Saída (-)</option>
+                                <option value="AJUSTE">Ajuste (definir estoque)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-6">
+                            <label class="form-label fw-bold text-muted small text-uppercase">Quantidade</label>
+                            <input type="number" step="0.01" class="form-control border-2"
+                                id="stock_quantidade" placeholder="0.00">
+                        </div>
+
+                    </div>
+
+                    <div class="mb-0">
+                        <label class="form-label fw-bold text-muted small text-uppercase">Observação</label>
+                        <textarea class="form-control border-2"
+                            id="stock_observacao"
+                            rows="3"
+                            placeholder="Motivo do ajuste"></textarea>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="modal-footer border-0">
+                <button class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button class="btn btn-success px-4" id="btn-save-stock">
+                    <i class="fa-solid fa-check me-2"></i>Salvar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 {% endblock %}
+
 {% block scripts %}
 <script src="file:///{{ assets }}/js/listaproduct.js"></script>
 {% endblock %}
