@@ -94,8 +94,8 @@ contextBridge.exposeInMainWorld('api', {
         },
     },
 
-    paymentTermsAPI: {
-        insert: (data) => ipcRenderer.invoke('paymentTerms:insert', data),
+    paymentTerms: {
+        insert: (data) => { return ipcRenderer.invoke('paymentTerms:insert', data); },
         find: (where) => ipcRenderer.invoke('paymentTerms:find', where),
         findById: (id) => ipcRenderer.invoke('paymentTerms:findById', id),
         update: (id, data) => ipcRenderer.invoke('paymentTerms:update', id, data),

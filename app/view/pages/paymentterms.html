@@ -16,11 +16,10 @@
     <div class="row">
         <div class="col-12 col-xl-11 mx-auto">
             <button class="btn btn-success"
-                onclick="api.window.openModal('pages/listasupplier', { width: 900, height: 600, title: 'Cadastrar Fornecedor' })">
+                onclick="api.window.openModal('pages/listasupplier', { width: 1000, height: 800, title: 'Cadastrar Fornecedor' })">
                 <i class="fa-solid fa-plus me-1"></i>
                 Novo fornecedor
             </button>
-
             <form id="form">
                 <input type="hidden" name="acao" id="acao" value="{{acao}}">
                 <input type="hidden" name="id" id="id" value="{{id}}">
@@ -29,7 +28,7 @@
                 <div class="card shadow-sm">
                     <div class="card-body p-4">
                         <div class="row g-3 mb-4">
-                            <div class="col-lg-4 col-md-12">
+                            <div class="col-lg-6 col-md-12">
                                 <div class="form-floating">
                                     <select class="form-select border-secondary-subtle shadow-none" id="codigo"
                                         name="codigo">
@@ -52,20 +51,12 @@
                                     <label for="codigo" class="text-muted">Tipo de Pagamento</label>
                                 </div>
                             </div>
-                            <div class="col-lg-5 col-md-12">
+                            <div class="col-lg-6 col-md-12">
                                 <div class="form-floating">
                                     <input type="text" class="form-control border-secondary-subtle shadow-none"
                                         id="titulo_campo" name="titulo" placeholder="Ex: Dinheiro"
                                         value="{{paymentTerms.titulo}}">
-                                    <label for="titulo_campo" class="text-muted">Título da Condição (Ex: A
-                                        Vista)</label>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-md-12">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control border-secondary-subtle shadow-none"
-                                        id="atalho" name="atalho" placeholder="F6" value="{{paymentTerms.atalho}}">
-                                    <label for="atalho" class="text-muted">Atalho Teclado</label>
+                                    <label for="titulo_campo" class="text-muted">Título da Condição (Ex: A Vista)</label>
                                 </div>
                             </div>
                         </div>
@@ -78,29 +69,21 @@
                                     <i class="bi bi-calendar-range me-2 text-primary"></i>Configurar Parcelas
                                 </h5>
                             </div>
-                            <div class="col-lg-3 col-md-6">
+                            <div class="col-lg-4 col-md-6">
                                 <div class="form-floating">
                                     <input type="number" class="form-control border-secondary-subtle shadow-none"
                                         id="parcela" name="parcela" placeholder="1">
                                     <label for="parcela" class="text-muted">Qtd. Parcelas</label>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-md-6">
+                            <div class="col-lg-5 col-md-6">
                                 <div class="form-floating">
                                     <input type="number" class="form-control border-secondary-subtle shadow-none"
                                         id="intervalo" name="intervalo" placeholder="30">
                                     <label for="intervalo" class="text-muted">Intervalo (Dias)</label>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-md-8">
-                                <div class="form-floating">
-                                    <input type="number" class="form-control border-secondary-subtle shadow-none"
-                                        id="vencimento_incial_parcela" name="vencimento_incial_parcela" placeholder="0">
-                                    <label for="vencimento_incial_parcela" class="text-muted">1º Vencimento
-                                        (Dias)</label>
-                                </div>
-                            </div>
-                            <div class="col-lg-2 col-md-4 d-grid">
+                            <div class="col-lg-3 col-md-12 d-grid">
                                 <button id="insertInstallmentButton" type="button"
                                     class="btn btn-outline-primary fw-bold shadow-sm py-2">
                                     <i class="bi bi-plus-lg me-1"></i> Adicionar
@@ -115,13 +98,12 @@
                                         <th class="ps-3 py-3">Código</th>
                                         <th>Parcelas</th>
                                         <th>Intervalo (Dias)</th>
-                                        <th>1º Vencimento</th>
                                         <th class="text-center">Ação</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbInstallments" class="small">
                                     <tr>
-                                        <td class="text-center py-4 text-muted" colspan="5">
+                                        <td class="text-center py-4 text-muted" colspan="4">
                                             Nenhuma parcela configurada para esta condição.
                                         </td>
                                     </tr>

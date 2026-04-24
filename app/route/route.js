@@ -1,5 +1,6 @@
 import { ipcMain, BrowserWindow } from 'electron';
 import Template from '../mixin/Template.js';
+import PaymentTerms from '../controller/PaymentTerms.js';
 
 
 
@@ -21,7 +22,7 @@ function broadcastReload(channel) {
 // --- DASHBOARD / ESTATÍSTICAS ---
 ipcMain.handle('dashboard:getStats', async () => {
     try {
-        
+
         const productsResult = await Product.find() || {};
         const customersResult = await Customer.find() || {};
         const usersResult = await Users.find() || {};
@@ -241,8 +242,8 @@ ipcMain.handle('purchase:insert', async (_e, data) => {
 // --- CONDIÇÕES DE PAGAMENTO ---
 ipcMain.handle('paymentTerms:insert', async (_e, data) => {
     const result = await PaymentTerms.insert(data);
-    if (result.status) broadcastReload('paymentTerms:reload');
-    return result;
+    //if (result.status) broadcastReload('paymentTerms:reload');
+    //return result;
 });
 
 ipcMain.handle('paymentTerms:find', async (_e, where = {}) => {

@@ -1,7 +1,9 @@
+
+const codigo = document.getElementById('codigo');
+const InsertButton = document.getElementById('insertPaymentoTermsButton');
+
 // paymentterms.js
 // Gerencia condições de pagamento e parcelas
-
-const API_BASE = "/pagamento";
 
 // Estado local das parcelas
 let installments = [];
@@ -13,7 +15,6 @@ function getField(id) {
 }
 
 function showToast(message, type = "success") {
-  // Cria toast Bootstrap dinamicamente
   const toastContainer = document.getElementById("toast-container") || createToastContainer();
   const id = `toast-${Date.now()}`;
   const bg = type === "success" ? "bg-success" : type === "danger" ? "bg-danger" : "bg-warning";
@@ -46,7 +47,6 @@ function createToastContainer() {
 function clearInstallmentFields() {
   getField("parcela").value = "";
   getField("intervalo").value = "";
-  getField("vencimento_incial_parcela").value = "";
 }
 
 // ─── Renderizar tabela de parcelas ────────────────────────────────────────────
@@ -57,7 +57,7 @@ function renderInstallments() {
   if (installments.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td class="text-center py-4 text-muted" colspan="5">
+        <td class="text-center py-4 text-muted" colspan="4">
           Nenhuma parcela configurada para esta condição.
         </td>
       </tr>`;
@@ -71,7 +71,6 @@ function renderInstallments() {
         <td class="ps-3 py-2">${String(index + 1).padStart(2, "0")}</td>
         <td>${item.parcela}x</td>
         <td>${item.intervalo} dias</td>
-        <td>${item.vencimento_incial_parcela} dias</td>
         <td class="text-center">
           <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"
             onclick="removeInstallment(${index})" title="Remover parcela">
@@ -85,14 +84,12 @@ function renderInstallments() {
 
 // ─── Carregar parcelas existentes (modo edição) ───────────────────────────────
 
-async function loadInstallments(idParcelamento) {
-  if (!idParcelamento) return;
+async function loadInstallments(id) {
+  if (!id) return;
 
   try {
-    const res = await fetch(`${API_BASE}/parcelas/${idParcelamento}`);
-    if (!res.ok) throw new Error("Erro ao buscar parcelas");
-    const data = await res.json();
-    installments = data || [];
+    const data = await window.api.paymentTermsAPI.findById(id);
+    installments = data?.parcelas || [];
     renderInstallments();
   } catch (err) {
     console.error(err);
@@ -105,7 +102,6 @@ async function loadInstallments(idParcelamento) {
 function addInstallment() {
   const parcela = parseInt(getField("parcela").value);
   const intervalo = parseInt(getField("intervalo").value);
-  const vencimento = parseInt(getField("vencimento_incial_parcela").value);
 
   if (!parcela || parcela < 1) {
     showToast("Informe a quantidade de parcelas.", "warning");
@@ -117,17 +113,8 @@ function addInstallment() {
     getField("intervalo").focus();
     return;
   }
-  if (isNaN(vencimento) || vencimento < 0) {
-    showToast("Informe o 1º vencimento em dias.", "warning");
-    getField("vencimento_incial_parcela").focus();
-    return;
-  }
 
-  installments.push({
-    parcela,
-    intervalo,
-    vencimento_incial_parcela: vencimento,
-  });
+  installments.push({ parcela, intervalo });
 
   renderInstallments();
   clearInstallmentFields();
@@ -144,13 +131,11 @@ function removeInstallment(index) {
 // ─── Salvar condição de pagamento ─────────────────────────────────────────────
 
 async function savePaymentTerms() {
-  const acao = getField("acao").value;       // 'inserir' | 'editar'
+  const acao = getField("acao").value;
   const id = getField("id").value;
   const codigo = getField("codigo").value;
   const titulo = getField("titulo_campo").value.trim();
-  const atalho = getField("atalho").value.trim();
 
-  // Validações
   if (!codigo) {
     showToast("Selecione o tipo de pagamento.", "warning");
     getField("codigo").focus();
@@ -166,32 +151,21 @@ async function savePaymentTerms() {
     return;
   }
 
-  const payload = {
-    codigo,
-    titulo,
-    atalho,
-    parcelas: installments,
-  };
+  const payload = { codigo, titulo, parcelas: installments };
 
-  const isEdit = acao === "editar" && id;
-  const url = isEdit ? `${API_BASE}/editar/${id}` : `${API_BASE}/inserir`;
-  const method = isEdit ? "PUT" : "POST";
+  const btn = document.getElementById("insertPaymentoTermsButton");
 
   try {
-    const btn = document.getElementById("insertPaymentoTermsButton");
     btn.disabled = true;
     btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Salvando...`;
 
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    const isEdit = acao === "editar" && id;
+    const result = isEdit
+      ? await window.api.paymentTermsAPI.update(id, payload)
+      : await window.api.paymentTermsAPI.insert(payload);
 
-    const result = await res.json();
-
-    if (!res.ok) {
-      throw new Error(result.message || "Erro ao salvar.");
+    if (!result?.status) {
+      throw new Error(result?.msg || "Erro ao salvar.");
     }
 
     showToast(
@@ -199,33 +173,27 @@ async function savePaymentTerms() {
       "success"
     );
 
-    // Redireciona após salvar
     setTimeout(() => {
-      window.location.href = "/pagamento/lista";
+      window.api.window.open('pages/listapagamento');
     }, 1800);
+
   } catch (err) {
     console.error(err);
     showToast(err.message || "Erro inesperado ao salvar.", "danger");
   } finally {
-    const btn = document.getElementById("insertPaymentoTermsButton");
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = `<i class="bi bi-check-circle me-2"></i> Salvar Condição`;
-    }
+    btn.disabled = false;
+    btn.innerHTML = `<i class="bi bi-check-circle me-2"></i> Salvar Condição`;
   }
 }
 
 // ─── Inicialização ─────────────────────────────────────────────────────────────
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Botão adicionar parcela
   document.getElementById("insertInstallmentButton").addEventListener("click", addInstallment);
-
-  // Botão salvar condição
   document.getElementById("insertPaymentoTermsButton").addEventListener("click", savePaymentTerms);
 
-  // Permitir Enter nos campos de parcela para adicionar
-  ["parcela", "intervalo", "vencimento_incial_parcela"].forEach((id) => {
+  // Enter nos campos de parcela para adicionar
+  ["parcela", "intervalo"].forEach((id) => {
     getField(id)?.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
@@ -241,5 +209,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// Expor para uso inline (botão remover via onclick no HTML gerado dinamicamente)
+
+codigo.addEventListener('change', () => {
+  document.getElementById('titulo_campo').value = codigo.options[codigo.selectedIndex].text;
+  document.getElementById('titulo_campo').focus();
+});
+
+InsertButton.addEventListener('click', async () => {
+  //Validar os compo do formulario.
+  const form = document.getElementById('form');
+  const data = formToJson(form);
+  api.paymentTerms.insert(data);
+});
+
 window.removeInstallment = removeInstallment;
