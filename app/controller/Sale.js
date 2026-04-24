@@ -3,6 +3,7 @@ import connection from '../database/Connection.js';
 export default class Sale {
     // Tabela no banco
     static table = 'sale';
+    static tableItem = 'item_sale';
     // Mapeamento: índice da coluna no DataTable → nome no banco
     static #columns = ['id', 'id_cliente', 'total_bruto', 'total_liquido', 'desconto', 'acrescimo', 'observacao', 'created_at', 'updated_at', null];
     // Colunas pesquisáveis pelo termo de busca
@@ -58,8 +59,9 @@ export default class Sale {
     // Insere uma nova venda
     static async insert(data) {
         try {
-            const id = await connection(Sale.table).insert(data).returning('id');
-            return { status: true, id: id[0] };
+            const raw = await connection(Sale.table).insert(data).returning('id');
+            const id = Array.isArray(raw) ? raw[0]?.id ?? raw[0] : raw;
+            return { status: true, id };
         } catch (error) {
             return { status: false, error: error.message };
         }
@@ -82,6 +84,104 @@ export default class Sale {
             return { status: affectedRows > 0 };
         } catch (error) {
             return { status: false, error: error.message };
+        }
+    }
+
+    // Insere um item na venda
+    static async insertItem(data) {
+        const id = data['id'] ?? null;
+        const id_produto = data['id_produto'] ?? null;
+        const quantidade = parseFloat(data['quantidade']) || 1;
+        const preco_unitario = parseFloat(data['preco_unitario']) || 0;
+
+        // Verifica se o id da venda está vazio ou nulo
+        if (!id) {
+            return {
+                status: false,
+                msg: 'Restrição: O ID da venda é obrigatório!',
+                id: 0
+            };
+        }
+
+        // Verifica se o id do produto está vazio ou nulo
+        if (!id_produto) {
+            return {
+                status: false,
+                msg: 'Restrição: O ID do produto é obrigatório!',
+                id: 0
+            };
+        }
+
+        try {
+            // Seleciona o produto que está sendo vendido
+            const produto = await connection('product')
+                .where({ id: id_produto })
+                .first();
+
+            if (!produto) {
+                return {
+                    status: false,
+                    msg: 'Restrição: Nenhum produto localizado!',
+                    id: 0
+                };
+            }
+
+            // Calcula os valores baseado no preço unitário fornecido ou preço de venda do produto
+            const precoUnitario = preco_unitario > 0 ? preco_unitario : parseFloat(produto.preco_venda || 0);
+            const totalBruto = parseFloat((quantidade * precoUnitario).toFixed(4));
+            const totalLiquido = totalBruto; // Inicialmente igual ao bruto
+
+            const FieldAndValue = {
+                id_venda: id,
+                id_produto: id_produto,
+                quantidade: quantidade,
+                unitario_bruto: precoUnitario,
+                unitario_liquido: precoUnitario,
+                total_bruto: totalBruto,
+                total_liquido: totalLiquido,
+                desconto: 0,
+                acrescimo: 0,
+                nome: produto.nome
+            };
+
+            // Insere o item na venda
+            const isInserted = await connection(Sale.tableItem)
+                .insert(FieldAndValue);
+
+            if (!isInserted) {
+                return {
+                    status: false,
+                    msg: 'Restrição: Falha ao inserir o item da venda!',
+                    id: 0
+                };
+            }
+
+            // Soma os totais de todos os itens da venda
+            const sale = await connection(Sale.tableItem)
+                .where({ id_venda: id })
+                .sum({ total_bruto: 'total_bruto', total_liquido: 'total_liquido' })
+                .first();
+
+            // Atualiza o total da venda
+            await connection(Sale.table)
+                .where({ id })
+                .update({
+                    total_bruto: parseFloat(sale.total_bruto || 0),
+                    total_liquido: parseFloat(sale.total_liquido || 0)
+                });
+
+            return {
+                status: true,
+                msg: 'Item inserido com sucesso!',
+                id: 0
+            };
+
+        } catch (error) {
+            return {
+                status: false,
+                msg: 'Restrição: ' + error.message,
+                id: 0
+            };
         }
     }
 }
