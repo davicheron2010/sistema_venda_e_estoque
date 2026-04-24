@@ -2,12 +2,12 @@ import connection from '../database/Connection.js';
 export default class Customer {
     // Tabela no banco
     static table = 'customer';
-    //teste
+
     // Mapeamento: índice da coluna no DataTable → nome no banco
-    static #columns = ['id', 'nome', 'cpf', 'rg', null];
+    static #columns = ['id', 'nome', 'cpf', null];
 
     // Colunas pesquisáveis pelo termo de busca
-    static #searchable = ['nome', 'cpf', 'rg'];
+    static #searchable = ['nome', 'cpf'];
 
     //Insere um novo cliente.
     static async insert(data) {

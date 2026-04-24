@@ -1,4 +1,4 @@
-import { Datatables } from "../components/Datatables.js";
+
 
 Datatables.SetTable('#table-customers', [
     { data: 'id', className: 'text-center' },

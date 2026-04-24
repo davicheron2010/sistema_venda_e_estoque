@@ -1,26 +1,19 @@
-import { Datatables } from "../components/Datatables.js"
-
-api.product.onReload(() => {
-    $('#table-products').DataTable().ajax.reload(null, false);
-});
-
-Datatables.SetTable('#table-products', [
+const table = Datatables.SetTable('#table-products', [
     { data: 'id' },
     { data: 'nome' },
-    { data: 'codigo_barra' },
-    { data: 'grupo' },
-    { data: 'unidade' },
-    { data: 'estq_atual' },
+    { data: 'codigo_barra', defaultContent: '-' },
+    { data: 'grupo', defaultContent: '-' },
+    { data: 'unidade', defaultContent: '-' },
     {
         data: 'preco_compra',
         render: function (data) {
-            return parseFloat(data).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            return parseFloat(data || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
     },
     {
         data: 'preco_venda',
         render: function (data) {
-            return parseFloat(data).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            return parseFloat(data || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
     },
     {
@@ -48,6 +41,10 @@ Datatables.SetTable('#table-products', [
     }
 ]).getData(filter => api.product.find(filter));
 
+api.product.onReload(() => {
+    table.ajax.reload(null, false);
+});
+
 async function deleteProduct(id) {
     const result = await Swal.fire({
         title: 'Tem certeza?',
@@ -60,10 +57,9 @@ async function deleteProduct(id) {
 
     if (result.isConfirmed) {
         const response = await api.product.delete(id);
-
         if (response.status) {
             toast('success', 'Excluído', response.msg);
-            $('#table-products').DataTable().ajax.reload();
+            table.ajax.reload(null, false);
         } else {
             toast('error', 'Erro', response.msg);
         }
@@ -77,12 +73,10 @@ async function editProduct(id) {
             toast('error', 'Erro', 'Produto não encontrado.');
             return;
         }
-
         await api.temp.set('product:edit', {
             action: 'e',
             ...product,
         });
-
         api.window.openModal('pages/product', {
             width: 800,
             height: 420,
@@ -180,13 +174,11 @@ async function printProduct(id) {
         `;
 
         const result = await api.report.print(stringHtml);
-
         if (result?.sucesso) {
             toast('success', 'Sucesso', 'PDF gerado em: ' + result.caminho);
         } else {
             toast('error', 'Erro', 'Falha ao gerar PDF.');
         }
-
     } catch (err) {
         toast('error', 'Falha', 'Erro: ' + err.message);
     }

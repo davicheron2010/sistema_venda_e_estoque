@@ -1,4 +1,4 @@
-import { Datatables } from "../components/Datatables.js";
+
 
 api.supplier.onReload(() => {
     $('#table-suppliers').DataTable().ajax.reload(null, false);

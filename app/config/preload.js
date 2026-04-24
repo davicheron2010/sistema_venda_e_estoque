@@ -11,17 +11,17 @@ contextBridge.exposeInMainWorld('api', {
     report: {
         print(stringHtml, args = {}) { return ipcRenderer.invoke('print', stringHtml, args); }
     },
-        
+
     window: {
         open(name, opts) { return ipcRenderer.invoke('window:open', name, opts); },
         openModal(name, opts) { return ipcRenderer.invoke('window:openModal', name, opts); },
         close() { return ipcRenderer.invoke('window:close'); }
     },
-    
+
     dashboard: {
         getStats() { return ipcRenderer.invoke('dashboard:getStats'); }
     },
-    
+
     temp: {
         set(key, data) { return ipcRenderer.invoke('temp:set', key, data); },
         get(key) { return ipcRenderer.invoke('temp:get', key); },
@@ -43,9 +43,8 @@ contextBridge.exposeInMainWorld('api', {
         findById(id) { return ipcRenderer.invoke('customer:findById', id); },
         update(id, data) { return ipcRenderer.invoke('customer:update', id, data); },
         delete(id) { return ipcRenderer.invoke('customer:delete', id); },
-        onReload(callback) {
-            ipcRenderer.on('customer:reload', () => callback());
-        },
+        count() { return ipcRenderer.invoke('customer:count'); },
+        onReload(callback) { ipcRenderer.on('customer:reload', () => callback()); },
     },
 
     product: {
@@ -83,14 +82,14 @@ contextBridge.exposeInMainWorld('api', {
         },
     },
 
-    enterprise: {
-        insert(data) { return ipcRenderer.invoke('enterprise:insert', data); },
-        find(where) { return ipcRenderer.invoke('enterprise:find', where); },
-        findById(id) { return ipcRenderer.invoke('enterprise:findById', id); },
-        update(id, data) { return ipcRenderer.invoke('enterprise:update', id, data); },
-        delete(id) { return ipcRenderer.invoke('enterprise:delete', id); },
+    company: {
+        insert(data) { return ipcRenderer.invoke('company:insert', data); },
+        find(where) { return ipcRenderer.invoke('company:find', where); },
+        findById(id) { return ipcRenderer.invoke('company:findById', id); },
+        update(id, data) { return ipcRenderer.invoke('company:update', id, data); },
+        delete(id) { return ipcRenderer.invoke('company:delete', id); },
         onReload(callback) {
-            ipcRenderer.on('enterprise:reload', () => callback());
+            ipcRenderer.on('company:reload', () => callback());
         },
     },
 
