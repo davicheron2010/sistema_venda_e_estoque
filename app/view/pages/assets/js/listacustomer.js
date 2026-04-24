@@ -1,6 +1,4 @@
-
-
-Datatables.SetTable('#table-customers', [
+const table = Datatables.SetTable('#table-customers', [
     { data: 'id', className: 'text-center' },
     { data: 'nome' },
     { data: 'cpf', defaultContent: '-' },
@@ -34,6 +32,7 @@ Datatables.SetTable('#table-customers', [
     }
 ]).getData(filter => api.customer.find(filter));
 
+// ✅ RELOAD automático ao inserir/editar/excluir
 api.customer.onReload(() => {
     table.ajax.reload(null, false);
 });

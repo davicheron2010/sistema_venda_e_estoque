@@ -30,16 +30,16 @@ ipcMain.handle('print', async (_e, stringHtml, args = {}) => {
 // --- DASHBOARD ---
 ipcMain.handle('dashboard:getStats', async () => {
     try {
-        const productsResult   = await Product.find()  || {};
-        const customersResult  = await Customer.find() || {};
-        const suppliersResult  = await Supplier.find() || {};
-        const companiesResult  = await Company.find()  || {};
+        const productsResult = await Product.find() || {};
+        const customersResult = await Customer.find() || {};
+        const suppliersResult = await Supplier.find() || {};
+        const companiesResult = await Company.find() || {};
 
         return {
-            totalProducts:   productsResult.recordsTotal  || 0,
-            totalCustomers:  customersResult.recordsTotal || 0,
-            totalSuppliers:  suppliersResult.recordsTotal || 0,
-            totalCompanies:  companiesResult.recordsTotal || 0,
+            totalProducts: productsResult.recordsTotal || 0,
+            totalCustomers: customersResult.recordsTotal || 0,
+            totalSuppliers: suppliersResult.recordsTotal || 0,
+            totalCompanies: companiesResult.recordsTotal || 0,
         };
     } catch (error) {
         console.error("Erro ao processar estatísticas:", error);
@@ -129,8 +129,8 @@ ipcMain.handle('stock:adjust', async (_e, data) => {
     // Se você tiver um Stock Controller, use: result = await Stock.adjust(data);
     // Abaixo uma implementação direta caso ainda não tenha o controller:
     try {
-        const result = await Stock.adjust(data); 
-        if (result.status) broadcastReload('product:reload'); 
+        const result = await Stock.adjust(data);
+        if (result.status) broadcastReload('product:reload');
         return result;
     } catch (error) {
         return { status: false, msg: error.message };
@@ -153,4 +153,58 @@ ipcMain.handle('sale:insert', async (_e, data) => {
 ipcMain.handle('purchase:insert', async (_e, data) => {
     console.log('Dados da Compra Recebidos:', data);
     return { status: true, msg: 'Compra registrada com sucesso!' };
+});
+ipcMain.handle('supplier:insert', async (_e, data) => {
+    const result = await Supplier.insert(data);
+    if (result.status) broadcastReload('supplier:reload');
+    return result;
+});
+
+ipcMain.handle('supplier:find', async (_e, where = {}) => {
+    return await Supplier.find(where);
+});
+
+ipcMain.handle('supplier:findById', async (_e, id) => {
+    return await Supplier.findById(id);
+});
+
+ipcMain.handle('supplier:update', async (_e, id, data) => {
+    const result = await Supplier.update(id, data);
+    if (result.status) broadcastReload('supplier:reload');
+    return result;
+});
+
+ipcMain.handle('supplier:delete', async (_e, id) => {
+    const result = await Supplier.delete(id);
+    if (result.status) broadcastReload('supplier:reload');
+    return result;
+});
+
+ipcMain.handle('supplier:count', async () => {
+    return await Supplier.count();
+});
+ipcMain.handle('company:insert', async (_e, data) => {
+    const result = await Company.insert(data);
+    if (result.status) broadcastReload('company:reload');
+    return result;
+});
+
+ipcMain.handle('company:find', async (_e, where = {}) => {
+    return await Company.find(where);
+});
+
+ipcMain.handle('company:findById', async (_e, id) => {
+    return await Company.findById(id);
+});
+
+ipcMain.handle('company:update', async (_e, id, data) => {
+    const result = await Company.update(id, data);
+    if (result.status) broadcastReload('company:reload');
+    return result;
+});
+
+ipcMain.handle('company:delete', async (_e, id) => {
+    const result = await Company.delete(id);
+    if (result.status) broadcastReload('company:reload');
+    return result;
 });

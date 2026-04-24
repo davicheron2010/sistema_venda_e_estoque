@@ -8,16 +8,14 @@ const table = Datatables.SetTable('#table-products', [
     {
         data: 'preco_compra',
         render: d => parseFloat(d || 0).toLocaleString('pt-BR', {
-            style: 'currency',
-            currency: 'BRL'
+            style: 'currency', currency: 'BRL'
         })
     },
 
     {
         data: 'preco_venda',
         render: d => parseFloat(d || 0).toLocaleString('pt-BR', {
-            style: 'currency',
-            currency: 'BRL'
+            style: 'currency', currency: 'BRL'
         })
     },
 
@@ -34,26 +32,27 @@ const table = Datatables.SetTable('#table-products', [
         searchable: false,
         render: (row) => `
             <div class="d-flex gap-1">
-
                 <button onclick="openStockModal(${row.id}, '${row.nome.replace(/'/g, "\\'")}')"
                     class="btn btn-info btn-sm">
                     <i class="fa-solid fa-boxes-stacked"></i>
                 </button>
-
                 <button onclick="editProduct(${row.id})"
                     class="btn btn-warning btn-sm">
                     <i class="fa-solid fa-pen-to-square"></i>
                 </button>
-
                 <button onclick="deleteProduct(${row.id})"
                     class="btn btn-danger btn-sm">
                     <i class="fa-solid fa-trash"></i>
                 </button>
-
             </div>
         `
     }
 ]).getData(filter => api.product.find(filter));
+
+// ✅ RELOAD automático ao inserir/editar/excluir
+api.product.onReload(() => {
+    table.ajax.reload(null, false);
+});
 
 /* =========================
    MODAL STOCK
@@ -68,17 +67,11 @@ window.openStockModal = function (id, nome) {
     stockModal.show();
 };
 
-/* UX simples */
 document.getElementById('stock_tipo').addEventListener('change', (e) => {
     const input = document.getElementById('stock_quantidade');
-
-    input.placeholder =
-        e.target.value === 'AJUSTE'
-            ? 'Novo estoque final'
-            : 'Quantidade';
+    input.placeholder = e.target.value === 'AJUSTE' ? 'Novo estoque final' : 'Quantidade';
 });
 
-/* SALVAR ESTOQUE */
 document.getElementById('btn-save-stock').addEventListener('click', async () => {
 
     const id_produto = parseInt(document.getElementById('stock_product_id').value);
@@ -93,12 +86,7 @@ document.getElementById('btn-save-stock').addEventListener('click', async () => 
     $("#btn-save-stock").prop("disabled", true);
 
     try {
-        const response = await api.stock.adjust({
-            id_produto,
-            tipo,
-            quantidade,
-            observacao
-        });
+        const response = await api.stock.adjust({ id_produto, tipo, quantidade, observacao });
 
         if (response.status) {
             toast('success', 'Sucesso', response.msg);
@@ -107,7 +95,6 @@ document.getElementById('btn-save-stock').addEventListener('click', async () => 
         } else {
             toast('error', 'Erro', response.msg);
         }
-
     } catch (err) {
         toast('error', 'Erro', err.message);
     } finally {
