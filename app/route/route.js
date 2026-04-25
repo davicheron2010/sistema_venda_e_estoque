@@ -42,26 +42,39 @@ ipcMain.handle('dashboard:getStats', async () => {
         return { totalProducts: 0, totalCustomers: 0, totalSuppliers: 0, totalCompanies: 0 };
     }
 });
-
 // --- WINDOW ---
+
+// Altere o handle 'window:open' para este:
 ipcMain.handle('window:open', (_e, name, opts = {}) => {
     const win = Template.create(name, opts);
+    
+    // Se o objeto 'opts' tiver 'maximized: true', maximiza a janela
+    if (opts.maximized) {
+        win.maximize();
+    }
+    
     Template.loadView(win, name);
 });
 
+// Altere o handle 'window:openModal' para este:
 ipcMain.handle('window:openModal', (e, name, opts = {}) => {
     const parent = getWin(e);
     if (!parent) return;
     const win = Template.create(name, {
         width: 560,
         height: 420,
-        resizable: false,
+        resizable: true, // Mude para true para permitir maximizar
         minimizable: false,
-        maximizable: false,
+        maximizable: true, // Garanta que é true
         parent: parent,
         modal: true,
         ...opts,
     });
+
+    if (opts.maximized) {
+        win.maximize();
+    }
+
     Template.loadView(win, name);
 });
 
@@ -223,6 +236,11 @@ ipcMain.handle('sale:update', async (_e, id, data) => {
 
 ipcMain.handle('sale:delete', async (_e, id) => {
     const result = await Sale.delete(id);
+    if (result.status) broadcastReload('sale:reload');
+    return result;
+});
+ipcMain.handle('sale:insertItem', async (_e, data) => {
+    const result = await Sale.insertItem(data);
     if (result.status) broadcastReload('sale:reload');
     return result;
 });
