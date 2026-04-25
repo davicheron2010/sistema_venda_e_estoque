@@ -10,42 +10,51 @@ export default class Sale {
     static #searchable = ['id_cliente', 'total_bruto', 'total_liquido', 'desconto', 'acrescimo', 'observacao'];
 
     // Implementamos a pesquisa completa para a venda
-    static async find(data = {}) {
-        const { term = '', limit = 10, offset = 0, orderType = 'asc', column = 0, draw = 1 } = data;
-        // Total sem filtro
-        const [{ count: total }] = await connection(Sale.table).count('id as count');
-        // Monta WHERE da busca
-        const search = term?.trim();
-        function applySearch(query) {
-            if (search) {
-                query.where(function () {
-                    for (const col of Sale.#searchable) {
-                        this.orWhereRaw(`CAST("${col}" AS TEXT) ILIKE ?`, [`%${search}%`]);
-                    }
-                });
-            }
-            return query;
-        }
-        // Total filtrado
-        const filteredQ = connection(Sale.table).count('id as count');
-        applySearch(filteredQ);
-        const [{ count: filtered }] = await filteredQ;
-        // Dados paginados
-        const orderColumn = Sale.#columns[column] || 'id';
-        const orderDir = orderType === 'desc' ? 'desc' : 'asc';
-        const dataQ = connection(Sale.table).select('*');
-        applySearch(dataQ);
-        dataQ.orderBy(orderColumn, orderDir);
-        dataQ.limit(parseInt(limit));
-        dataQ.offset(parseInt(offset));
-        const rows = await dataQ;
-        return {
-            draw: parseInt(draw),
-            recordsTotal: parseInt(total),
-            recordsFiltered: parseInt(filtered),
-            data: rows,
-        };
+  static async find(data = {}) {
+    const { term = '', limit = 10, offset = 0, orderType = 'asc', column = 0, draw = 1 } = data;
+
+    // 1. Query base com JOIN para pegar o nome do cliente
+    const queryBase = connection(Sale.table)
+        .leftJoin('customer', 'sale.id_cliente', 'customer.id')
+        .select('sale.*', 'customer.nome as nome_cliente');
+
+    // 2. Contagem total
+    const [{ count: total }] = await connection(Sale.table).count('id as count');
+
+    // 3. Filtro de busca (pesquisa no ID da venda, Observação ou Nome do Cliente)
+    if (term) {
+        queryBase.where(function() {
+            this.whereRaw('CAST(sale.id AS TEXT) ILIKE ?', [`%${term}%`])
+                .orWhere('sale.observacao', 'ILIKE', `%${term}%`)
+                .orWhere('customer.nome', 'ILIKE', `%${term}%`);
+        });
     }
+
+    // 4. Contagem filtrada
+    const filteredCountQuery = connection(Sale.table)
+        .leftJoin('customer', 'sale.id_cliente', 'customer.id');
+    if (term) {
+        filteredCountQuery.where(function() {
+            this.whereRaw('CAST(sale.id AS TEXT) ILIKE ?', [`%${term}%`])
+                .orWhere('customer.nome', 'ILIKE', `%${term}%`);
+        });
+    }
+    const [{ count: filtered }] = await filteredCountQuery.count('sale.id as count');
+
+    // 5. Ordenação e Paginação
+    const rows = await queryBase
+        .orderBy(`sale.id`, orderType === 'desc' ? 'desc' : 'asc')
+        .limit(parseInt(limit))
+        .offset(parseInt(offset));
+
+    return {
+        draw: parseInt(draw),
+        recordsTotal: parseInt(total),
+        recordsFiltered: parseInt(filtered),
+        data: rows,
+    };
+}
+
 
     // Retorna apenas uma venda pelo seu ID
     static async findById(id) {
@@ -91,8 +100,8 @@ export default class Sale {
     static async insertItem(data) {
         const id = data['id'] ?? null;
         const id_produto = data['id_produto'] ?? null;
-        const quantidade = parseFloat(document.getElementById('stock_quantidade').value) || 0;
-         const preco_unitario = parseFloat(data['preco_unitario']) || 0;
+        const quantidade = parseFloat(data['quantidade']) || 1;
+        const preco_unitario = parseFloat(data['preco_unitario']) || 0;
 
         // Verifica se o id da venda está vazio ou nulo
         if (!id) {

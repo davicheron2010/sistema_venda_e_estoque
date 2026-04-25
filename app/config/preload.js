@@ -84,11 +84,14 @@ contextBridge.exposeInMainWorld('api', {
 
     sale: {
         insert(data) { return ipcRenderer.invoke('sale:insert', data); },
-        find(where) { return ipcRenderer.invoke('sale:find', where); },
+        insertItem(data) { return ipcRenderer.invoke('sale:insertItem', data); },
+        find(where) { return ipcRenderer.invoke('sale:find', where); }, // Esta é a linha que o Datatables usa
         findById(id) { return ipcRenderer.invoke('sale:findById', id); },
         update(id, data) { return ipcRenderer.invoke('sale:update', id, data); },
         delete(id) { return ipcRenderer.invoke('sale:delete', id); },
-        onReload(callback) { ipcRenderer.on('sale:reload', () => callback()); },
+        onReload(callback) {
+            ipcRenderer.on('sale:reload', () => callback());
+        },
     },
 
     stock: {

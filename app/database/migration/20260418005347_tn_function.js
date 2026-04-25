@@ -50,6 +50,31 @@ export function up(knex) {
             RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
+
+        CREATE OR REPLACE FUNCTION fn_trigger_sale_to_stock_movement()
+        RETURNS TRIGGER
+        LANGUAGE plpgsql
+        AS $$
+        BEGIN
+            INSERT INTO stock_movement (
+                id_item_venda,
+                id_produto,
+                quantidade_saida,
+                tipo,
+                origem_movimento,
+                observacao
+            )
+            VALUES (
+                NEW.id,
+                NEW.id_produto,
+                NEW.quantidade,
+                'SAIDA',
+                'VENDA',
+                'VENDA AUTOMÁTICA'
+            );
+            RETURN NEW;
+        END;
+        $$;
     `);
 }
 
@@ -58,5 +83,6 @@ export function down(knex) {
         DROP FUNCTION IF EXISTS refresh_mvw_estoque;
         DROP FUNCTION IF EXISTS fn_trigger_purchase_to_stock_movement;
         DROP FUNCTION IF EXISTS fn_trigger_inicializar_estoque;
+        DROP FUNCTION IF EXISTS fn_trigger_sale_to_stock_movement;
     `);
 }

@@ -19,6 +19,11 @@ export function up(knex) {
         AFTER INSERT ON product
         FOR EACH ROW
         EXECUTE FUNCTION fn_trigger_inicializar_estoque();
+        
+        CREATE TRIGGER trg_sale_to_stock_movement
+        AFTER INSERT ON item_sale
+        FOR EACH ROW
+        EXECUTE FUNCTION fn_trigger_sale_to_stock_movement();
     `);
 }
 
@@ -28,5 +33,6 @@ export function down(knex) {
         DROP TRIGGER IF EXISTS trg_refresh_estoque_on_product ON product;
         DROP TRIGGER IF EXISTS trg_purchase_to_stock_movement ON purchase;
         DROP TRIGGER IF EXISTS trg_init_product_stock ON product;
+        DROP TRIGGER IF EXISTS trg_sale_to_stock_movement ON item_sale;
     `);
 }
