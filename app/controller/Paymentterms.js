@@ -1,7 +1,7 @@
 import connection from '../database/Connection.js';
 export default class PaymentTerms {
   // Tabela no banco
-  static table = 'customer';
+  static table = 'payment_terms';
   //teste
   // Mapeamento: índice da coluna no DataTable → nome no banco
   static #columns = ['id', 'codigo', 'titulo'];
@@ -11,21 +11,28 @@ export default class PaymentTerms {
     if (data.codigo === null || data.titulo === null) {
       return { status: false, msg: 'Preencha corretamento os dados para salvar', id: null, data: [] };
     }
+    try {
 
-    const clean = PaymentTerms.#sanitize(data);
+      const clean = PaymentTerms.#sanitize(data);
 
-    //Inserir no banco de dados 
-    const [result] = await connection('payment_terms')
-      .insert(clean)
-      .returning('*');
+      //Inserir no banco de dados 
+      const [result] = await connection(PaymentTerms.table)
+        .insert(clean)
+        .returning('*');
 
-    return { status: true, msg: 'Salvo com sucesso!', id: result.id, data: [result] };
+
+      const response = { status: true, msg: 'Salvo com sucesso!', id: result.id, data: result };
+
+      return response;
+    } catch (error) {
+      return { status: false, msg: 'Erro: ' + error.message, id: null, data: [] };
+    }
   }
 
   //Remove campos vazios e converte tipos.
   static #sanitize(data) {
     // Campos de controle do form — não existem no banco
-    const ignore = ['id', 'action'];
+    const ignore = ['id', 'acao'];
 
     const clean = {};
 

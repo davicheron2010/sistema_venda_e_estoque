@@ -2,8 +2,6 @@ import { ipcMain, BrowserWindow } from 'electron';
 import Template from '../mixin/Template.js';
 import PaymentTerms from '../controller/PaymentTerms.js';
 
-
-
 function getWin(event) {
     return BrowserWindow.fromWebContents(event.sender);
 }
@@ -242,8 +240,7 @@ ipcMain.handle('purchase:insert', async (_e, data) => {
 // --- CONDIÇÕES DE PAGAMENTO ---
 ipcMain.handle('paymentTerms:insert', async (_e, data) => {
     const result = await PaymentTerms.insert(data);
-    //if (result.status) broadcastReload('paymentTerms:reload');
-    //return result;
+    return result;
 });
 
 ipcMain.handle('paymentTerms:find', async (_e, where = {}) => {
@@ -268,5 +265,38 @@ ipcMain.handle('paymentTerms:delete', async (_e, id) => {
 
 ipcMain.handle('paymentTerms:getAll', async () => {
     const result = await PaymentTerms.find({ limit: 99999, offset: 0 }) || {};
+    return result.data || [];
+});
+
+//  parcelas
+
+ipcMain.handle('installment:insert', async (_e, data) => {
+    const result = await Installment.insert(data);
+    if (result.status) broadcastReload('installment:reload');
+    return result;
+});
+
+ipcMain.handle('installment:find', async (_e, where = {}) => {
+    return await Installment.find(where);
+});
+
+ipcMain.handle('installment:findById', async (_e, id) => {
+    return await Installment.findById(id);
+});
+
+ipcMain.handle('installment:update', async (_e, id, data) => {
+    const result = await Installment.update(id, data);
+    if (result.status) broadcastReload('installment:reload');
+    return result;
+});
+
+ipcMain.handle('installment:delete', async (_e, id) => {
+    const result = await Installment.delete(id);
+    if (result.status) broadcastReload('installment:reload');
+    return result;
+});
+
+ipcMain.handle('installment:getAll', async () => {
+    const result = await Installment.find({ limit: 99999, offset: 0 }) || {};
     return result.data || [];
 });

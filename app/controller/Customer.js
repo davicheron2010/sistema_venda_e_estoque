@@ -139,7 +139,7 @@ export default class Customer {
         return clean;
     }
     static async count() {
-    const [{ count }] = await connection(Customer.table).count('id as count');
-    return parseInt(count);
-}
+        const [{ count }] = await connection(Customer.table).count('id as count');
+        return parseInt(count);
+    }
 }
