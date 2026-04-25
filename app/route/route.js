@@ -1,6 +1,7 @@
 import { ipcMain, BrowserWindow } from 'electron';
 import Template from '../mixin/Template.js';
 import PaymentTerms from '../controller/PaymentTerms.js';
+import Installment from '../controller/Installment.js';
 
 function getWin(event) {
     return BrowserWindow.fromWebContents(event.sender);

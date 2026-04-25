@@ -102,4 +102,9 @@ contextBridge.exposeInMainWorld('api', {
         delete: (id) => ipcRenderer.invoke('paymentTerms:delete', id),
         getAll: () => ipcRenderer.invoke('paymentTerms:getAll'),
     },
+    installment: {
+        insert: (data) => { return ipcRenderer.invoke('installment:insert', data); },
+        findBy: (where) => ipcRenderer.invoke('installment:findBy', where),
+
+    }
 });

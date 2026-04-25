@@ -1,3 +1,4 @@
+import { da } from '@faker-js/faker';
 import connection from '../database/Connection.js';
 export default class PaymentTerms {
   // Tabela no banco
@@ -13,13 +14,15 @@ export default class PaymentTerms {
     }
     try {
 
-      const clean = PaymentTerms.#sanitize(data);
+      const clean = {
+        codigo: data.codigo,
+        titulo: data.titulo
+      }
 
       //Inserir no banco de dados 
       const [result] = await connection(PaymentTerms.table)
         .insert(clean)
         .returning('*');
-
 
       const response = { status: true, msg: 'Salvo com sucesso!', id: result.id, data: result };
 

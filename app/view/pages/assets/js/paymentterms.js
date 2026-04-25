@@ -14,8 +14,6 @@ async function InsertPaymentTerms() {
       :
       await api.paymentTerms.update(document.getElementById('id').value, data);
 
-    console.log(response);
-
     if (!response.status) {
       toast('error', 'Erro', response.msg, 3000);
       return;
@@ -34,10 +32,22 @@ async function InsertInstallment() {
   if (document.getElementById('acao').value === 'c') {
     await InsertPaymentTerms();
   }
+  //Validar os compo do formulario.
+  const form = document.getElementById('form');
+  const data = formToJson(form);
   try {
+    const response = await api.installment.insert(data);
+
+    if (!response.status) {
+      toast('error', 'Erro', response.msg, 3000);
+      return;
+    }
+
+    await ListInstallment();
+    toast('success', 'Sucesso', 'Parcela adicionada com sucesso!', 3000);
 
   } catch (error) {
-
+    toast('error', 'Erro', error.message, 3000);
   } finally {
 
   }
@@ -45,6 +55,12 @@ async function InsertInstallment() {
 //Preencher a tabela de parcelas da condição de pagamento
 async function ListInstallment() {
 
+  const response = await api.installment.findBy();
+  
+  if (!response.status) {
+    toast('error', 'Erro', response.msg, 3000);
+    return;
+  }
 }
 // Remover uma parcela pelo id da condição de pagamento
 async function DeleteInstallment(id) {
@@ -59,7 +75,7 @@ codigo.addEventListener('change', () => {
 insertPaymentoTermsButton.addEventListener('click', async () => { await InsertPaymentTerms(); });
 
 insertInstallmentButton.addEventListener('click', async () => {
-
+  await InsertInstallment();
 });
 
 //window.removeInstallment = removeInstallment;
