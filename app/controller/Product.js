@@ -1,18 +1,8 @@
 import connection from '../database/Connection.js';
-
 export default class Product {
-    // Tabela no banco de dados
     static table = 'product';
-
-    // Mapeamento: índice da coluna (DataTable) → nome no banco
     static #columns = ['id', 'nome', 'codigo_barra', 'unidade', 'grupo', 'preco_compra', 'preco_venda', 'ativo', null];
-
-    // Colunas pesquisáveis pelo termo de busca
     static #searchable = ['nome', 'codigo_barra', 'unidade', 'grupo'];
-
-    /**
-     * Pesquisa de produtos (Compatível com Select2 e DataTables)
-     */
     static async find(data = {}) {
         const {
             search = '',
@@ -24,65 +14,44 @@ export default class Product {
             column = 0,
             draw = 1,
         } = data;
-
-        // Consolida o termo de busca de todas as fontes possíveis
         const searchTerm = (search || term || q || '').trim();
-
         try {
-            // 1. Contagem total sem filtros
             const [{ count: total }] = await connection(Product.table).count('id as count');
-
-            // 2. Função interna para aplicar os filtros de busca (ILIKE para Postgres)
             const applySearch = (query) => {
                 if (searchTerm) {
                     query.where(function () {
                         for (const col of Product.#searchable) {
-                            this.orWhere(col, 'ilike', `%${searchTerm}%`);
+                            this.orWhere(`${Product.table}.${col}`, 'ilike', `%${searchTerm}%`);
                         }
                     });
                 }
                 return query;
             };
-
-            // 3. Contagem de registros filtrados
-            const filteredQ = connection(Product.table).count('id as count');
+            const filteredQ = connection(Product.table).count(`${Product.table}.id as count`);
             applySearch(filteredQ);
             const [{ count: filtered }] = await filteredQ;
-
-            // 4. Busca dos dados paginados
             const orderColumn = Product.#columns[column] || 'nome';
             const orderDir = orderType === 'desc' ? 'desc' : 'asc';
-
-            const dataQ = connection(Product.table).select('*');
+            const dataQ = connection(Product.table)
+                .select(`${Product.table}.*`)
+                .select(connection.raw('COALESCE(mvw.estoque_atual, 0) AS estoque_atual'))
+                .leftJoin('mvw_estoque as mvw', 'mvw.id_produto', `${Product.table}.id`);
             applySearch(dataQ);
-
             const rows = await dataQ
                 .orderBy(orderColumn, orderDir)
                 .limit(parseInt(limit))
                 .offset(parseInt(offset));
-
-            // 5. Formatação de retorno
-            const formattedRows = rows.map(row => ({
-                ...row,
-                supplier: { nome: '—' },
-                group: { nome: '—' }
-            }));
-
             return {
                 draw: parseInt(draw),
                 recordsTotal: parseInt(total),
                 recordsFiltered: parseInt(filtered),
-                data: formattedRows,
+                data: rows,
             };
         } catch (error) {
             console.error("Erro no Product.find:", error);
             return { draw: 1, recordsTotal: 0, recordsFiltered: 0, data: [] };
         }
     }
-
-    /**
-     * Insere um novo produto
-     */
     static async insert(data) {
         if (!data.nome || data.nome.trim() === '') {
             return { status: false, msg: 'O campo nome é obrigatório' };
@@ -95,10 +64,6 @@ export default class Product {
             return { status: false, msg: 'Erro ao inserir: ' + err.message };
         }
     }
-
-    /**
-     * Atualiza um produto existente
-     */
     static async update(id, data) {
         if (!id) return { status: false, msg: 'ID é obrigatório' };
         try {
@@ -110,10 +75,6 @@ export default class Product {
             return { status: false, msg: 'Erro ao atualizar: ' + err.message };
         }
     }
-
-    /**
-     * Exclui um produto
-     */
     static async delete(id) {
         if (!id) return { status: false, msg: 'ID é obrigatório' };
         try {
@@ -123,10 +84,6 @@ export default class Product {
             return { status: false, msg: 'Erro ao excluir: ' + err.message };
         }
     }
-
-    /**
-     * Busca um único produto pelo ID
-     */
     static async findById(id) {
         if (!id) return null;
         try {
@@ -135,10 +92,6 @@ export default class Product {
             return null;
         }
     }
-
-    /**
-     * Remove campos desnecessários e trata booleanos
-     */
     static #sanitize(data) {
         const ignore = ['id', 'action'];
         const clean = {};
@@ -151,7 +104,6 @@ export default class Product {
         }
         return clean;
     }
-
     static async productSearch(data = {}) {
         const {
             search = '',
@@ -165,6 +117,5 @@ export default class Product {
         } = data;
 
         console.log(term);
-
     }
 }
