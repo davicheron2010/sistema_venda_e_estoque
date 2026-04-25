@@ -1,6 +1,6 @@
 import connection from '../database/Connection.js';
 
-export default class purchase {
+export default class Purchase {
     // Tabela no banco
     static table = 'purchase';
     // Mapeamento: índice da coluna no DataTable → nome no banco
@@ -58,8 +58,19 @@ export default class purchase {
     // Insere uma nova compra
     static async insert(data) {
         try {
-            const id = await connection(Purchase.table).insert(data).returning('id');
-            return { status: true, id: id[0] };
+            console.log(data);
+            const id_fornecedor = data.fornecedor_id ?? null;
+            const total_bruto = 0;
+            const total_liquido = 0;
+
+
+            const clean = {
+                id_fornecedor: id_fornecedor,
+                total_bruto: total_bruto,
+                total_liquido: total_liquido
+            }
+            const response = await connection(Purchase.table).insert(clean).returning('*');
+            return { status: true, msg: 'Compra inserida com sucesso!', id: response[0].id, data: response };
         } catch (error) {
             return { status: false, error: error.message };
         }
@@ -113,7 +124,7 @@ export default class purchase {
                 acrescimo: 0,
                 nome: produto.nome
             };
-            console.log(FieldAndValue);
+
 
             // Insere o item na compra
             const isInserted = await connection('item_purchase')
@@ -174,6 +185,24 @@ export default class purchase {
         } catch (error) {
             return { status: false, error: error.message };
         }
+    }
+
+    //Remove campos vazios e converte tipos.
+    static #sanitize(data) {
+        // Campos de controle do form — não existem no banco
+        const ignore = ['id', 'action'];
+
+        const clean = {};
+
+        for (const [key, value] of Object.entries(data)) {
+            if (ignore.includes(key)) continue;
+            if (value === '' || value === null || value === undefined) continue;
+            if (value === 'true') { clean[key] = true; continue; }
+            if (value === 'false') { clean[key] = false; continue; }
+            clean[key] = value;
+        }
+
+        return clean;
     }
 
 }

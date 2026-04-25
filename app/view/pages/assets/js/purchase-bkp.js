@@ -274,7 +274,7 @@ async function InsertItemPurchase() {
     } finally {
         insertItemButton.textContent = originalText;
         insertItemButton.disabled = false;
-    }
+    }  
 }
 
 // ─── Função listar itens da compra
@@ -348,7 +348,7 @@ async function listItemPurchase() {
         });
     }
 }
-
+ 
 async function UpdatePurchase(id, formId) {
     const form = document.getElementById(formId);
     if (!form) throw new Error("Formulário não encontrado!");

@@ -181,3 +181,62 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     // Se acao === 'c', o form já está vazio e pronto para nova compra
 });
+
+
+
+
+
+
+
+async function Insertpurchase() {
+    const valid = Validate.SetForm('form').Validate();
+    if (!valid) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: 'Por favor, preencha os campos corretamente.',
+            time: 2000,
+            progressBar: true,
+        });
+        return;
+    }
+
+    try {
+        const form = document.getElementById('form');
+        if (!form) throw new Error('Formulário não encontrado!');
+        const json = formToJson(form);
+
+        // Chama insert ou update dependendo da ação atual
+        const response = Action.value === 'c'
+            ? await api.purchase.insert(json)
+            : await api.purchase.update({ id: Id.value, ...json });
+
+        if (!response.status) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: response.msg || 'Ocorreu um erro ao inserir a venda.',
+                time: 3000,
+                progressBar: true,
+            });
+            return;
+        }
+
+        // Altera a ação do formulário para 'e' (editar) após a venda ser inserida com sucesso
+        Action.value = 'e';
+        // Seta o ID da última venda inserida no banco de dados
+        Id.value = response.id;
+
+        // Lista todos os itens vendidos, quantidade e total da venda
+        await listItemPurchase();
+
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: error.message || 'Ocorreu um erro ao inserir a venda.',
+            time: 3000,
+            progressBar: true,
+        });
+    }
+}
