@@ -57,22 +57,43 @@ export default class Purchase {
 
     // Insere uma nova compra
     static async insert(data) {
+        const id_fornecedor = data.id_fornecedor ?? null;
+        const total_bruto = data.total_bruto ?? null;
+        const total_liquido = data.total_liquido ?? null;
+        
         try {
-            console.log(data);
-            const id_fornecedor = data.fornecedor_id ?? null;
-            const total_bruto = 0;
-            const total_liquido = 0;
-
-
             const clean = {
                 id_fornecedor: id_fornecedor,
-                total_bruto: total_bruto,
-                total_liquido: total_liquido
+                total_bruto: 0,
+                total_liquido: 0,
+                desconto: 0,
+                acrescimo: 0,
+                observacao: ''
+            };
+            const response = await connection('purchase')
+                .insert(clean)
+                .returning('id');
+
+            if (!response || response.length === 0) {
+                return {
+                    status: false,
+                    msg: 'Restrição: Falha ao inserir a compra!',
+                    id: 0
+                };
             }
-            const response = await connection(Purchase.table).insert(clean).returning('*');
-            return { status: true, msg: 'Compra inserida com sucesso!', id: response[0].id, data: response };
+
+            return {
+                status: true,
+                msg: 'Compra inserida com sucesso!',
+                id: response[0].id ?? response[0]
+            };
+
         } catch (error) {
-            return { status: false, error: error.message };
+            return {
+                status: false,
+                msg: 'Restrição: ' + error.message,
+                id: 0
+            };
         }
     }
 
@@ -80,7 +101,6 @@ export default class Purchase {
     static async insertItem(data) {
         const id = data.id ?? null;
         const id_produto = data.pesquisa ?? null;
-        const quantidade = data.quantidade ?? 1;
 
         // Verifica se o id da compra está vazio ou nulo
         if (id === null || id === undefined) {
@@ -101,7 +121,7 @@ export default class Purchase {
         }
 
         try {
-            // Seleciona o produto que está sendo vendido
+            // Seleciona o produto que está sendo comprado
             const produto = await connection('product')
                 .where({ id: id_produto })
                 .first();
@@ -114,48 +134,50 @@ export default class Purchase {
                 };
             }
 
-            const FieldAndValue = {
+            const clean = {
                 id_compra: id,
                 id_produto: id_produto,
-                quantidade: quantidade,
+                quantidade: 1,
                 total_bruto: produto.valor,
                 total_liquido: produto.valor,
                 desconto: 0,
                 acrescimo: 0,
                 nome: produto.nome
-            };
-
+            };            
+            
 
             // Insere o item na compra
             const isInserted = await connection('item_purchase')
-                .insert(FieldAndValue).returning('id');
+                .insert(clean)
+                .returning('id');
 
-            if (!isInserted) {
+            if (!isInserted || isInserted.length === 0) {
                 return {
                     status: false,
-                    msg: 'Restrição: Falha ao inserir o item da venda!',
+                    msg: 'Restrição: Falha ao inserir o item da compra!',
                     id: 0
                 };
             }
 
-            // Soma os totais de todos os itens da compra para atualizar o total da compra
-            const total_purchase = await connection('vw_item_purchase')
+            // Soma os totais de todos os itens para atualizar o total da compra
+            const totais = await connection('item_purchase')
                 .where({ id_compra: id })
+                .sum({ total_bruto: 'total_bruto', total_liquido: 'total_liquido' })
                 .first();
 
             // Atualiza o total da compra
             await connection('purchase')
                 .where({ id })
                 .update({
-                    total_bruto: total_purchase.total_bruto,
-                    total_liquido: total_purchase.total_liquido
+                    total_bruto: totais.total_bruto ?? 0,
+                    total_liquido: totais.total_liquido ?? 0
                 });
 
             return {
                 status: true,
                 msg: 'Item inserido com sucesso!',
-                id: isInserted[0],
-                data: total_purchase
+                id: isInserted[0].id ?? isInserted[0],
+                data: totais
             };
 
         } catch (error) {
@@ -166,7 +188,6 @@ export default class Purchase {
             };
         }
     }
-
     // Atualiza uma compra pelo ID
     static async update(id, data) {
         try {

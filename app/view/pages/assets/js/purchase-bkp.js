@@ -65,6 +65,7 @@ if (inputPreco && inputQuantidade) {
 
 // ─── Configuração de Máscaras 
 
+// Configurações do Inputmask para os campos de preço e quantidade
 Inputmask("currency", {
     radixPoint: ",",
     groupSeparator: ".",
@@ -76,7 +77,7 @@ Inputmask("currency", {
         return String(value).replace(".", ",");
     },
 }).mask(inputPreco);
-
+// Configurações do Inputmask para o campo de quantidade
 Inputmask("currency", {
     radixPoint: ",",
     groupSeparator: ".",
@@ -88,6 +89,7 @@ Inputmask("currency", {
         return String(value).replace(".", ",");
     },
 }).mask(inputQuantidade);
+
 
 // ─── Select2: Fornecedor 
 fornecedorSelect.select2({
@@ -113,7 +115,6 @@ fornecedorSelect.select2({
         delay: 250
     }
 });
-
 // ─── Select2: Produto 
 produtoSelect2.select2({
     theme: 'bootstrap-5',
@@ -138,7 +139,6 @@ produtoSelect2.select2({
         delay: 250
     }
 });
-
 // ─── Evento ao selecionar Produto
 produtoSelect2.on('select2:select', async function (e) {
     const productId = e.params.data.id;
@@ -157,7 +157,6 @@ produtoSelect2.on('select2:select', async function (e) {
         console.error("Erro ao buscar detalhes do produto:", err);
     }
 });
-
 // Focar no campo de busca do Select2 ao abrir
 $(document).on('select2:open', () => {
     document.querySelector('.select2-search__field').focus();

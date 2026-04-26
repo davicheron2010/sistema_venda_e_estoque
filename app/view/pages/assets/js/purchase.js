@@ -3,15 +3,16 @@
 // =============================================================================
 
 // ─── Referências DOM 
-const selectProduct = document.getElementById("produto");
-const inputPreco = document.getElementById('preco_compra');
-const inputQuantidade = document.getElementById('quantidade');
-const inputTotal = document.getElementById('valor-total');
-const fornecedorSelect = $('#fornecedor_id');
-const produtoSelect2 = $('#produto');
-const insertItemButton = document.getElementById('insert-item');
-const Action = document.getElementById('acao');
+const fornecedorSelect2 = $('#id_fornecedor');
+const produtoSelect2 = $('#id_produto');
 const Id = document.getElementById('id');
+const Action = document.getElementById('acao');
+const form = document.getElementById('form');
+const selectProduct = document.getElementById("produto");
+const inputQuantity = document.getElementById('quantidade');
+const insertItemButton = document.getElementById('insert-item');
+const inputUnitPrice = document.getElementById('preco-unitario');
+const inputTotalProduct = document.getElementById('valor-total-produto');
 
 
 // ─── Funções de Cálculo 
@@ -38,16 +39,16 @@ function floatParaString(valor) {
 function executarCalculo() {
     try {
         // Tenta pegar o valor "desmascarado" do Inputmask primeiro, se não conseguir, limpa a string
-        const precoBruto = inputPreco.inputmask ? inputPreco.inputmask.unmaskedvalue() : inputPreco.value;
-        const qtdBruta = inputQuantidade.inputmask ? inputQuantidade.inputmask.unmaskedvalue() : inputQuantidade.value;
+        const unitPrice = inputUnitPrice.inputmask ? inputUnitPrice.inputmask.unmaskedvalue() : inputUnitPrice.value;
+        const Quantity = inputQuantity.inputmask ? inputQuantity.inputmask.unmaskedvalue() : inputQuantity.value;
 
-        const preco = stringParaFloat(precoBruto);
-        const qtd = stringParaFloat(qtdBruta);
+        const price = stringParaFloat(unitPrice);
+        const amount = stringParaFloat(Quantity);
 
-        const total = preco * qtd;
+        const total = price * amount;
 
-        if (inputTotal) {
-            inputTotal.value = floatParaString(total);
+        if (inputTotalProduct) {
+            inputTotalProduct.value = floatParaString(total);
         }
     } catch (e) {
         console.error("Erro ao calcular total:", e);
@@ -56,15 +57,15 @@ function executarCalculo() {
 
 // ─── Ouvintes de Evento 
 
-if (inputPreco && inputQuantidade) {
-    inputPreco.addEventListener('input', executarCalculo);
-    inputQuantidade.addEventListener('input', executarCalculo);
+if (inputUnitPrice && inputQuantity) {
+    inputUnitPrice.addEventListener('input', executarCalculo);
+    inputQuantity.addEventListener('input', executarCalculo);
 
     executarCalculo();
 }
 
-// ─── Configuração de Máscaras 
-
+// ─── Configuração de Máscaras
+// Configurações do Inputmask para os campos de preço e quantidade
 Inputmask("currency", {
     radixPoint: ",",
     groupSeparator: ".",
@@ -75,8 +76,8 @@ Inputmask("currency", {
     onBeforeMask: function (value) {
         return String(value).replace(".", ",");
     },
-}).mask(inputPreco);
-
+}).mask(inputUnitPrice);
+// Configurações do Inputmask para o campo de quantidade
 Inputmask("currency", {
     radixPoint: ",",
     groupSeparator: ".",
@@ -87,10 +88,10 @@ Inputmask("currency", {
     onBeforeMask: function (value) {
         return String(value).replace(".", ",");
     },
-}).mask(inputQuantidade);
+}).mask(inputQuantity);
 
 // ─── Select2: Fornecedor 
-fornecedorSelect.select2({
+fornecedorSelect2.select2({
     theme: 'bootstrap-5',
     placeholder: "Selecione um fornecedor",
     language: "pt-BR",
@@ -113,7 +114,6 @@ fornecedorSelect.select2({
         delay: 250
     }
 });
-
 // ─── Select2: Produto 
 produtoSelect2.select2({
     theme: 'bootstrap-5',
@@ -138,7 +138,6 @@ produtoSelect2.select2({
         delay: 250
     }
 });
-
 // ─── Evento ao selecionar Produto
 produtoSelect2.on('select2:select', async function (e) {
     const productId = e.params.data.id;
@@ -147,17 +146,16 @@ produtoSelect2.on('select2:select', async function (e) {
 
         if (response && response.preco_compra) {
             // Preenche o valor vindo do banco
-            inputPreco.value = response.preco_compra;
+            inputUnitPrice.value = response.preco_compra;
 
             // CRUCIAL: Dispara o evento 'input' para o Inputmask formatar 
             // e o executarCalculo() ser chamado automaticamente
-            inputPreco.dispatchEvent(new Event('input'));
+            inputUnitPrice.dispatchEvent(new Event('input'));
         }
     } catch (err) {
         console.error("Erro ao buscar detalhes do produto:", err);
     }
 });
-
 // Focar no campo de busca do Select2 ao abrir
 $(document).on('select2:open', () => {
     document.querySelector('.select2-search__field').focus();
@@ -165,22 +163,16 @@ $(document).on('select2:open', () => {
 
 // ─── Funções de inserir compra e item da compra
 async function Insertpurchase() {
-    const valid = Validate.SetForm('form').Validate();
-    if (!valid) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: 'Por favor, preencha os campos corretamente.',
-            time: 2000,
-            progressBar: true,
-        });
-        return;
-    }
+    insertItemButton.disabled = true;
+    const originalText = insertItemButton.textContent;
+    insertItemButton.textContent = "Inserindo...";
 
     try {
         const form = document.getElementById('form');
         if (!form) throw new Error('Formulário não encontrado!');
         const json = formToJson(form);
+        console.log(json)
+        return;
 
         // Chama insert ou update dependendo da ação atual
         const response = Action.value === 'c'
@@ -217,74 +209,13 @@ async function Insertpurchase() {
     }
 }
 
-// ─── Função insert item
-async function InsertItemPurchase() {
-    let timer = 3000;
-    //Desabilita o botão para evistar múltiplos cliques enquanto a requisição está em andamento
-    insertItemButton.disabled = true;
-    const originalText = insertItemButton.textContent;
-    insertItemButton.textContent = "Inserindo...";
-    const form = document.getElementById('form');
-    const data = formToJson(form);
-
-    // Função auxiliar para limpar máscaras antes de enviar ao banco
-    const cleanInput = (val) => String(val).replace(/[R$%\s.]/g, "").replace(".", "").replace(",", ".");
-    //Converte os dados para do form para decimal, limpando as máscaras de moeda e porcentagem
-
-    data.inputPreco = cleanInput(data.preco_compra);
-    data.inputQuantidade = cleanInput(data.quantidade);
-    data.inputTotal = cleanInput(data.valor_total);
-
-
-    let id = (Action.value !== "c") ? Id.value : null;
-
-    try {
-        const response = (Action.value === "c")
-            ? await api.purchase.insert(data)
-            : await api.purchase.update(id, data);
-        if (!response.status) {
-            toast("error", "Erro", response.msg, timer);
-            return;
-        }
-        //Insere o item na tabela item compra
-
-        const responseItem = await api.purchase.insertItem(data);
-
-        //Atualizar os campos de total da compra
-        document.getElementById('total_liquido').innerHTML = parseFloat(responseItem.data.total_liquido).toLocaleString('pt-BR', {
-            style: 'currency',
-            currency: 'BRL'
-        });
-
-        document.getElementById('total_bruto').innerHTML = parseFloat(responseItem.data.total_bruto).toLocaleString('pt-BR', {
-            style: 'currency',
-            currency: 'BRL'
-        });
-        //Essa funcção copula a tabela de itens da compra, atualizando os totais da compra e inserindo o item na tabela item_purchase
-        await listItemPurchase();
-
-        //Limpar os campos do item da compra
-        produtoSelect2.val(null).trigger('change');
-        inputPreco.value = 'R$ 0,00';
-        inputQuantidade.value = '1,00';
-        inputTotal.value = 'R$ 0,00';
-
-    } catch (err) {
-        toast("error", "Falha", "Erro interno: " + err.message, timer);
-    } finally {
-        insertItemButton.textContent = originalText;
-        insertItemButton.disabled = false;
-    }
-}
-
-// ─── Função listar itens da compra
 async function listItemPurchase() {
     try {
         const form = document.getElementById('form');
         if (!form) throw new Error('Formulário não encontrado!');
         const json = formToJson(form);
 
-        const response = await api.purchase.listItemSale(json);
+        const response = await api.purchase.findById(json);
 
         if (!response.status) {
             Swal.fire({
@@ -349,13 +280,9 @@ async function listItemPurchase() {
     }
 }
 
-async function UpdatePurchase(id, formId) {
-    const form = document.getElementById(formId);
-    if (!form) throw new Error("Formulário não encontrado!");
-    const json = formToJson(form);
-    return await api.purchase.update(id, json);
-}
+// ─── Função insert item
+
 
 insertItemButton.addEventListener("click", async () => {
-    await InsertItemPurchase();
+    await Insertpurchase();
 });

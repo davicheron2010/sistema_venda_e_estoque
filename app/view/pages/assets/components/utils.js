@@ -22,3 +22,11 @@ function toast(icon, title, text, timer = 3000) {
         showConfirmButton: false,
     });
 }
+function error(icon, title, text,) {
+    return Swal.fire({
+        icon,
+        title,
+        text,
+        footer: "<a href=\"#\">Why do I have this issue?</a>"
+    });
+}
