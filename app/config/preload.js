@@ -88,10 +88,12 @@ contextBridge.exposeInMainWorld('api', {
     purchase: {
         insert(data) { return ipcRenderer.invoke('purchase:insert', data); },
         insertItem(data) { return ipcRenderer.invoke('purchase:insertItem', data); },
+        listItem(data) { return ipcRenderer.invoke('purchase:listItem', data); },
         find(where) { return ipcRenderer.invoke('purchase:find', where); },
         findById(id) { return ipcRenderer.invoke('purchase:findById', id); },
         update(id, data) { return ipcRenderer.invoke('purchase:update', id, data); },
         delete(id) { return ipcRenderer.invoke('purchase:delete', id); },
+        deleteItem(id) { return ipcRenderer.invoke('purchase:deleteItem', id); },
         onReload(callback) {
             ipcRenderer.on('enterprise:reload', () => callback());
         },

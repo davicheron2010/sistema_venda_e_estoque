@@ -30,3 +30,14 @@ function error(icon, title, text,) {
         footer: "<a href=\"#\">Why do I have this issue?</a>"
     });
 }
+function confirmDialog(title, text) {
+    return Swal.fire({
+        icon: 'warning',
+        title,
+        text,
+        showCancelButton: true,
+        confirmButtonText: 'Sim, excluir',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#d33',
+    });
+}
