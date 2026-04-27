@@ -1,7 +1,7 @@
 exports.up = async function (knex) {
   await knex.schema.createTable('installment_sale_purchase', (table) => {
     table.bigIncrements('id').notNullable().primary();
-    table.bigInteger('id_sale').notNullable();
+    table.bigInteger('id_sale').nullable().defaultTo(null);
     table.bigInteger('id_purchase').notNullable();
     table.bigInteger('id_installment').notNullable();
     table.bigInteger('id_payment_terms').notNullable();

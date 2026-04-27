@@ -238,75 +238,66 @@ ipcMain.handle('enterprise:delete', async (_e, id) => {
     return result;
 });
 // Purchase
-
 ipcMain.handle('purchase:insert', async (_e, data) => {
-    const result = await Purchase.insert(data);
-    if (result.status) broadcastReload('purchase:reload');
-    return result;
+    try {
+        const result = await Purchase.insert(data);
+        if (result.status) broadcastReload('purchase:reload');
+        return result;
+    } catch (error) {
+        return { status: false, msg: 'Erro ao salvar compra: ' + error.message };
+    }
 });
-
 ipcMain.handle('purchase:insertItem', async (_e, data) => {
-    const result = await Purchase.insertItem(data);
-    if (result.status) broadcastReload('purchase:reload');
-    return result;
+    try {
+        const result = await Purchase.insertItem(data);
+        if (result.status) broadcastReload('purchase:reload');
+        return result;
+    } catch (error) {
+        return { status: false, msg: 'Erro ao salvar item da compra: ' + error.message };
+    }
 });
-
+ipcMain.handle('purchase:listItem', async (_e, data) => { 
+    try {
+        return await Purchase.listItem(data);
+    } catch (error) {
+        return { status: false, msg: 'Erro ao listar itens da compra: ' + error.message, data: [] };
+    }
+});
 ipcMain.handle('purchase:find', async (_e, where = {}) => {
     return await Purchase.find(where);
 });
-
 ipcMain.handle('purchase:findById', async (_e, id) => {
     return await Purchase.findById(id);
 });
-
-ipcMain.handle('purchase:listItemPurchase', async (_e, data) => {
-    return await Purchase.listItemPurchase(data);
-});
-
 ipcMain.handle('purchase:update', async (_e, id, data) => {
     const result = await Purchase.update(id, data);
     if (result.status) broadcastReload('purchase:reload');
     return result;
-});
-ipcMain.handle('purchase:deleteItem', async (_e, data) => {
-    try {
-        return await Purchase.deleteItem(data);
-    } catch (error) {
-        console.error('Erro ao excluir item da compra:', error);
-        return { status: false, msg: error.message };
-    }
 });
 ipcMain.handle('purchase:delete', async (_e, id) => {
     const result = await Purchase.delete(id);
     if (result.status) broadcastReload('purchase:reload');
     return result;
 });
-// --- CONDIÇÕES DE PAGAMENTO ---
-ipcMain.handle('paymentTerms:insert', async (_e, data) => {
-    const result = await PaymentTerms.insert(data);
-    if (result.status) broadcastReload('paymentTerms:reload');
+ipcMain.handle('purchase:finalize', async (_e, data) => {
+    const result = await Purchase.finalize(data);
+    if (result.status) broadcastReload('purchase:reload');
     return result;
 });
-
-ipcMain.handle('paymentTerms:find', async (_e, where = {}) => {
-    return await PaymentTerms.find(where);
+ipcMain.handle('purchase:deleteItem', async (_e, id) => {
+    console.log('route deleteItem id:', id);
+    try {
+        const result = await Purchase.deleteItem(id);
+        if (result.status) broadcastReload('purchase:reload');
+        return result;
+    } catch (error) {
+        return { status: false, msg: 'Erro ao excluir item: ' + error.message };
+    }
 });
 
-ipcMain.handle('paymentTerms:findById', async (_e, id) => {
-    return await PaymentTerms.findById(id);
+ipcMain.handle('paymentTerms:find', async (event, params) => {
+    return await PaymentTerms.find(params);
 });
-
-ipcMain.handle('paymentTerms:update', async (_e, id, data) => {
-    const result = await PaymentTerms.update(id, data);
-    if (result.status) broadcastReload('paymentTerms:reload');
-    return result;
-});
-
-ipcMain.handle('paymentTerms:delete', async (_e, id) => {
-    const result = await PaymentTerms.delete(id);
-    if (result.status) broadcastReload('paymentTerms:reload');
-    return result;
-});
-ipcMain.handle('paymentTerms:findWithInstallments', async (_e, id) => {
-        return await PaymentTerms.findWithInstallments(id);
+ipcMain.handle('paymentTerms:simulate', async (event, data) => {
+    return await PaymentTerms.simulate(data);
 });

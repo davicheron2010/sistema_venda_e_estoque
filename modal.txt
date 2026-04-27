@@ -1,0 +1,63 @@
+-------------------------------------------
+ const stringHtml = `
+        <!DOCTYPE html>
+        <html lang="pt-br">
+        <head>
+            <meta charset="UTF-8">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+            <style>
+                body { font-family: Arial, sans-serif; font-size: 11px; color: #333; }
+                .container { padding: 20px; border: 1px solid #ddd; margin-top: 10px; background: #fff; }
+                .header-box { border-bottom: 2px solid #333; margin-bottom: 20px; padding-bottom: 10px; }
+                .info-card { background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+                .table thead { background: #343a40; color: white; }
+                .total-final { background: #28a745; color: white; font-size: 14px; font-weight: bold; padding: 15px; margin-top: 20px; border-radius: 4px; }
+                .section-title { border-left: 4px solid #007bff; padding-left: 10px; margin: 20px 0 10px; font-weight: bold; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header-box text-center">
+                    <h2>Relatório de Compra #${saveResult.id}</h2>
+                    <p>Data: <strong>${dataAtual}</strong></p>
+                </div>
+                <div class="section-title">FORNECEDOR</div>
+                <div class="info-card">
+                    <strong>${fornecedorNome}</strong><br>
+                    Razão Social: ${fornecedorRazao}<br>
+                    CNPJ/CPF: ${fornecedorCnpjCpf}
+                </div>
+                <div class="section-title">ITENS DA COMPRA</div>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Grupo</th>
+                            <th class="text-center">Qtd</th>
+                            <th class="text-right">Unit.</th>
+                            <th class="text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>${itensHtml}</tbody>
+                </table>
+                <div class="section-title">CONDIÇÃO DE PAGAMENTO: ${currentPaymentTerm.titulo}</div>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Parcela</th>
+                            <th class="text-right">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>${parcelasHtml}</tbody>
+                </table>
+                <div class="total-final text-right">
+                    TOTAL: ${total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                </div>
+            </div>
+        </body>
+        </html>
+        `;
+
+        await window.api.report.print(stringHtml);
+    }
+-------------------

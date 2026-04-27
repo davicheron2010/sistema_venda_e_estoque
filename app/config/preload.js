@@ -27,19 +27,17 @@ contextBridge.exposeInMainWorld('api', {
         get(key) { return ipcRenderer.invoke('temp:get', key); },
     },
 
-    // --- NOVO MÓDULO DE COMPRAS ---
-    purchase: {
-        insert: (data) => ipcRenderer.invoke('purchase:insert', data),
-        insertItem: (data) => ipcRenderer.invoke('purchase:insertItem', data),
-        listItemPurchase: (data) => ipcRenderer.invoke('purchase:listItemPurchase', data),
-        update: (id, data) => ipcRenderer.invoke('purchase:update', id, data),
-        find: (where) => ipcRenderer.invoke('purchase:find', where),
-        findPurchase: (where) => ipcRenderer.invoke('purchase:findPurchase', where),
-        findById: (id) => ipcRenderer.invoke('purchase:findById', id),
-        deleteItem: (data) => ipcRenderer.invoke('purchase:deleteItem', data),
-        delete: (id) => ipcRenderer.invoke('purchase:delete', id),
-        onReload: (callback) => {
-            ipcRenderer.removeAllListeners('purchase:reload');
+     purchase: {
+        insert(data) { return ipcRenderer.invoke('purchase:insert', data); },
+        insertItem(data) { return ipcRenderer.invoke('purchase:insertItem', data); },
+        listItem(data) { return ipcRenderer.invoke('purchase:listItem', data); },
+        find(where) { return ipcRenderer.invoke('purchase:find', where); },
+        findById(id) { return ipcRenderer.invoke('purchase:findById', id); },
+        finalize(data) { return ipcRenderer.invoke('purchase:finalize', data); },
+        update(id, data) { return ipcRenderer.invoke('purchase:update', id, data); },
+        delete(id) { return ipcRenderer.invoke('purchase:delete', id); },
+        deleteItem(id) { return ipcRenderer.invoke('purchase:deleteItem', id); },
+        onReload(callback) {
             ipcRenderer.on('purchase:reload', () => callback());
         },
     },
@@ -104,6 +102,7 @@ contextBridge.exposeInMainWorld('api', {
     paymentTerms: {
         insert(data) { return ipcRenderer.invoke('paymentTerms:insert', data); },
         find(where) { return ipcRenderer.invoke('paymentTerms:find', where); },
+        simulate(data) { return ipcRenderer.invoke('paymentTerms:simulate', data); },
         findById(id) { return ipcRenderer.invoke('paymentTerms:findById', id); },
         update(id, data) { return ipcRenderer.invoke('paymentTerms:update', id, data); },
         delete(id) { return ipcRenderer.invoke('paymentTerms:delete', id); },

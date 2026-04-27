@@ -155,6 +155,51 @@ export default class PaymentTerms {
         }
     }
 
+    static async simulate(data = {}) {
+        const { id, total } = data;
+
+        if (!id || !total) {
+            return { status: false, msg: 'ID do pagamento e valor total são obrigatórios.' };
+        }
+
+        try {
+            // Busca as regras de parcelamento vinculadas a esta forma de pagamento
+            const rules = await connection('installment')
+                .where({ id_pagamento: id })
+                .orderBy('parcela', 'asc');
+
+            if (!rules || rules.length === 0) {
+                return { status: true, data: [], msg: 'Sem parcelas configuradas.' };
+            }
+
+            const totalParcelas = rules.length;
+            const valorParcelaBase = Math.floor((total / totalParcelas) * 100) / 100;
+            const diferenca = parseFloat((total - (valorParcelaBase * totalParcelas)).toFixed(2));
+
+            const simulation = rules.map((rule, index) => {
+                const dataVencimento = new Date();
+                // Adiciona o intervalo de dias definido no banco
+                dataVencimento.setDate(dataVencimento.getDate() + (rule.intervalor || 0));
+
+                return {
+                    numero: rule.parcela,
+                    // Se for a última parcela, adiciona a diferença do arredondamento
+                    valor: index === totalParcelas - 1 ? (valorParcelaBase + diferenca) : valorParcelaBase,
+                    vencimento: dataVencimento.toLocaleDateString('pt-BR'),
+                    percentual: rule.percentual
+                };
+            });
+
+            return {
+                status: true,
+                data: simulation
+            };
+        } catch (error) {
+            console.error('Erro ao simular parcelas:', error);
+            return { status: false, msg: 'Erro interno ao calcular parcelas.' };
+        }
+    }
+
     static async findWithInstallments(id) {
         if (!id) return null;
 

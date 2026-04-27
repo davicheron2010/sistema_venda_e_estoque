@@ -3,155 +3,165 @@
 {% block title %}Compra - Deskivo{% endblock %}
 
 {% block content %}
-<input type="hidden" id="acao" value="c">
-<input type="hidden" id="id" value="">
 
 <div class="col-12 my-4">
   <div class="d-flex justify-content-between align-items-center">
     <div>
-      <h1 class="h3">Compra</h1>
-      <p class="text-muted">Gerencie a entrada de produtos e fornecedores.</p>
+      <h1 class="h3 mb-1">Compra</h1>
+      <p class="text-muted mb-0">Gerencie a entrada de produtos e fornecedores.</p>
     </div>
-    <span class="badge bg-primary">Status: <strong id="purchase-status">Em edição</strong></span>
+    <span class="badge bg-primary fs-6 px-3 py-2">
+      Status: <strong id="purchase-status">Em edição</strong>
+    </span>
   </div>
 </div>
 
-<div class="col-12">
-  <div class="row gy-4">
-    <div class="col-lg-7">
-      <div class="card shadow-sm mb-4">
-        <div class="card-body">
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label class="form-label fw-bold" for="fornecedor_id">Fornecedor</label>
-              <select class="form-select" id="fornecedor_id" name="fornecedor_id">
-                <option value="">Selecione um fornecedor...</option>
-              </select>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label fw-bold" for="estado_compra">Estado da compra</label>
-              <select class="form-select" id="estado_compra" name="estado_compra">
-                <option value="EM_ANDAMENTO">Em andamento</option>
-                <option value="RECEBIDO">Recebido</option>
-                <option value="CONCLUIDO">Concluído</option>
-              </select>
+<form id="form">
+  <input type="hidden" id="acao" name="acao" value="c">
+  <input type="hidden" id="id" name="id">
+  <div class="col-12">
+    <div class="row gy-4">
+      <div class="col-lg-9">
+
+        <div class="card shadow-sm mb-4">
+          <div class="card-header fw-semibold">Dados da Compra</div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="id_fornecedor" class="form-label fw-bold">Fornecedor</label>
+                <select class="form-select" id="id_fornecedor" name="id_fornecedor">
+                  <option value="">Selecione um fornecedor...</option>
+                </select>
+              </div>
+
+              <div class="col-12">
+                <label for="observacao" class="form-label fw-bold">Observação</label>
+                <textarea class="form-control" id="observacao" name="observacao" rows="2"
+                  placeholder="Observações sobre a compra..."></textarea>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="card shadow-sm mb-4 border-primary">
-        <div class="card-header bg-light">
-          <h2 class="h6 mb-0 text-primary">
-            <i class="bi bi-plus-circle me-1"></i> Adicionar Item
-          </h2>
-        </div>
-        <div class="card-body">
-          <form id="form">
+        <div class="card shadow-sm mb-4">
+          <div class="card-header fw-semibold">Adicionar Item</div>
+          <div class="card-body">
             <div class="row g-3">
               <div class="col-12">
-                <label for="produto" class="form-label small fw-bold">Produto</label>
-                <select id="produto" name="produto" class="form-select w-100" required>
+                <label for="id_produto" class="form-label fw-bold">Produto</label>
+                <select id="id_produto" name="id_produto" class="form-select w-100">
                   <option value="">Buscar produto...</option>
                 </select>
               </div>
 
-              <div class="col-md-6">
-                <label for="quantidade" class="form-label small fw-bold">Quantidade</label>
-                <input type="text" id="quantidade" name="quantidade" class="form-control" value="1" required>
+              <div class="col-md-4">
+                <label for="quantidade" class="form-label fw-bold">Quantidade</label>
+                <input type="text" id="quantidade" name="quantidade" class="form-control" value="1,00">
               </div>
 
-              <div class="col-md-6">
-                <label for="preco_compra" class="form-label small fw-bold">Preço Unitário</label>
-                <div class="input-group">
-                  <span class="input-group-text">R$</span>
-                  <input type="text" id="preco_compra" name="preco_compra" class="form-control" required>
-                </div>
+              <div class="col-md-4">
+                <label for="preco-unitario" class="form-label fw-bold">Preço Unitário</label>
+                <input type="text" id="preco-unitario" name="preco-unitario" class="form-control" readonly
+                  placeholder="R$ 0,00">
               </div>
 
-              <div class="col-12">
-                <label for="valor-total" class="form-label small fw-bold">Total do Item</label>
-                <div class="input-group">
-                  <span class="input-group-text">R$</span>
-                  <input type="text" id="valor-total" class="form-control" readonly>
-                </div>
-              </div>
-
-              <div class="col-12 text-end">
-                <button type="button" class="btn btn-primary px-4" id="insert-item">
-                  <i class="bi bi-plus-lg me-1"></i> Inserir na Lista
-                </button>
+              <div class="col-md-4">
+                <label for="valor-total-produto" class="form-label fw-bold">Valor Total</label>
+                <input type="text" id="valor-total-produto" name="valor-total-produto" class="form-control" readonly
+                  placeholder="0,00">
               </div>
             </div>
-          </form>
+
+            <div class="d-flex justify-content-end mt-3">
+              <button type="button" class="btn btn-primary px-4" id="insert-item">
+                <i class="bi bi-plus-lg me-1"></i> Inserir na Lista
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card shadow-sm">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">Itens da Compra</span>
+            <span id="product-count" class="badge bg-secondary">Itens: 0</span>
+          </div>
+
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0" id="purchase-items-table">
+                <thead class="table-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Produto</th>
+                    <th>Fornecedor</th>
+                    <th>Grupo</th>
+                    <th class="text-end">Qtd</th>
+                    <th class="text-end">Unit.</th>
+                    <th class="text-end">Total</th>
+                    <th class="text-center">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="products-table-tbody">
+                  <tr>
+                    <td colspan="8" class="text-center text-muted py-4">
+                      <i class="bi bi-inbox me-2"></i>
+                      Nenhum item adicionado.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h2 class="h5 mb-3">Itens da Compra</h2>
-          <div class="table-responsive">
-            <table class="table table-hover align-middle" id="purchase-items-table">
-              <thead>
-                <tr>
-                  <th>Produto</th>
-                  <th>Fornecedor</th>
-                  <th>Grupo</th>
-                  <th class="text-end">Qtd</th>
-                  <th class="text-end">Unit.</th>
-                  <th class="text-end">Total</th>
-                  <th class="text-center">Ações</th>
-                </tr>
-              </thead>
-              <tbody id="products-table-tbody">
-                <tr id="empty-row">
-                  <td colspan="7" class="text-center text-muted py-4">Nenhum item adicionado.</td>
-                </tr>
-              </tbody>
-            </table>
+      <div class="col-lg-3">
+        <div style="position: sticky; top: 1rem;">
+          <div class="card shadow-sm mb-4">
+            <div class="card-header fw-semibold">Resumo da Compra</div>
+            <div class="card-body">
+              <dl class="row mb-0">
+                <dt class="col-7">Subtotal</dt>
+                <dd class="col-5 text-end mb-2">
+                  <span id="total_liquido">R$ 0,00</span>
+                </dd>
+
+                <dt class="col-7">Desconto</dt>
+                <dd class="col-5 text-end mb-2">
+                  <div class="input-group input-group-sm justify-content-end"
+                    style="max-width: 140px; margin-left: auto;">
+                    <span class="input-group-text">R$</span>
+                    <input type="text" id="purchase-discount" class="form-control text-end" value="0,00" min="0">
+                  </div>
+                </dd>
+
+                <dt class="col-7 pt-2 border-top fw-bold">Total</dt>
+                <dd class="col-5 text-end pt-2 border-top fw-bold fs-5 mb-0">
+                  <span id="total_bruto">R$ 0,00</span>
+                </dd>
+              </dl>
+            </div>
+          </div>
+
+          <div class="card shadow-sm">
+            <div class="card-body d-grid gap-2">
+              <button type="button" id="finalize-purchase" class="btn btn-success py-2">
+                <i class="bi bi-check-lg me-1"></i> Finalizar Compra
+              </button>
+              <button type="button" id="clear-purchase" class="btn btn-outline-danger">
+                <i class="bi bi-trash me-1"></i> Limpar Tudo
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-
-    <div class="col-lg-5">
-      <div class="card shadow-sm mb-4">
-        <div class="card-body">
-          <h2 class="h5 mb-3">Resumo da Compra</h2>
-          <dl class="row mb-0">
-            <dt class="col-7">Subtotal</dt>
-            <dd class="col-5 text-end">R$ <span id="total_liquido">0,00</span></dd>
-
-            <dt class="col-7">Desconto</dt>
-            <dd class="col-5 text-end">
-              <div class="input-group input-group-sm justify-content-end" style="max-width: 140px; margin-left: auto;">
-                <span class="input-group-text">R$</span>
-                <input type="text" id="purchase-discount" class="form-control text-end" value="0,00">
-              </div>
-            </dd>
-
-            <dt class="col-7 pt-2 border-top">Total</dt>
-            <dd class="col-5 text-end pt-2 border-top fw-bold fs-5">R$ <span id="total_bruto">0,00</span></dd>
-          </dl>
-        </div>
-      </div>
-
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <button id="finalize-sale" class="btn btn-success w-100 mb-2 py-2" type="button">
-            <i class="bi bi-check-lg me-1"></i> Finalizar Compra
-          </button>
-          <button id="clear-sale" class="btn btn-outline-danger w-100" type="button">
-            <i class="bi bi-trash me-1"></i> Limpar Tudo
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
-</div>
+</form>
 
-<div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered modal-lg">
+    <input type="hidden" id="id_compra_modal" value="">
     <div class="modal-content">
       <div class="modal-header border-0 pb-0">
         <h5 class="modal-title fw-bold">
@@ -166,21 +176,16 @@
           <span class="fs-4 fw-bold">R$ <span id="modal-total">0,00</span></span>
         </div>
 
-        <div class="mb-3">
-          <label class="form-label fw-bold small text-muted text-uppercase">Forma de Pagamento</label>
-          <div id="payment-terms-buttons" class="btn-group w-100 flex-wrap gap-2" role="group" aria-label="Formas de pagamento"></div>
+        <div class="mb-4">
+          <label class="form-label fw-bold small text-muted text-uppercase">Escolha a Forma</label>
+          <div id="payment-terms-buttons" class="btn-group w-100 flex-wrap gap-2" role="group"></div>
         </div>
 
-        <div id="payment-split-wrap" class="mb-3 d-none">
-          <label class="form-label fw-bold small text-muted text-uppercase">Divisão do Pagamento</label>
-          <div id="payment-split-list" class="row g-2"></div>
-        </div>
-
-        <div id="card-installments-wrap" class="mb-3 d-none">
-          <label for="payment-installments" class="form-label fw-bold small text-muted text-uppercase">Parcelas</label>
+        <div id="card-installments-wrap" class="mb-4 d-none p-3 border rounded bg-light">
+          <label for="payment-installments" class="form-label fw-bold small text-muted text-uppercase">Quantidade de
+            Parcelas</label>
           <select id="payment-installments" class="form-select form-select-lg">
-            <option value="">Selecione...</option>
-            <option value="1">1x</option>
+            <option value="1" selected>1x (À vista)</option>
             <option value="2">2x</option>
             <option value="3">3x</option>
             <option value="4">4x</option>
@@ -195,26 +200,32 @@
           </select>
         </div>
 
-        <div id="installment-list" class="row g-2 mb-3"></div>
+        <div class="mb-2">
+          <label class="form-label fw-bold small text-muted text-uppercase">Resumo das Parcelas</label>
+          <div id="installment-list" class="row g-2">
+          </div>
+        </div>
 
-        <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded">
-          <span class="small text-muted">Ajuste de Diferença:</span>
-          <span id="installment-difference" class="badge bg-secondary fs-6">0,00</span>
+        <div class="d-flex justify-content-between align-items-center mt-3 p-2 border-top border-bottom">
+          <span class="small text-muted italic text-uppercase" style="font-size: 0.7rem;">Ajuste de Diferença
+            (Centavos):</span>
+          <span id="installment-difference" class="badge bg-secondary">0,00</span>
         </div>
       </div>
 
       <div class="modal-footer border-0">
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Voltar</button>
         <button type="button" class="btn btn-primary px-4" id="confirm-payment" disabled>
-          Confirmar e Salvar
+          <i class="bi bi-check-circle me-1"></i> Confirmar e Salvar
         </button>
       </div>
     </div>
   </div>
 </div>
+
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ assets }}/js/purchase.js"></script>
-<script src="{{ assets }}/js/item-purchase.js"></script>
+<script defer type="module" src="file:///{{ assets }}/js/purchase.js"></script>
+<script defer type="module" src="file:///{{ assets }}/js/itempurchase.js"></script>
 {% endblock %}
