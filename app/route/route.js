@@ -187,10 +187,6 @@ ipcMain.handle('sale:insertItem', async (_e, data) => {
     if (result.status) broadcastReload('sale:reload');
     return result;
 });
-ipcMain.handle('purchase:insert', async (_e, data) => {
-    console.log('Dados da Compra Recebidos:', data);
-    return { status: true, msg: 'Compra registrada com sucesso!' };
-});
 ipcMain.handle('supplier:insert', async (_e, data) => {
     const result = await Supplier.insert(data);
     if (result.status) broadcastReload('supplier:reload');
@@ -244,4 +240,56 @@ ipcMain.handle('company:delete', async (_e, id) => {
     const result = await Company.delete(id);
     if (result.status) broadcastReload('company:reload');
     return result;
+});
+// Purchase
+ipcMain.handle('purchase:insert', async (_e, data) => {
+    try {
+        const result = await Purchase.insert(data);
+        if (result.status) broadcastReload('purchase:reload');
+        return result;
+    } catch (error) {
+        return { status: false, msg: 'Erro ao salvar compra: ' + error.message };
+    }
+});
+ipcMain.handle('purchase:insertItem', async (_e, data) => {
+    try {
+        const result = await Purchase.insertItem(data);
+        if (result.status) broadcastReload('purchase:reload');
+        return result;
+    } catch (error) {
+        return { status: false, msg: 'Erro ao salvar item da compra: ' + error.message };
+    }
+});
+ipcMain.handle('purchase:listItem', async (_e, data) => {
+    try {
+        return await Purchase.listItem(data);
+    } catch (error) {
+        return { status: false, msg: 'Erro ao listar itens da compra: ' + error.message, data: [] };
+    }
+});
+ipcMain.handle('purchase:find', async (_e, where = {}) => {
+    return await Purchase.find(where);
+});
+ipcMain.handle('purchase:findById', async (_e, id) => {
+    return await Purchase.findById(id);
+});
+ipcMain.handle('purchase:update', async (_e, id, data) => {
+    const result = await Purchase.update(id, data);
+    if (result.status) broadcastReload('purchase:reload');
+    return result;
+});
+ipcMain.handle('purchase:delete', async (_e, id) => {
+    const result = await Purchase.delete(id);
+    if (result.status) broadcastReload('purchase:reload');
+    return result;
+});
+ipcMain.handle('purchase:deleteItem', async (_e, id) => {
+    console.log('route deleteItem id:', id);
+    try {
+        const result = await Purchase.deleteItem(id);
+        if (result.status) broadcastReload('purchase:reload');
+        return result;
+    } catch (error) {
+        return { status: false, msg: 'Erro ao excluir item: ' + error.message };
+    }
 });

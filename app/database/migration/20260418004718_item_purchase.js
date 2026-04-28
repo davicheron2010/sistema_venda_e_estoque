@@ -6,6 +6,7 @@ export function up(knex) {
         table.decimal('quantidade', 18, 4).nullable();
         table.decimal('total_bruto', 18, 4).nullable();
         table.decimal('total_liquido', 18, 4).nullable().comment('Valor a ser pago produto.');
+        table.decimal('preco_unitario', 18, 4).nullable();
         table.decimal('desconto', 18, 4).nullable();
         table.decimal('acrescimo', 18, 4).nullable();
         table.text('nome').nullable();
