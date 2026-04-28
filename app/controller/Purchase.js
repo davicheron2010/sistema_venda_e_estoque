@@ -51,7 +51,7 @@ export default class Purchase {
             .first();
         return row || null;
     }
-    
+
     static async listItem(data = {}) {
         const id = data.id ?? null;
 
@@ -64,7 +64,6 @@ export default class Purchase {
         }
 
         try {
-            // Busca os dados da compra
             const purchase = await connection(Purchase.table)
                 .where({ id })
                 .first();
@@ -77,7 +76,6 @@ export default class Purchase {
                 };
             }
 
-            // Busca os itens da compra
             const items = await connection('item_purchase')
                 .where({ id_compra: id })
                 .orderBy('id', 'asc');
@@ -99,7 +97,6 @@ export default class Purchase {
     }
 
     static async insert(data) {
-        // Converte para número pois o select2 envia como string
         const id_fornecedor = data.id_fornecedor ? Number(data.id_fornecedor) : null;
 
         try {
@@ -143,22 +140,13 @@ export default class Purchase {
     static async insertItem(data) {
         const id = data.id ?? null;
         const id_produto = data.id_produto ?? null;
-        const quantidade = data.quantidade ?? null;
 
         if (id === null || id === undefined) {
-            return {
-                status: false,
-                msg: 'Restrição: O ID da compra é obrigatório!',
-                id: 0
-            };
+            return { status: false, msg: 'Restrição: O ID da compra é obrigatório!', id: 0 };
         }
 
         if (id_produto === null || id_produto === undefined) {
-            return {
-                status: false,
-                msg: 'Restrição: O ID do produto é obrigatório!',
-                id: 0
-            };
+            return { status: false, msg: 'Restrição: O ID do produto é obrigatório!', id: 0 };
         }
 
         try {
@@ -167,17 +155,12 @@ export default class Purchase {
                 .first();
 
             if (!produto) {
-                return {
-                    status: false,
-                    msg: 'Restrição: Nenhum produto localizado!',
-                    id: 0
-                };
+                return { status: false, msg: 'Restrição: Nenhum produto localizado!', id: 0 };
             }
 
             const qtd = parseFloat(data.quantidade) || 1;
-            const preco = parseFloat(data.inputPreco) || parseFloat(produto.preco_compra) || 0;
             const preco_unit = parseFloat(data.inputPreco) || 0;
-            const total = parseFloat(data.inputTotal) || (preco * qtd);
+            const total = parseFloat(data.inputTotal) || (preco_unit * qtd);
 
             const clean = {
                 id_compra: id,
@@ -190,25 +173,20 @@ export default class Purchase {
                 acrescimo: 0,
                 nome: produto.nome
             };
+
             const isInserted = await connection('item_purchase')
                 .insert(clean)
                 .returning('id');
 
             if (!isInserted || isInserted.length === 0) {
-                return {
-                    status: false,
-                    msg: 'Restrição: Falha ao inserir o item da compra!',
-                    id: 0
-                };
+                return { status: false, msg: 'Restrição: Falha ao inserir o item da compra!', id: 0 };
             }
 
-            // Soma os totais de todos os itens para atualizar o total da compra
             const totais = await connection('item_purchase')
                 .where({ id_compra: id })
                 .sum({ total_bruto: 'total_bruto', total_liquido: 'total_liquido' })
                 .first();
 
-            // Atualiza o total da compra
             await connection(Purchase.table)
                 .where({ id })
                 .update({
@@ -224,11 +202,90 @@ export default class Purchase {
             };
 
         } catch (error) {
-            return {
-                status: false,
-                msg: 'Restrição: ' + error.message,
-                id: 0
-            };
+            return { status: false, msg: 'Restrição: ' + error.message, id: 0 };
+        }
+    }
+
+    /**
+     * Finaliza a compra salvando as parcelas de cada forma de pagamento.
+     *
+     * @param {object} data
+     * @param {number} data.id_purchase       - ID da compra
+     * @param {Array}  data.formas            - Array com até 2 formas de pagamento
+     * @param {number} data.formas[].id_payment_terms
+     * @param {number} data.formas[].parcelas - Número de parcelas escolhido
+     * @param {number} data.formas[].valor    - Valor total desta forma
+     * @param {Array}  data.formas[].installments - [{ id, parcela, intervalo }] vindos da tabela installment
+     */
+    static async finalize(data) {
+        const { id_purchase, formas } = data;
+
+        if (!id_purchase) {
+            return { status: false, msg: 'Restrição: ID da compra é obrigatório!' };
+        }
+
+        if (!formas || formas.length === 0) {
+            return { status: false, msg: 'Restrição: Nenhuma forma de pagamento informada!' };
+        }
+
+        try {
+            await connection.transaction(async (trx) => {
+
+                await trx('installment_sale_purchase')
+                    .where({ id_purchase })
+                    .del();
+
+                const hoje = new Date();
+                const registros = [];
+
+                for (const forma of formas) {
+                    const { id_payment_terms, parcelas, valor, installments } = forma;
+
+                    const valorBase = Math.floor((valor / parcelas) * 100) / 100;
+                    const soma = valorBase * parcelas;
+                    const diferenca = parseFloat((valor - soma).toFixed(2));
+
+                    for (let i = 1; i <= parcelas; i++) {
+                        const valorParcela = i === parcelas ? valorBase + diferenca : valorBase;
+
+                        const instData = installments.find(inst => inst.parcela === i);
+                        const intervalo = instData?.intervalo ?? (i * 30);
+                        const id_installment = instData?.id ?? null;
+
+                        const vencimento = new Date(hoje);
+                        vencimento.setDate(vencimento.getDate() + intervalo);
+
+                        registros.push({
+                            id_sale: null,
+                            id_purchase: Number(id_purchase),
+                            id_installment: id_installment,
+                            id_payment_terms: Number(id_payment_terms),
+                            total_parcelas: parcelas,
+                            numero_parcela: i,
+                            valor_parcela: valorParcela,
+                            valor_total: valor,
+                            status: 'aberto',
+                            data_vencimento: vencimento,
+                            data_cadastro: new Date(),
+                            data_atualizacao: new Date()
+                        });
+                    }
+                }
+
+                await trx('installment_sale_purchase').insert(registros);
+
+                await trx(Purchase.table)
+                    .where({ id: id_purchase })
+                    .update({
+                        estado_compra: 'RECEBIDO',
+                        data_atualizacao: new Date()
+                    });
+            });
+
+            return { status: true, msg: 'Compra finalizada com sucesso!' };
+
+        } catch (error) {
+            return { status: false, msg: 'Restrição: ' + error.message };
         }
     }
 
@@ -247,49 +304,60 @@ export default class Purchase {
         }
     }
 
-    static async deleteItem(id) {
-
+    static async delete(id) {
         if (!id) {
-            return {
-                status: false,
-                msg: 'Restrição: O ID do item é obrigatório!',
-            };
+            return { status: false, msg: 'Restrição: O ID da compra é obrigatório!' };
         }
 
         try {
-            // Busca o item antes de deletar para saber o id_compra
+            await connection('item_purchase')
+                .where({ id_compra: id })
+                .del();
+
+            const deleted = await connection(Purchase.table)
+                .where({ id })
+                .del();
+
+            if (!deleted) {
+                return { status: false, msg: 'Restrição: Falha ao excluir a compra!' };
+            }
+
+            return { status: true, msg: 'Compra excluída com sucesso!' };
+
+        } catch (error) {
+            return { status: false, msg: 'Restrição: ' + error.message };
+        }
+    }
+
+    static async deleteItem(id) {
+        if (!id) {
+            return { status: false, msg: 'Restrição: O ID do item é obrigatório!' };
+        }
+
+        try {
             const item = await connection('item_purchase')
                 .where({ id })
                 .first();
 
             if (!item) {
-                return {
-                    status: false,
-                    msg: 'Restrição: Item não encontrado!',
-                };
+                return { status: false, msg: 'Restrição: Item não encontrado!' };
             }
 
             const id_compra = item.id_compra;
 
-            // Deleta o item
             const deleted = await connection('item_purchase')
                 .where({ id })
                 .del();
 
             if (!deleted) {
-                return {
-                    status: false,
-                    msg: 'Restrição: Falha ao excluir o item da compra!',
-                };
+                return { status: false, msg: 'Restrição: Falha ao excluir o item da compra!' };
             }
 
-            // Recalcula os totais dos itens restantes
             const totais = await connection('item_purchase')
                 .where({ id_compra })
                 .sum({ total_bruto: 'total_bruto', total_liquido: 'total_liquido' })
                 .first();
 
-            // Atualiza o total da compra (zera se não houver mais itens)
             await connection(Purchase.table)
                 .where({ id: id_compra })
                 .update({
@@ -297,16 +365,10 @@ export default class Purchase {
                     total_liquido: totais.total_liquido ?? 0
                 });
 
-            return {
-                status: true,
-                msg: 'Item excluído com sucesso!',
-            };
+            return { status: true, msg: 'Item excluído com sucesso!' };
 
         } catch (error) {
-            return {
-                status: false,
-                msg: 'Restrição: ' + error.message,
-            };
+            return { status: false, msg: 'Restrição: ' + error.message };
         }
     }
 

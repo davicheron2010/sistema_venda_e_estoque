@@ -3,7 +3,6 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
-    // Suporte para chamadas diretas se necessário
     ipcRenderer: {
         invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args),
     },
@@ -34,6 +33,7 @@ contextBridge.exposeInMainWorld('api', {
         find(where) { return ipcRenderer.invoke('purchase:find', where); },
         findById(id) { return ipcRenderer.invoke('purchase:findById', id); },
         update(id, data) { return ipcRenderer.invoke('purchase:update', id, data); },
+        finalize(data) { return ipcRenderer.invoke('purchase:finalize', data); },
         delete(id) { return ipcRenderer.invoke('purchase:delete', id); },
         deleteItem(id) { return ipcRenderer.invoke('purchase:deleteItem', id); },
         onReload(callback) {
@@ -93,6 +93,7 @@ contextBridge.exposeInMainWorld('api', {
     sale: {
         insert(data) { return ipcRenderer.invoke('sale:insert', data); },
         insertItem(data) { return ipcRenderer.invoke('sale:insertItem', data); },
+        insertInstallmentSale: (data) => ipcRenderer.invoke('sale:insertInstallmentSale', data),
         find(where) { return ipcRenderer.invoke('sale:find', where); }, // Esta é a linha que o Datatables usa
         findById(id) { return ipcRenderer.invoke('sale:findById', id); },
         update(id, data) { return ipcRenderer.invoke('sale:update', id, data); },
@@ -107,4 +108,8 @@ contextBridge.exposeInMainWorld('api', {
         getMovements(id_produto) { return ipcRenderer.invoke('stock:getMovements', id_produto); },
         adjust(data) { return ipcRenderer.invoke('stock:adjust', data); },
     },
+    paymentTerms: {
+    findAll() { return ipcRenderer.invoke('paymentTerms:findAll'); },
+    findInstallments(id_pagamento) { return ipcRenderer.invoke('paymentTerms:findInstallments', id_pagamento); },
+},
 });

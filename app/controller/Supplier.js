@@ -127,7 +127,7 @@ export default class Supplier {
     static async supplierSearch({ q = '' }) {
         const search = q.trim();
 
-        const query = connection(Supplier.table).select('id', 'razao_social', 'nome_fantasia');
+        const query = connection(Supplier.table).select('id', 'razao_social', 'nome_fantasia', 'cnpj_cpf');
 
         if (search !== '') {
             data: await query.where(function () {
