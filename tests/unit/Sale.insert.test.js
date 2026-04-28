@@ -6,56 +6,77 @@ vi.mock('../../app/database/Connection.js', () => ({
   default: vi.fn()
 }));
 
-describe('Sale.insert', () => {
+describe('Sale.insertItem (unit)', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('deve inserir uma venda com sucesso', async () => {
-    const returningMock = vi.fn().mockResolvedValue([{ id: 10 }]);
+  it('deve inserir item e atualizar totais da venda', async () => {
 
-    const insertMock = vi.fn().mockReturnValue({
-      returning: returningMock
-    });
+    // mock produto
+    const productMock = {
+      id: 1,
+      nome: 'Produto Teste',
+      preco_venda: 10
+    };
 
-    connection.mockReturnValue({
-      insert: insertMock
+    // mock chain do knex
+    const whereMock = vi.fn()
+      .mockReturnValueOnce({ first: vi.fn().mockResolvedValue(productMock) }) // busca produto
+      .mockReturnValueOnce({ sum: vi.fn().mockReturnValue({ first: vi.fn().mockResolvedValue({ total_bruto: 20, total_liquido: 20 }) }) }) // soma
+      .mockReturnValueOnce({ update: vi.fn().mockResolvedValue(true) }); // update venda
+
+    const insertMock = vi.fn().mockResolvedValue(true);
+
+    connection.mockImplementation((table) => {
+      if (table === 'product') {
+        return { where: whereMock };
+      }
+      if (table === 'item_sale') {
+        return {
+          insert: insertMock,
+          where: whereMock
+        };
+      }
+      if (table === 'sale') {
+        return {
+          where: whereMock
+        };
+      }
     });
 
     const payload = {
-      id_cliente: 1,
-      total_bruto: 100,
-      total_liquido: 100
+      id: 1, // id_venda
+      id_produto: 1,
+      quantidade: 2,
+      preco_unitario: 10
     };
 
-    const result = await Sale.insert(payload);
+    const result = await Sale.insertItem(payload);
 
-    expect(connection).toHaveBeenCalledWith('sale');
-    expect(insertMock).toHaveBeenCalledWith(payload);
-    expect(returningMock).toHaveBeenCalledWith('id');
-
-    expect(result).toStrictEqual({
-      status: true,
-      id: 10
-    });
+    expect(result.status).toBe(true);
+    expect(result.msg).toBe('Item inserido com sucesso!');
+    expect(insertMock).toHaveBeenCalled();
   });
 
-  it('deve retornar erro quando ocorrer falha no banco', async () => {
-    const insertMock = vi.fn().mockImplementation(() => {
-      throw new Error('Erro no banco');
+  it('deve falhar se produto não existir', async () => {
+
+    const whereMock = vi.fn().mockReturnValue({
+      first: vi.fn().mockResolvedValue(null)
     });
 
     connection.mockReturnValue({
-      insert: insertMock
+      where: whereMock
     });
 
-    const result = await Sale.insert({});
-
-    expect(result).toStrictEqual({
-      status: false,
-      error: 'Erro no banco'
+    const result = await Sale.insertItem({
+      id: 1,
+      id_produto: 999
     });
+
+    expect(result.status).toBe(false);
+    expect(result.msg).toBe('Restrição: Nenhum produto localizado!');
   });
 
 });
