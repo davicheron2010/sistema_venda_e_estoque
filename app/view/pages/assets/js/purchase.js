@@ -243,8 +243,6 @@ async function listItemPurchase() {
                 <tr id="tritem${item.id}">
                     <td>${item.id}</td>
                     <td>${item.nome}</td>
-                    <td>${item.fornecedor ?? '-'}</td>
-                    <td>${item.grupo ?? '-'}</td>
                     <td class="text-end">${parseFloat(item.quantidade).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
                     <td class="text-end">${parseFloat(item.preco_unitario).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                     <td class="text-end">${parseFloat(item.total_liquido).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
