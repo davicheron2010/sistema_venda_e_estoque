@@ -4,17 +4,17 @@ import Product from '../controller/Product.js';
 import Company from '../controller/Company.js';
 import Customer from '../controller/Customer.js';
 import PaymentTerms from '../controller/PaymentTerms.js';
+import Installment from '../controller/Installment.js';
 import Sale from '../controller/Sale.js';
 import { Print } from '../mixin/Print.js';
 import Supplier from '../controller/Supplier.js';
 import Purchase from '../controller/Purchase.js';
-import Stock from '../controller/Stock.js'; // Verifique se criou esse controller
+import Stock from '../controller/Stock.js';
 
 function getWin(event) {
     return BrowserWindow.fromWebContents(event.sender);
 }
 
-// Avisa todas as janelas para recarregar
 function broadcastReload(channel) {
     for (const win of BrowserWindow.getAllWindows()) {
         if (!win.isDestroyed()) {
@@ -23,7 +23,7 @@ function broadcastReload(channel) {
     }
 }
 
-//Imprimir PDF
+// --- PRINT ---
 ipcMain.handle('print', async (_e, stringHtml, args = {}) => {
     await Print.create().stringHTML(stringHtml).print();
 });
@@ -49,45 +49,32 @@ ipcMain.handle('dashboard:getStats', async () => {
 });
 
 // --- WINDOW ---
-
-// Altere o handle 'window:open' para este:
 ipcMain.handle('window:open', (_e, name, opts = {}) => {
     const win = Template.create(name, opts);
-
-    // Se o objeto 'opts' tiver 'maximized: true', maximiza a janela
-    if (opts.maximized) {
-        win.maximize();
-    }
-
+    if (opts.maximized) win.maximize();
     Template.loadView(win, name);
 });
 
-// Altere o handle 'window:openModal' para este:
 ipcMain.handle('window:openModal', (e, name, opts = {}) => {
     const parent = getWin(e);
     if (!parent) return;
     const win = Template.create(name, {
         width: 560,
         height: 420,
-        resizable: true, // Mude para true para permitir maximizar
+        resizable: true,
         minimizable: false,
-        maximizable: true, // Garanta que é true
+        maximizable: true,
         parent: parent,
         modal: true,
         ...opts,
     });
-
-    if (opts.maximized) {
-        win.maximize();
-    }
-
+    if (opts.maximized) win.maximize();
     Template.loadView(win, name);
 });
 
 ipcMain.handle('window:close', (e) => {
     getWin(e)?.close();
 });
-
 
 // --- TEMP STORE ---
 let tempData = {};
@@ -117,7 +104,7 @@ ipcMain.handle('customer:delete', async (_e, id) => {
     return result;
 });
 
-// --- PRODUTOS ---
+// --- PRODUCT ---
 ipcMain.handle('product:insert', async (_e, data) => {
     const result = await Product.insert(data);
     if (result.status) broadcastReload('product:reload');
@@ -140,10 +127,8 @@ ipcMain.handle('product:getAll', async () => {
     return result.data || [];
 });
 
-// --- ESTOQUE (STOCK) - ADICIONADO ---
+// --- STOCK ---
 ipcMain.handle('stock:adjust', async (_e, data) => {
-    // Se você tiver um Stock Controller, use: result = await Stock.adjust(data);
-    // Abaixo uma implementação direta caso ainda não tenha o controller:
     try {
         const result = await Stock.adjust(data);
         if (result.status) broadcastReload('product:reload');
@@ -152,34 +137,16 @@ ipcMain.handle('stock:adjust', async (_e, data) => {
         return { status: false, msg: error.message };
     }
 });
-
+ipcMain.handle('stock:getByProduct', async (_e, id_produto) => {
+    return await Stock.getByProduct(id_produto);
+});
 ipcMain.handle('stock:getMovements', async (_e, id_produto) => {
     return await Stock.getMovements(id_produto);
 });
 
-// --- VENDAS ---
+// --- SALE ---
 ipcMain.handle('sale:insert', async (_e, data) => {
     const result = await Sale.insert(data);
-    if (result.status) broadcastReload('sale:reload');
-    return result;
-});
-
-ipcMain.handle('sale:find', async (_e, where = {}) => {
-    return await Sale.find(where);
-});
-
-ipcMain.handle('sale:findById', async (_e, id) => {
-    return await Sale.findById(id);
-});
-
-ipcMain.handle('sale:update', async (_e, id, data) => {
-    const result = await Sale.update(id, data);
-    if (result.status) broadcastReload('sale:reload');
-    return result;
-});
-
-ipcMain.handle('sale:delete', async (_e, id) => {
-    const result = await Sale.delete(id);
     if (result.status) broadcastReload('sale:reload');
     return result;
 });
@@ -188,68 +155,67 @@ ipcMain.handle('sale:insertItem', async (_e, data) => {
     if (result.status) broadcastReload('sale:reload');
     return result;
 });
+ipcMain.handle('sale:insertInstallmentSale', async (_e, data) => {
+    return await Sale.insertInstallmentSale(data);
+});
+ipcMain.handle('sale:find', async (_e, where = {}) => await Sale.find(where));
+ipcMain.handle('sale:findById', async (_e, id) => await Sale.findById(id));
+ipcMain.handle('sale:update', async (_e, id, data) => {
+    const result = await Sale.update(id, data);
+    if (result.status) broadcastReload('sale:reload');
+    return result;
+});
+ipcMain.handle('sale:delete', async (_e, id) => {
+    const result = await Sale.delete(id);
+    if (result.status) broadcastReload('sale:reload');
+    return result;
+});
+
+// --- SUPPLIER ---
 ipcMain.handle('supplier:insert', async (_e, data) => {
     const result = await Supplier.insert(data);
     if (result.status) broadcastReload('supplier:reload');
     return result;
 });
-
-ipcMain.handle('sale:insertInstallmentSale', async (_e, data) => {
-    return await Sale.insertInstallmentSale(data);
-});
-
-ipcMain.handle('supplier:find', async (_e, where = {}) => {
-    return await Supplier.find(where);
-});
-
-ipcMain.handle('supplier:findById', async (_e, id) => {
-    return await Supplier.findById(id);
-});
-ipcMain.handle('supplier:supplierSearch', async (_e, term) => {
-    return await Supplier.supplierSearch(term);
-});
-
+ipcMain.handle('supplier:find', async (_e, where = {}) => await Supplier.find(where));
+ipcMain.handle('supplier:findById', async (_e, id) => await Supplier.findById(id));
+ipcMain.handle('supplier:supplierSearch', async (_e, term) => await Supplier.supplierSearch(term));
 ipcMain.handle('supplier:update', async (_e, id, data) => {
     const result = await Supplier.update(id, data);
     if (result.status) broadcastReload('supplier:reload');
     return result;
 });
-
 ipcMain.handle('supplier:delete', async (_e, id) => {
     const result = await Supplier.delete(id);
     if (result.status) broadcastReload('supplier:reload');
     return result;
 });
-
-ipcMain.handle('supplier:count', async () => {
-    return await Supplier.count();
+ipcMain.handle('supplier:getAll', async () => {
+    const result = await Supplier.find({ limit: 99999, offset: 0 }) || {};
+    return result.data || [];
 });
+ipcMain.handle('supplier:count', async () => await Supplier.count());
+
+// --- COMPANY ---
 ipcMain.handle('company:insert', async (_e, data) => {
     const result = await Company.insert(data);
     if (result.status) broadcastReload('company:reload');
     return result;
 });
-
-ipcMain.handle('company:find', async (_e, where = {}) => {
-    return await Company.find(where);
-});
-
-ipcMain.handle('company:findById', async (_e, id) => {
-    return await Company.findById(id);
-});
-
+ipcMain.handle('company:find', async (_e, where = {}) => await Company.find(where));
+ipcMain.handle('company:findById', async (_e, id) => await Company.findById(id));
 ipcMain.handle('company:update', async (_e, id, data) => {
     const result = await Company.update(id, data);
     if (result.status) broadcastReload('company:reload');
     return result;
 });
-
 ipcMain.handle('company:delete', async (_e, id) => {
     const result = await Company.delete(id);
     if (result.status) broadcastReload('company:reload');
     return result;
 });
-// Purchase
+
+// --- PURCHASE ---
 ipcMain.handle('purchase:insert', async (_e, data) => {
     try {
         const result = await Purchase.insert(data);
@@ -275,16 +241,21 @@ ipcMain.handle('purchase:listItem', async (_e, data) => {
         return { status: false, msg: 'Erro ao listar itens da compra: ' + error.message, data: [] };
     }
 });
-ipcMain.handle('purchase:find', async (_e, where = {}) => {
-    return await Purchase.find(where);
-});
-ipcMain.handle('purchase:findById', async (_e, id) => {
-    return await Purchase.findById(id);
-});
+ipcMain.handle('purchase:find', async (_e, where = {}) => await Purchase.find(where));
+ipcMain.handle('purchase:findById', async (_e, id) => await Purchase.findById(id));
 ipcMain.handle('purchase:update', async (_e, id, data) => {
     const result = await Purchase.update(id, data);
     if (result.status) broadcastReload('purchase:reload');
     return result;
+});
+ipcMain.handle('purchase:finalize', async (_e, data) => {
+    try {
+        const result = await Purchase.finalize(data);
+        if (result.status) broadcastReload('purchase:reload');
+        return result;
+    } catch (error) {
+        return { status: false, msg: 'Erro ao finalizar compra: ' + error.message };
+    }
 });
 ipcMain.handle('purchase:delete', async (_e, id) => {
     const result = await Purchase.delete(id);
@@ -292,7 +263,6 @@ ipcMain.handle('purchase:delete', async (_e, id) => {
     return result;
 });
 ipcMain.handle('purchase:deleteItem', async (_e, id) => {
-    console.log('route deleteItem id:', id);
     try {
         const result = await Purchase.deleteItem(id);
         if (result.status) broadcastReload('purchase:reload');
@@ -300,78 +270,52 @@ ipcMain.handle('purchase:deleteItem', async (_e, id) => {
     } catch (error) {
         return { status: false, msg: 'Erro ao excluir item: ' + error.message };
     }
-    ipcMain.handle('purchase:finalize', async (_e, data) => {
-        try {
-            const result = await Purchase.finalize(data);
-            if (result.status) broadcastReload('purchase:reload');
-            return result;
-        } catch (error) {
-            return { status: false, msg: 'Erro ao finalizar compra: ' + error.message };
-        }
-    });
-    ipcMain.handle('paymentTerms:insert', async (_e, data) => {
-        const result = await PaymentTerms.insert(data);
-        return result;
-    });
+});
 
-    ipcMain.handle('paymentTerms:find', async (_e, where = {}) => {
-        return await PaymentTerms.find(where);
-    });
+// --- PAYMENT TERMS ---
+ipcMain.handle('paymentTerms:insert', async (_e, data) => {
+    const result = await PaymentTerms.insert(data);
+    return result;
+});
+ipcMain.handle('paymentTerms:find', async (_e, where = {}) => await PaymentTerms.find(where));
+ipcMain.handle('paymentTerms:findById', async (_e, id) => await PaymentTerms.findById(id));
+ipcMain.handle('paymentTerms:update', async (_e, id, data) => {
+    const result = await PaymentTerms.update(id, data);
+    if (result.status) broadcastReload('paymentTerms:reload');
+    return result;
+});
+ipcMain.handle('paymentTerms:delete', async (_e, id) => {
+    const result = await PaymentTerms.delete(id);
+    if (result.status) broadcastReload('paymentTerms:reload');
+    return result;
+});
+ipcMain.handle('paymentTerms:getAll', async () => {
+    const result = await PaymentTerms.find({ limit: 99999, offset: 0 }) || {};
+    return result.data || [];
+});
 
-    ipcMain.handle('paymentTerms:findById', async (_e, id) => {
-        return await PaymentTerms.findById(id);
-    });
-
-    ipcMain.handle('paymentTerms:update', async (_e, id, data) => {
-        const result = await PaymentTerms.update(id, data);
-        if (result.status) broadcastReload('paymentTerms:reload');
-        return result;
-    });
-
-    ipcMain.handle('paymentTerms:delete', async (_e, id) => {
-        const result = await PaymentTerms.delete(id);
-        if (result.status) broadcastReload('paymentTerms:reload');
-        return result;
-    });
-
-    ipcMain.handle('paymentTerms:getAll', async () => {
-        const result = await PaymentTerms.find({ limit: 99999, offset: 0 }) || {};
-        return result.data || [];
-    });
-
-    //  parcelas
-
-    ipcMain.handle('installment:insert', async (_e, data) => {
-        const result = await Installment.insert(data);
-        if (result.status) broadcastReload('installment:reload');
-        return result;
-    });
-
-    ipcMain.handle('installment:find', async (_e, where = {}) => {
-        return await Installment.find(where);
-    });
-
-    ipcMain.handle('installment:findById', async (_e, id) => {
-        return await Installment.findById(id);
-    });
-    ipcMain.handle('installment:findByPaymentTerms', async (_e, id_pagamento) => {
-        return await Installment.findByPaymentTerms(id_pagamento);
-    });
-
-    ipcMain.handle('installment:update', async (_e, id, data) => {
-        const result = await Installment.update(id, data);
-        if (result.status) broadcastReload('installment:reload');
-        return result;
-    });
-
-    ipcMain.handle('installment:delete', async (_e, id) => {
-        const result = await Installment.delete(id);
-        if (result.status) broadcastReload('installment:reload');
-        return result;
-    });
-
-    ipcMain.handle('installment:getAll', async () => {
-        const result = await Installment.find({ limit: 99999, offset: 0 }) || {};
-        return result.data || [];
-    });
+// --- INSTALLMENT ---
+ipcMain.handle('installment:insert', async (_e, data) => {
+    const result = await Installment.insert(data);
+    if (result.status) broadcastReload('installment:reload');
+    return result;
+});
+ipcMain.handle('installment:find', async (_e, where = {}) => await Installment.find(where));
+ipcMain.handle('installment:findById', async (_e, id) => await Installment.findById(id));
+ipcMain.handle('installment:findByPaymentTerms', async (_e, id_pagamento) => {
+    return await Installment.findByPaymentTerms(id_pagamento);
+});
+ipcMain.handle('installment:update', async (_e, id, data) => {
+    const result = await Installment.update(id, data);
+    if (result.status) broadcastReload('installment:reload');
+    return result;
+});
+ipcMain.handle('installment:delete', async (_e, id) => {
+    const result = await Installment.delete(id);
+    if (result.status) broadcastReload('installment:reload');
+    return result;
+});
+ipcMain.handle('installment:getAll', async () => {
+    const result = await Installment.find({ limit: 99999, offset: 0 }) || {};
+    return result.data || [];
 });
