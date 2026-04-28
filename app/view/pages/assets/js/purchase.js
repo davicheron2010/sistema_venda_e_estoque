@@ -334,7 +334,6 @@ async function clearPurchase() {
     }
 }
 
-// ─── Estado do modal de pagamento ────────────────────────────────────────────
 let paymentModalInstance = null;
 let formasSelecionadas = [];
 const SEM_PARCELAS = ['pix', 'dinheiro', 'cheque'];
@@ -612,7 +611,6 @@ function atualizarConfirmButton(total) {
     confirmBtn.disabled = !(diferenca <= 0.01 && todasComParcelas);
 }
 
-// ─── Gera o HTML do relatório de compra ──────────────────────────────────────
 function gerarHtmlRelatorio({ id_purchase, fornecedor, items, formas, total }) {
     const dataAtual = new Date().toLocaleDateString('pt-BR');
 
@@ -723,7 +721,6 @@ function gerarHtmlRelatorio({ id_purchase, fornecedor, items, formas, total }) {
     `;
 }
 
-// ─── Confirma e salva, depois abre o PDF ─────────────────────────────────────
 async function confirmPayment() {
     const total = calcPurchaseTotal();
     const id_purchase = Id.value;
@@ -745,7 +742,7 @@ async function confirmPayment() {
             installments: f.installments
         }));
 
-        // 1. Salva no banco
+
         const response = await api.purchase.finalize({ id_purchase, formas });
 
         if (!response.status) {
@@ -753,13 +750,11 @@ async function confirmPayment() {
             return;
         }
 
-        // 2. Busca dados para o relatório em paralelo
         const [purchaseData, itemsData] = await Promise.all([
             api.purchase.findById(id_purchase),
             api.purchase.listItem({ id: id_purchase })
         ]);
 
-        // 3. Busca dados do fornecedor
         let fornecedor = null;
         if (purchaseData?.id_fornecedor) {
             fornecedor = await api.supplier.findById(purchaseData.id_fornecedor);
@@ -767,7 +762,6 @@ async function confirmPayment() {
 
         const items = itemsData?.data ?? [];
 
-        // 4. Gera o HTML e abre o visualizador de PDF
         const html = gerarHtmlRelatorio({
             id_purchase,
             fornecedor,
@@ -778,7 +772,6 @@ async function confirmPayment() {
 
         await api.report.print(html);
 
-        // 5. Fecha modal e reseta a tela
         paymentModalInstance.hide();
         resetLocalState();
         toast("success", "Sucesso", "Compra finalizada com sucesso!");

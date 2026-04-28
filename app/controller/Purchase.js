@@ -231,7 +231,6 @@ export default class Purchase {
         try {
             await connection.transaction(async (trx) => {
 
-                // Remove parcelas antigas desta compra caso já existam
                 await trx('installment_sale_purchase')
                     .where({ id_purchase })
                     .del();
