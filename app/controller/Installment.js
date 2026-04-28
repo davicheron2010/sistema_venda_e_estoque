@@ -8,13 +8,13 @@ export default class Installment {
   //Insere um novo condição de pagamento.
   static async insert(data) {
     console.log(data);
-    if (data.id === null || data.parcela === null || data.intervalo === null) {
+    if (data.id_pagamento === null || data.parcela === null || data.intervalo === null) {
       return { status: false, msg: 'Preencha corretamento os dados para salvar', id: null, data: [] };
     }
     try {
 
       const clean = {
-        id_pagamento: data.id,
+        id_pagamento: data.id_pagamento,
         parcela: data.parcela,
         intervalo: data.intervalo
       }
@@ -55,6 +55,34 @@ export default class Installment {
       return { status: false, msg: 'Erro: ' + error.message, id: null, data: [] };
     }
   }
+
+  //Deleta uma parcela pelo ID
+  static async delete(id) {
+    try {
+      const affectedRows = await connection(Installment.table)
+        .where({ id: id })
+        .del();
+
+      return { status: affectedRows > 0, msg: affectedRows > 0 ? 'Parcela deletada com sucesso!' : 'Parcela não encontrada' };
+    } catch (error) {
+      return { status: false, msg: 'Erro: ' + error.message };
+    }
+  }
+
+  //Atualiza uma parcela pelo ID
+  static async update(id, data) {
+    try {
+      const clean = Installment.#sanitize(data);
+      const affectedRows = await connection(Installment.table)
+        .where({ id: id })
+        .update(clean);
+
+      return { status: affectedRows > 0, msg: affectedRows > 0 ? 'Parcela atualizada com sucesso!' : 'Parcela não encontrada' };
+    } catch (error) {
+      return { status: false, msg: 'Erro: ' + error.message };
+    }
+  }
+
   //Remove campos vazios e converte tipos.
   static #sanitize(data) {
     // Campos de controle do form — não existem no banco

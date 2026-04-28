@@ -16,14 +16,14 @@
     <div class="row">
         <div class="col-12 col-xl-11 mx-auto">
             <button class="btn btn-success"
-                onclick="api.window.openModal('pages/paymentterms', { width: 1000, height: 800, title: 'Cadastrar Fornecedor' })">
+                onclick="api.window.openModal('pages/paymentterms', { width: 1000, height: 800, title: 'Cadastrar Condição de Pagamento' })">
                 <i class="fa-solid fa-plus me-1"></i>
-                PGAMENTO
+                NOVA CONDIÇÃO
             </button>
             <form id="form">
-                <input type="text" name="acao" id="acao" value="c">
-                <input type="text" name="id" id="id" value="{{id}}">
-                <input type="text" name="id_parcelamento" id="id_parcelamento">
+                <input type="hidden" name="acao" id="acao" value="c">
+                <input type="hidden" name="id" id="id" value="{{id}}">
+                <input type="hidden" name="id_parcelamento" id="id_parcelamento">
 
                 <div class="card shadow-sm">
                     <div class="card-body p-4">
@@ -96,23 +96,15 @@
                             <table class="table table-hover mb-0">
                                 <thead class="table-dark small">
                                     <tr>
-                                        <th class="ps-3 py-3">Código</th>
-                                        <th>Parcelas</th>
+                                        <th class="ps-3 py-3">Parcelas</th>
+                                        <th>Qtd.</th>
                                         <th>Intervalo (Dias)</th>
                                         <th class="text-center">Ação</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbInstallments" class="small">
                                     <tr>
-                                        <td>15</td>
-                                        <td>1X</td>
-                                        <td>30 Dias</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-danger me-2"
-                                                onclick="DeleteInstallment(1)">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </td>
+                                        <td colspan="4" class="text-center text-muted py-4">Nenhuma parcela adicionada.</td>
                                     </tr>
                                 </tbody>
                             </table>
