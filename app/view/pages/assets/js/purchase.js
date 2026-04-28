@@ -42,7 +42,6 @@ function executarCalculo() {
     }
 }
 
-
 function cleanInput(val) {
     return String(val)
         .replace(/[R$%\s]/g, "")
@@ -50,12 +49,10 @@ function cleanInput(val) {
         .replace(/,/, ".");
 }
 
-
 function calcPurchaseTotal() {
     const totalEl = document.getElementById('total_bruto');
     return stringParaFloat(totalEl ? totalEl.innerText : '0');
 }
-
 
 if (inputUnitPrice && inputQuantity) {
     inputUnitPrice.addEventListener('input', executarCalculo);
@@ -112,7 +109,6 @@ fornecedorSelect2.select2({
     }
 });
 
-
 produtoSelect2.select2({
     theme: 'bootstrap-5',
     placeholder: "Selecione um produto",
@@ -137,7 +133,6 @@ produtoSelect2.select2({
     }
 });
 
-
 produtoSelect2.on('select2:select', async function (e) {
     const productId = e.params.data.id;
     try {
@@ -155,6 +150,7 @@ $(document).on('select2:open', () => {
     document.querySelector('.select2-search__field').focus();
 });
 
+
 async function InsertItemPurchase() {
     insertItemButton.disabled = true;
     const originalText = insertItemButton.textContent;
@@ -163,13 +159,9 @@ async function InsertItemPurchase() {
     try {
         const data = formToJson(form);
 
-
         data.inputPreco = cleanInput(data['preco-unitario']);
         data.quantidade = cleanInput(data.quantidade);
-
-
         data.inputTotal = (parseFloat(data.inputPreco) * parseFloat(data.quantidade)).toFixed(2);
-
 
         if (Action.value === 'c') {
             const response = await api.purchase.insert(data);
@@ -177,21 +169,17 @@ async function InsertItemPurchase() {
                 toast("error", "Erro", response.msg, null);
                 return;
             }
-
             Action.value = 'e';
             Id.value = response.id;
         }
 
-
         data.id = Id.value;
-
 
         const responseItem = await api.purchase.insertItem(data);
         if (!responseItem.status) {
             toast("error", "Erro", responseItem.msg, null);
             return;
         }
-
 
         document.getElementById('total_liquido').innerHTML = parseFloat(responseItem.data.total_liquido)
             .toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -200,7 +188,6 @@ async function InsertItemPurchase() {
             .toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
         await listItemPurchase();
-
 
         produtoSelect2.val(null).trigger('change');
         inputUnitPrice.value = 'R$ 0,00';
@@ -232,10 +219,6 @@ async function listItemPurchase() {
 
         document.getElementById('total_bruto').innerHTML = parseFloat(response?.purchase?.total_bruto ?? 0)
             .toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-        document.getElementById('preco-unitario').innerHTML = parseFloat(response?.purchase?.preco_unitario ?? 0)
-            .toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
 
         let trs = '';
         response.data.forEach(item => {
@@ -295,6 +278,38 @@ async function deleteItem(id) {
         toast("error", "Falha", "Erro interno: " + err.message);
     }
 }
+
+
+function resetLocalState() {
+    Action.value = 'c';
+    Id.value = '';
+
+    fornecedorSelect2.val(null).trigger('change');
+    produtoSelect2.val(null).trigger('change');
+
+    const observacao = document.getElementById('observacao');
+    if (observacao) observacao.value = '';
+
+    inputUnitPrice.value = 'R$ 0,00';
+    inputQuantity.value = '1,00';
+    if (inputTotalProduct) inputTotalProduct.value = '0,00';
+
+    document.getElementById('total_liquido').innerHTML = 'R$ 0,00';
+    document.getElementById('total_bruto').innerHTML = 'R$ 0,00';
+
+    document.getElementById('product-count').innerText = 'Itens: 0';
+    document.getElementById('products-table-tbody').innerHTML = `
+        <tr>
+            <td colspan="8" class="text-center text-muted py-4">
+                <i class="bi bi-inbox me-2"></i>Nenhum item adicionado.
+            </td>
+        </tr>
+    `;
+
+    const discount = document.getElementById('purchase-discount');
+    if (discount) discount.value = '0,00';
+}
+
 async function clearPurchase() {
     const result = await confirmDialog(
         'Limpar tudo?',
@@ -304,35 +319,15 @@ async function clearPurchase() {
     if (!result.isConfirmed) return;
 
     try {
-        Action.value = 'c';
-        Id.value = '';
+        if (Action.value === 'e' && Id.value) {
+            const response = await api.purchase.delete(Id.value);
+            if (!response.status) {
+                toast("error", "Erro", response.msg || 'Não foi possível limpar a compra.');
+                return;
+            }
+        }
 
-
-        fornecedorSelect2.val(null).trigger('change');
-        produtoSelect2.val(null).trigger('change');
-
-        const observacao = document.getElementById('observacao');
-        if (observacao) observacao.value = '';
-
-        inputUnitPrice.value = 'R$ 0,00';
-        inputQuantity.value = '1,00';
-        if (inputTotalProduct) inputTotalProduct.value = '0,00';
-
-        document.getElementById('total_liquido').innerHTML = 'R$ 0,00';
-        document.getElementById('total_bruto').innerHTML = 'R$ 0,00';
-
-        document.getElementById('product-count').innerText = 'Itens: 0';
-        document.getElementById('products-table-tbody').innerHTML = `
-            <tr>
-                <td colspan="8" class="text-center text-muted py-4">
-                    <i class="bi bi-inbox me-2"></i>Nenhum item adicionado.
-                </td>
-            </tr>
-        `;
-
-        const discount = document.getElementById('purchase-discount');
-        if (discount) discount.value = '0,00';
-
+        resetLocalState();
         toast("success", "Sucesso", "Compra reiniciada com sucesso!");
 
     } catch (err) {
@@ -358,8 +353,6 @@ function openPaymentModal() {
 window.deleteItem = deleteItem;
 window.openPaymentModal = openPaymentModal;
 window.clearPurchase = clearPurchase;
-
-
 
 insertItemButton.addEventListener("click", async () => {
     await InsertItemPurchase();

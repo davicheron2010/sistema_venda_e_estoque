@@ -246,6 +246,44 @@ export default class Purchase {
             return { status: false, msg: 'Restrição: ' + error.message };
         }
     }
+    static async delete(id) {
+    if (!id) {
+        return {
+            status: false,
+            msg: 'Restrição: O ID da compra é obrigatório!',
+        };
+    }
+
+    try {
+        // Deleta todos os itens da compra primeiro
+        await connection('item_purchase')
+            .where({ id_compra: id })
+            .del();
+
+        // Deleta a compra
+        const deleted = await connection(Purchase.table)
+            .where({ id })
+            .del();
+
+        if (!deleted) {
+            return {
+                status: false,
+                msg: 'Restrição: Falha ao excluir a compra!',
+            };
+        }
+
+        return {
+            status: true,
+            msg: 'Compra excluída com sucesso!',
+        };
+
+    } catch (error) {
+        return {
+            status: false,
+            msg: 'Restrição: ' + error.message,
+        };
+    }
+}
 
     static async deleteItem(id) {
 
