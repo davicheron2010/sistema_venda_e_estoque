@@ -1,9 +1,8 @@
 {% extends "layouts/main.html" %}
 
-{% block title %}SENAC — Home{% endblock %}
+{% block title %}DESKIVO — Home{% endblock %}
 
 {% block styles %}
-<link rel="stylesheet" href="file:///{{ assets }}/css/home.css">
 <link rel="stylesheet" href="{{ assets }}/css/home.css">
 {% endblock %}
 
@@ -12,113 +11,112 @@
 {% endblock %}
 
 {% block content %}
-<div class="row g-4 p-3 row-cols-1 row-cols-md-3 row-cols-lg-5">
+<div class="container-fluid">
+    <h1 class="mt-4 mb-4 px-3 fw-bold">Painel Principal</h1>
 
-    <!-- CLIENTES -->
-    <div class="col">
-        <div class="small-box card-clientes shadow-sm"
-            onclick="api.window.open('pages/listacustomer', { title: 'Clientes' })">
+    <div class="row g-4 p-3 row-cols-1 row-cols-md-3 row-cols-lg-5">
 
-            <div class="inner">
-                <h3 id="count-clientes">0</h3>
-                <p>Clientes</p>
+        <!-- CLIENTES -->
+        <div class="col">
+            <div class="small-box card-clientes shadow-sm"
+                onclick="api.window.open('pages/listacustomer', { title: 'Clientes' })">
+
+                <div class="inner">
+                    <p>Clientes</p>
+                </div>
+
+                <div class="icon">
+                    <i class="fa-solid fa-user-group"></i>
+                </div>
+
+                <a href="#" class="small-box-footer">
+                    Mais informações <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
             </div>
+        </div>
 
-            <div class="icon">
-                <i class="fa-solid fa-user-group"></i>
+        <!-- EMPRESAS -->
+        <div class="col">
+            <div class="small-box card-empresas shadow-sm"
+                onclick="api.window.open('pages/listacompany', { title: 'Empresas' })">
+                <div class="inner">
+                    <p>Empresas</p>
+                </div>
+                <div class="icon">
+                    <i class="fa-solid fa-industry"></i>
+                </div>
+                <a href="#" class="small-box-footer">
+                    Mais informações <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
             </div>
-
-            <a href="#" class="small-box-footer">
-                Mais informações <i class="fa-solid fa-arrow-right ms-1"></i>
-            </a>
+        </div>
+        <!-- PRODUCTS -->
+        <div class="col">
+            <div class="small-box card-produtos shadow-sm"
+                onclick="api.window.open('pages/listaproduct', { title: 'Produtos' })">
+                <div class="inner">
+                    <p>Produtos</p>
+                </div>
+                <div class="icon">
+                    <i class="fa-solid fa-box"></i>
+                </div>
+                <a href="#" class="small-box-footer">
+                    Mais informações <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col">
+            <div class="small-box card-compras shadow-sm"
+                onclick="api.window.open('pages/listapurchase', { title: 'Compras' })">
+                <div class="inner">
+                    <p>Compras</p>
+                </div>
+                <div class="icon">
+                    <i class="fa-solid fa-boxes-packing"></i>
+                </div>
+                <a href="#" class="small-box-footer">Mais informações <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+        <div class="col">
+            <div class="small-box card-fornecedores shadow-sm"
+                onclick="api.window.open('pages/listasupplier', { title: 'Fornecedores' })">
+                <div class="inner">
+                    <p>Fornecedores</p>
+                </div>
+                <div class="icon">
+                    <i class="fa-solid fa-boxes-packing"></i>
+                </div>
+                <a href="#" class="small-box-footer">Mais informações <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+        <div class="col">
+            <div class="small-box card-vendas shadow-sm"
+                onclick="api.window.open('pages/listasale', { title: 'Vendas' })">
+                <div class="inner">
+                    <p>Vendas</p>
+                </div>
+                <div class="icon">
+                    <i class="fa-solid fa-boxes-packing"></i>
+                </div>
+                <a href="#" class="small-box-footer">Mais informações <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+        <div class="col">
+            <div class="small-box card-vendas shadow-sm"
+                onclick="api.window.open('pages/paymentterms', { title: 'Condições de pagamento' })">
+                <div class="inner">
+                    <p>Condições de pagamento</p>
+                </div>
+                <div class="icon">
+                    <i class="fa-solid fa-boxes-packing"></i>
+                </div>
+                <a href="#" class="small-box-footer">Mais informações <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            </div>
         </div>
     </div>
-
-    <!-- EMPRESAS -->
-    <div class="col">
-        <div class="small-box card-empresas shadow-sm"
-            onclick="api.window.open('pages/listacompany', { title: 'Empresas' })">
-
-            <div class="inner">
-                <h3 id="count-empresas">0</h3>
-                <p>Empresas</p>
-            </div>
-
-            <div class="icon">
-                <i class="fa-solid fa-industry"></i>
-            </div>
-
-            <a href="#" class="small-box-footer">
-                Mais informações <i class="fa-solid fa-arrow-right ms-1"></i>
-            </a>
-        </div>
-    </div>
-
-    <!-- PRODUCTS -->
-    <div class="col">
-        <div class="small-box card-produtos shadow-sm"
-            onclick="api.window.open('pages/listaproduct', { title: 'Produtos' })">
-
-            <div class="inner">
-                <h3 id="count-produtos">0</h3>
-                <p>Produtos</p>
-            </div>
-
-            <div class="icon">
-                <i class="fa-solid fa-box"></i>
-            </div>
-
-            <a href="#" class="small-box-footer">
-                Mais informações <i class="fa-solid fa-arrow-right ms-1"></i>
-            </a>
-        </div>
-    </div>
-    <div class="col">
-        <div class="small-box card-compra shadow-sm"
-            onclick="api.window.open('pages/listapurchase', { title: 'Compras' })">
-
-            <div class="inner">
-                <h3 id="count-compra">0</h3>
-                <p>Compra</p>
-            </div>
-
-            <div class="icon">
-                <i class="fa-solid fa-box"></i>
-            </div>
-
-            <a href="#" class="small-box-footer">
-                Mais informações <i class="fa-solid fa-arrow-right ms-1"></i>
-            </a>
-        </div>
-    </div>
-    <div class="col">
-        <div class="small-box card-fornecedores shadow-sm"
-            onclick="api.window.open('pages/listasupplier', { title: 'Fornecedores' })">
-            <div class="inner">
-                <h3 id="count-fornecedores">0</h3>
-                <p>Fornecedores</p>
-            </div>
-            <div class="icon">
-                <i class="fa-solid fa-boxes-packing"></i>
-            </div>
-            <a href="#" class="small-box-footer">Mais informações <i class="fa-solid fa-arrow-right ms-1"></i></a>
-        </div>
-    </div>
-    <div class="col">
-        <div class="small-box card-vendas shadow-sm" onclick="api.window.open('pages/listasale', { title: 'Vendas' })">
-            <div class="inner">
-                <h3 id="count-vendas">0</h3>
-                <p>Vendas</p>
-            </div>
-            <div class="icon">
-                <i class="fa-solid fa-boxes-packing"></i>
-            </div>
-            <a href="#" class="small-box-footer">Mais informações <i class="fa-solid fa-arrow-right ms-1"></i></a>
-        </div>
-    </div>
-</div>
 </div>
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ assets }}/js/home.js"></script>
 {% endblock %}
