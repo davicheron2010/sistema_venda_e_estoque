@@ -1,7 +1,7 @@
 {
     "name": "deskivo",
     "version": "1.0.0",
-    "main": "main.js",
+    "main": "index.js",
     "type": "module",
     "private": true,
     "scripts": {
