@@ -3,6 +3,7 @@ export default class Product {
     static table = 'product';
     static #columns = ['id', 'nome', 'codigo_barra', 'unidade', 'grupo', 'preco_compra', 'preco_venda', 'ativo', null];
     static #searchable = ['nome', 'codigo_barra', 'unidade', 'grupo'];
+
     static async find(data = {}) {
         const {
             search = '',
@@ -52,29 +53,32 @@ export default class Product {
             return { draw: 1, recordsTotal: 0, recordsFiltered: 0, data: [] };
         }
     }
+
     static async insert(data) {
         if (!data.nome || data.nome.trim() === '') {
-            return { status: false, msg: 'O campo nome é obrigatório' };
+            return { status: false, msg: 'O campo nome é obrigatório', id: null, data: [] };
         }
         try {
             const clean = Product.#sanitize(data);
             const [result] = await connection(Product.table).insert(clean).returning('*');
             return { status: true, msg: 'Produto cadastrado com sucesso!', id: result.id, data: [result] };
         } catch (err) {
-            return { status: false, msg: 'Erro ao inserir: ' + err.message };
+            return { status: false, msg: 'Erro ao inserir: ' + err.message, id: null, data: [] };
         }
     }
+
     static async update(id, data) {
-        if (!id) return { status: false, msg: 'ID é obrigatório' };
+        if (!id) return { status: false, msg: 'ID é obrigatório', id: null, data: [] };
         try {
             const clean = Product.#sanitize(data);
             delete clean.id;
             const [result] = await connection(Product.table).where({ id }).update(clean).returning('*');
             return { status: true, msg: 'Produto atualizado!', id: result.id, data: [result] };
         } catch (err) {
-            return { status: false, msg: 'Erro ao atualizar: ' + err.message };
+            return { status: false, msg: 'Erro ao atualizar: ' + err.message, id: null, data: [] };
         }
     }
+
     static async delete(id) {
         if (!id) return { status: false, msg: 'ID é obrigatório' };
         try {
@@ -84,6 +88,7 @@ export default class Product {
             return { status: false, msg: 'Erro ao excluir: ' + err.message };
         }
     }
+
     static async findById(id) {
         if (!id) return null;
         try {
@@ -92,6 +97,7 @@ export default class Product {
             return null;
         }
     }
+
     static #sanitize(data) {
         const ignore = ['id', 'action'];
         const clean = {};
@@ -104,11 +110,10 @@ export default class Product {
         }
         return clean;
     }
+
     static async productSearch(data = {}) {
         const {
-            search = '',
             term = '',
-            q = '',
             limit = 10,
             offset = 0,
             orderType = 'asc',
