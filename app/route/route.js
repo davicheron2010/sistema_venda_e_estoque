@@ -200,6 +200,9 @@ ipcMain.handle('supplier:find', async (_e, where = {}) => {
 ipcMain.handle('supplier:findById', async (_e, id) => {
     return await Supplier.findById(id);
 });
+ipcMain.handle('supplier:supplierSearch', async (_e, term) => {
+    return await Supplier.supplierSearch(term);
+});
 
 ipcMain.handle('supplier:update', async (_e, id, data) => {
     const result = await Supplier.update(id, data);

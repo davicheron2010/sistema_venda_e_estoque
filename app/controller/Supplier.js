@@ -4,7 +4,7 @@ export default class Supplier {
     static table = 'supplier';
 
     // 🔹 Colunas do DataTable
-    static #columns = ['id', 'nome_fantasia', 'razao_social', 'cnpj_cpf', 'ie_rg',null];
+    static #columns = ['id', 'nome_fantasia', 'razao_social', 'cnpj_cpf', 'ie_rg', null];
 
     // 🔹 Campos pesquisáveis
     static #searchable = ['nome_fantasia', 'razao_social', 'cnpj_cpf', 'ie_rg'];
@@ -123,6 +123,28 @@ export default class Supplier {
         } catch (err) {
             return { status: false, msg: 'Erro: ' + err.message, data: [] };
         }
+    }
+    static async supplierSearch({ q = '' }) {
+        const search = q.trim();
+
+        const query = connection(Supplier.table).select('id', 'razao_social', 'nome_fantasia');
+
+        if (search !== '') {
+            data: await query.where(function () {
+                this.where('razao_social', 'ilike', `%${search}%`)
+                    .orWhere('nome_fantasia', 'ilike', `%${search}%`);
+            })
+        }
+        query.limit(10).offset(0).orderBy('nome_fantasia', 'asc');
+
+        const rows = await query;
+
+        return {
+            draw: 10,
+            recordsTotal: 10,
+            recordsFiltered: 10,
+            data: rows,
+        };
     }
 
     // 🔹 FIND BY ID
