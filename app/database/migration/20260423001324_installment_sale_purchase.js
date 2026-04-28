@@ -8,6 +8,7 @@ exports.up = function (knex) {
         table.bigIncrements('id').primary();
 
         table.bigInteger('id_sale').unsigned().notNullable();
+        table.bigInteger('id_purchase').unsigned().notNullable();
         table.bigInteger('id_installment').unsigned().notNullable();
         table.bigInteger('id_payment_terms').unsigned().notNullable();
         table.integer('total_parcelas').notNullable();
@@ -27,6 +28,7 @@ exports.up = function (knex) {
 
         // Chaves Estrangeiras
         table.foreign('id_sale').references('id').inTable('sale').onDelete('CASCADE');
+        table.foreign('id_purchase').references('id').inTable('purchase').onDelete('CASCADE');
         table.foreign('id_installment').references('id').inTable('installment').onDelete('CASCADE');
         table.foreign('id_payment_terms').references('id').inTable('payment_terms').onDelete('RESTRICT');
     });

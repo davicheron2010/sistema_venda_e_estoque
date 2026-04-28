@@ -5,7 +5,6 @@ export default class Installment {
   //teste
   // Mapeamento: índice da coluna no DataTable → nome no banco
   static #columns = ['id', 'id_pagamento', 'parcela', 'intervalo'];
-
   //Insere um novo condição de pagamento.
   static async insert(data) {
     console.log(data);
@@ -32,7 +31,30 @@ export default class Installment {
       return { status: false, msg: 'Erro: ' + error.message, id: null, data: [] };
     }
   }
+  //Implementamos a pesquisa completa para o cliente
+  static async find(data = {}) {
 
+  }
+
+  static async findByPaymentTerms(id_pagamento) {
+    const dataQ = connection(Installment.table).select('id', 'parcela', 'intervalo');
+    dataQ.where({ id_pagamento: id_pagamento });
+    const rows = await dataQ;
+    return { status: true, msg: 'Parcelas encontradas!', data: rows };
+  }
+
+  //listar as parcelas da condição de pagamento
+  static async findById(id) {
+    try {
+      const result = await connection(Installment.table)
+        .where({ id: id })
+        .select('*');
+
+      return { status: true, msg: 'Parcelas encontradas!', id: null, data: result };
+    } catch (error) {
+      return { status: false, msg: 'Erro: ' + error.message, id: null, data: [] };
+    }
+  }
   //Remove campos vazios e converte tipos.
   static #sanitize(data) {
     // Campos de controle do form — não existem no banco
@@ -50,4 +72,5 @@ export default class Installment {
 
     return clean;
   }
+
 }

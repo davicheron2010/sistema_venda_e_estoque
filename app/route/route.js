@@ -284,6 +284,9 @@ ipcMain.handle('installment:find', async (_e, where = {}) => {
 ipcMain.handle('installment:findById', async (_e, id) => {
     return await Installment.findById(id);
 });
+ipcMain.handle('installment:findByPaymentTerms', async (_e, id_pagamento) => {
+    return await Installment.findByPaymentTerms(id_pagamento);
+});
 
 ipcMain.handle('installment:update', async (_e, id, data) => {
     const result = await Installment.update(id, data);

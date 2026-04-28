@@ -1,7 +1,6 @@
 const codigo = document.getElementById('codigo');
 const insertPaymentoTermsButton = document.getElementById('insertPaymentoTermsButton');
 const insertInstallmentButton = document.getElementById('insertInstallmentButton');
-
 //Salvar a condição de pagamento
 async function InsertPaymentTerms() {
   //Validar os compo do formulario.
@@ -54,13 +53,33 @@ async function InsertInstallment() {
 }
 //Preencher a tabela de parcelas da condição de pagamento
 async function ListInstallment() {
+  //Pegar o id da condição de pagamento para listar as parcelas.
+  const id_pagamento = document.getElementById('id').value;
+  //Listar as parcelas da condição de pagamento.
+  const response = await api.installment.findByPaymentTerms(id_pagamento);
 
-  const response = await api.installment.findBy();
-  
   if (!response.status) {
     toast('error', 'Erro', response.msg, 3000);
     return;
   }
+  const rows = '';
+  response.data.forEach(element => {
+    rows += `
+      <tr>
+          <td>15</td>
+          <td>1X</td>
+          <td>30 Dias</td>
+          <td>
+              <button class="btn btn-sm btn-outline-danger me-2"
+                  onclick="DeleteInstallment(1)">
+                  <i class="bi bi-trash"></i>
+              </button>
+          </td>
+      </tr>
+    `;
+  });
+  document.getElementById('tbInstallments').innerHTML = '';
+  document.getElementById('tbInstallments').innerHTML = rows;
 }
 // Remover uma parcela pelo id da condição de pagamento
 async function DeleteInstallment(id) {

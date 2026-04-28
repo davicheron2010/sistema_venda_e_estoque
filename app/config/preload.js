@@ -104,7 +104,11 @@ contextBridge.exposeInMainWorld('api', {
     },
     installment: {
         insert: (data) => { return ipcRenderer.invoke('installment:insert', data); },
-        findBy: (where) => ipcRenderer.invoke('installment:findBy', where),
-
+        find: (where) => ipcRenderer.invoke('installment:find', where),
+        findByPaymentTerms: (id_pagamento) => ipcRenderer.invoke('installment:findByPaymentTerms', id_pagamento),
+        findById: (id) => ipcRenderer.invoke('installment:findById', id),
+        update: (id, data) => ipcRenderer.invoke('installment:update', id, data),
+        delete: (id) => ipcRenderer.invoke('installment:delete', id),
+        getAll: () => ipcRenderer.invoke('installment:getAll'),
     }
 });
