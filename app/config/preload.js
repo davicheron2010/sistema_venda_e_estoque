@@ -115,6 +115,8 @@ contextBridge.exposeInMainWorld('api', {
         update: (id, data) => ipcRenderer.invoke('paymentTerms:update', id, data),
         delete: (id) => ipcRenderer.invoke('paymentTerms:delete', id),
         getAll: () => ipcRenderer.invoke('paymentTerms:getAll'),
+        findAll() { return ipcRenderer.invoke('paymentTerms:findAll'); },
+        findInstallments(id_pagamento) { return ipcRenderer.invoke('paymentTerms:findInstallments', id_pagamento); },
     },
     installment: {
         insert: (data) => { return ipcRenderer.invoke('installment:insert', data); },

@@ -284,6 +284,13 @@ ipcMain.handle('paymentTerms:update', async (_e, id, data) => {
     if (result.status) broadcastReload('paymentTerms:reload');
     return result;
 });
+ipcMain.handle('paymentTerms:findAll', async () => {
+    return await PaymentTerms.findAll();
+});
+
+ipcMain.handle('paymentTerms:findInstallments', async (_e, id_pagamento) => {
+    return await PaymentTerms.findInstallments(id_pagamento);
+});
 ipcMain.handle('paymentTerms:delete', async (_e, id) => {
     const result = await PaymentTerms.delete(id);
     if (result.status) broadcastReload('paymentTerms:reload');
