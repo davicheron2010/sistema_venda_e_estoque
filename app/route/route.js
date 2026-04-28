@@ -300,20 +300,78 @@ ipcMain.handle('purchase:deleteItem', async (_e, id) => {
     } catch (error) {
         return { status: false, msg: 'Erro ao excluir item: ' + error.message };
     }
-});
-ipcMain.handle('paymentTerms:findAll', async () => {
-    return await PaymentTerms.findAll();
-});
-
-ipcMain.handle('paymentTerms:findInstallments', async (_e, id_pagamento) => {
-    return await PaymentTerms.findInstallments(id_pagamento);
-});
-ipcMain.handle('purchase:finalize', async (_e, data) => {
-    try {
-        const result = await Purchase.finalize(data);
-        if (result.status) broadcastReload('purchase:reload');
+    ipcMain.handle('purchase:finalize', async (_e, data) => {
+        try {
+            const result = await Purchase.finalize(data);
+            if (result.status) broadcastReload('purchase:reload');
+            return result;
+        } catch (error) {
+            return { status: false, msg: 'Erro ao finalizar compra: ' + error.message };
+        }
+    });
+    ipcMain.handle('paymentTerms:insert', async (_e, data) => {
+        const result = await PaymentTerms.insert(data);
         return result;
-    } catch (error) {
-        return { status: false, msg: 'Erro ao finalizar compra: ' + error.message };
-    }
+    });
+
+    ipcMain.handle('paymentTerms:find', async (_e, where = {}) => {
+        return await PaymentTerms.find(where);
+    });
+
+    ipcMain.handle('paymentTerms:findById', async (_e, id) => {
+        return await PaymentTerms.findById(id);
+    });
+
+    ipcMain.handle('paymentTerms:update', async (_e, id, data) => {
+        const result = await PaymentTerms.update(id, data);
+        if (result.status) broadcastReload('paymentTerms:reload');
+        return result;
+    });
+
+    ipcMain.handle('paymentTerms:delete', async (_e, id) => {
+        const result = await PaymentTerms.delete(id);
+        if (result.status) broadcastReload('paymentTerms:reload');
+        return result;
+    });
+
+    ipcMain.handle('paymentTerms:getAll', async () => {
+        const result = await PaymentTerms.find({ limit: 99999, offset: 0 }) || {};
+        return result.data || [];
+    });
+
+    //  parcelas
+
+    ipcMain.handle('installment:insert', async (_e, data) => {
+        const result = await Installment.insert(data);
+        if (result.status) broadcastReload('installment:reload');
+        return result;
+    });
+
+    ipcMain.handle('installment:find', async (_e, where = {}) => {
+        return await Installment.find(where);
+    });
+
+    ipcMain.handle('installment:findById', async (_e, id) => {
+        return await Installment.findById(id);
+    });
+    ipcMain.handle('installment:findByPaymentTerms', async (_e, id_pagamento) => {
+        return await Installment.findByPaymentTerms(id_pagamento);
+    });
+
+    ipcMain.handle('installment:update', async (_e, id, data) => {
+        const result = await Installment.update(id, data);
+        if (result.status) broadcastReload('installment:reload');
+        return result;
+    });
+
+    ipcMain.handle('installment:delete', async (_e, id) => {
+        const result = await Installment.delete(id);
+        if (result.status) broadcastReload('installment:reload');
+        return result;
+    });
+
+    ipcMain.handle('installment:getAll', async () => {
+        const result = await Installment.find({ limit: 99999, offset: 0 }) || {};
+        return result.data || [];
+    });
 });

@@ -109,7 +109,20 @@ contextBridge.exposeInMainWorld('api', {
         adjust(data) { return ipcRenderer.invoke('stock:adjust', data); },
     },
     paymentTerms: {
-    findAll() { return ipcRenderer.invoke('paymentTerms:findAll'); },
-    findInstallments(id_pagamento) { return ipcRenderer.invoke('paymentTerms:findInstallments', id_pagamento); },
-},
+        insert: (data) => { return ipcRenderer.invoke('paymentTerms:insert', data); },
+        find: (where) => ipcRenderer.invoke('paymentTerms:find', where),
+        findById: (id) => ipcRenderer.invoke('paymentTerms:findById', id),
+        update: (id, data) => ipcRenderer.invoke('paymentTerms:update', id, data),
+        delete: (id) => ipcRenderer.invoke('paymentTerms:delete', id),
+        getAll: () => ipcRenderer.invoke('paymentTerms:getAll'),
+    },
+    installment: {
+        insert: (data) => { return ipcRenderer.invoke('installment:insert', data); },
+        find: (where) => ipcRenderer.invoke('installment:find', where),
+        findByPaymentTerms: (id_pagamento) => ipcRenderer.invoke('installment:findByPaymentTerms', id_pagamento),
+        findById: (id) => ipcRenderer.invoke('installment:findById', id),
+        update: (id, data) => ipcRenderer.invoke('installment:update', id, data),
+        delete: (id) => ipcRenderer.invoke('installment:delete', id),
+        getAll: () => ipcRenderer.invoke('installment:getAll'),
+    }
 });
