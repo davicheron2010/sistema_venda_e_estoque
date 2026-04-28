@@ -62,9 +62,10 @@ async function editPurchase(id) {
         });
 
         api.window.openModal('pages/purchase', {
-            width: 800,
-            height: 420,
+            width: 1000,
+            height: 800,
             title: 'Editar Produto',
+            maximized: true
         });
     } catch (err) {
         toast('error', 'Falha', 'Erro: ' + err.message);
