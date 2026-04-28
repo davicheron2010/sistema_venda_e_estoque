@@ -206,7 +206,6 @@ async function InsertItemPurchase() {
 async function listItemPurchase() {
     try {
         const data = formToJson(form);
-
         const response = await api.purchase.listItem(data);
 
         if (!response.status) {
@@ -335,19 +334,156 @@ async function clearPurchase() {
     }
 }
 
-
 let paymentModalInstance = null;
+let selectedPaymentTermId = null;
 
-function openPaymentModal() {
+async function openPaymentModal() {
     const total = calcPurchaseTotal();
+
+    if (total <= 0) {
+        toast("warning", "Atenção", "Adicione ao menos um item antes de finalizar.");
+        return;
+    }
+
     const modalEl = document.getElementById('paymentModal');
     if (!modalEl || !window.bootstrap) return;
 
     const modalTotal = document.getElementById('modal-total');
     if (modalTotal) modalTotal.innerText = floatParaString(total);
 
+    selectedPaymentTermId = null;
+    document.getElementById('card-installments-wrap').classList.add('d-none');
+    document.getElementById('installment-list').innerHTML = '';
+    document.getElementById('installment-difference').textContent = '0,00';
+    document.getElementById('confirm-payment').disabled = true;
+
+    await loadPaymentTerms(total);
+
     paymentModalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
     paymentModalInstance.show();
+}
+
+async function loadPaymentTerms(total) {
+    const container = document.getElementById('payment-terms-buttons');
+    container.innerHTML = '<span class="text-muted small">Carregando...</span>';
+
+    try {
+        const response = await api.paymentTerms.findAll();
+
+        if (!response.status || !response.data.length) {
+            container.innerHTML = '<span class="text-muted small">Nenhuma forma de pagamento cadastrada.</span>';
+            return;
+        }
+
+        container.innerHTML = '';
+        response.data.forEach(term => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-outline-primary';
+            btn.textContent = term.titulo;
+            btn.dataset.id = term.id;
+            btn.dataset.codigo = term.codigo;
+            btn.addEventListener('click', () => onSelectPaymentTerm(term, total, btn));
+            container.appendChild(btn);
+        });
+
+    } catch (err) {
+        container.innerHTML = '<span class="text-danger small">Erro ao carregar formas de pagamento.</span>';
+        console.error(err);
+    }
+}
+
+async function onSelectPaymentTerm(term, total, btnClicked) {
+    document.querySelectorAll('#payment-terms-buttons .btn').forEach(b => {
+        b.classList.remove('btn-primary');
+        b.classList.add('btn-outline-primary');
+    });
+    btnClicked.classList.remove('btn-outline-primary');
+    btnClicked.classList.add('btn-primary');
+
+    selectedPaymentTermId = term.id;
+    document.getElementById('confirm-payment').disabled = false;
+
+    const installmentsWrap = document.getElementById('card-installments-wrap');
+    const installmentList = document.getElementById('installment-list');
+
+    const semParcelas = ['pix', 'dinheiro', 'cheque'];
+    const tituloLower = term.titulo.toLowerCase().trim();
+    const aceitaParcelas = !semParcelas.some(p => tituloLower.includes(p));
+
+    if (!aceitaParcelas) {
+        installmentsWrap.classList.add('d-none');
+        installmentList.innerHTML = '';
+        document.getElementById('installment-difference').textContent = '0,00';
+        return;
+    }
+
+    try {
+        const response = await api.paymentTerms.findInstallments(term.id);
+
+        if (!response.status || !response.data.length) {
+            installmentsWrap.classList.add('d-none');
+            installmentList.innerHTML = '';
+            return;
+        }
+
+        installmentsWrap.classList.remove('d-none');
+        installmentList.innerHTML = '';
+        document.getElementById('installment-difference').textContent = '0,00';
+
+        const oldSelect = document.getElementById('payment-installments');
+        const newSelect = oldSelect.cloneNode(false);
+        newSelect.innerHTML = '<option value="">Selecione...</option>';
+
+        response.data.forEach(inst => {
+            const opt = document.createElement('option');
+            opt.value = inst.parcela;
+            opt.textContent = `${inst.parcela}x`;
+            newSelect.appendChild(opt);
+        });
+
+        oldSelect.parentNode.replaceChild(newSelect, oldSelect);
+
+        newSelect.addEventListener('change', () => {
+            const parcelas = parseInt(newSelect.value);
+            if (!parcelas) {
+                installmentList.innerHTML = '';
+                return;
+            }
+            renderInstallments(parcelas, total);
+        });
+
+    } catch (err) {
+        installmentsWrap.classList.add('d-none');
+        installmentList.innerHTML = '';
+        console.error(err);
+    }
+}
+
+function renderInstallments(parcelas, total) {
+    const valorBase = Math.floor((total / parcelas) * 100) / 100;
+    const soma = valorBase * parcelas;
+    const diferenca = parseFloat((total - soma).toFixed(2));
+
+    let html = '';
+    for (let i = 1; i <= parcelas; i++) {
+        const valor = i === parcelas ? valorBase + diferenca : valorBase;
+        html += renderInstallmentRow(i, valor);
+    }
+
+    document.getElementById('installment-list').innerHTML = html;
+    document.getElementById('installment-difference').textContent = floatParaString(Math.abs(diferenca));
+}
+
+function renderInstallmentRow(parcela, valor) {
+    return `
+        <div class="col-12 col-md-6">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text">${parcela}x</span>
+                <input type="text" class="form-control text-end" value="R$ ${floatParaString(valor)}" readonly>
+            </div>
+        </div>
+    `;
 }
 
 window.deleteItem = deleteItem;

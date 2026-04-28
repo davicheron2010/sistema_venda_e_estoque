@@ -255,12 +255,10 @@ export default class Purchase {
     }
 
     try {
-        // Deleta todos os itens da compra primeiro
         await connection('item_purchase')
             .where({ id_compra: id })
             .del();
 
-        // Deleta a compra
         const deleted = await connection(Purchase.table)
             .where({ id })
             .del();
@@ -295,7 +293,6 @@ export default class Purchase {
         }
 
         try {
-            // Busca o item antes de deletar para saber o id_compra
             const item = await connection('item_purchase')
                 .where({ id })
                 .first();
@@ -309,7 +306,6 @@ export default class Purchase {
 
             const id_compra = item.id_compra;
 
-            // Deleta o item
             const deleted = await connection('item_purchase')
                 .where({ id })
                 .del();
@@ -321,13 +317,11 @@ export default class Purchase {
                 };
             }
 
-            // Recalcula os totais dos itens restantes
             const totais = await connection('item_purchase')
                 .where({ id_compra })
                 .sum({ total_bruto: 'total_bruto', total_liquido: 'total_liquido' })
                 .first();
 
-            // Atualiza o total da compra (zera se não houver mais itens)
             await connection(Purchase.table)
                 .where({ id: id_compra })
                 .update({

@@ -3,7 +3,6 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
-    // Suporte para chamadas diretas se necessário
     ipcRenderer: {
         invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args),
     },
@@ -107,4 +106,8 @@ contextBridge.exposeInMainWorld('api', {
         getMovements(id_produto) { return ipcRenderer.invoke('stock:getMovements', id_produto); },
         adjust(data) { return ipcRenderer.invoke('stock:adjust', data); },
     },
+    paymentTerms: {
+    findAll() { return ipcRenderer.invoke('paymentTerms:findAll'); },
+    findInstallments(id_pagamento) { return ipcRenderer.invoke('paymentTerms:findInstallments', id_pagamento); },
+},
 });

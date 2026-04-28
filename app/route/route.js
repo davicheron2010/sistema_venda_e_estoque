@@ -3,6 +3,7 @@ import Template from '../mixin/Template.js';
 import Product from '../controller/Product.js';
 import Company from '../controller/Company.js';
 import Customer from '../controller/Customer.js';
+import PaymentTerms from '../controller/PaymentTerms.js';
 import Sale from '../controller/Sale.js';
 import Supplier from '../controller/Supplier.js';
 import Purchase from '../controller/Purchase.js';
@@ -295,4 +296,11 @@ ipcMain.handle('purchase:deleteItem', async (_e, id) => {
     } catch (error) {
         return { status: false, msg: 'Erro ao excluir item: ' + error.message };
     }
+});
+ipcMain.handle('paymentTerms:findAll', async () => {
+    return await PaymentTerms.findAll();
+});
+
+ipcMain.handle('paymentTerms:findInstallments', async (_e, id_pagamento) => {
+    return await PaymentTerms.findInstallments(id_pagamento);
 });

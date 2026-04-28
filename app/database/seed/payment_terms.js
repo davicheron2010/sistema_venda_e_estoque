@@ -38,15 +38,15 @@ exports.seed = async function (knex) {
   ]);
 
   await inserirCondicao('cartao', 'Cartão', 'CC', [
-    { parcela: 1, intervalo: 30 },
-    { parcela: 2, intervalo: 60 },
-    { parcela: 3, intervalo: 90 },
-    { parcela: 4, intervalo: 120 },
-    { parcela: 5, intervalo: 150 },
-    { parcela: 6, intervalo: 180 },
-    { parcela: 7, intervalo: 210 },
-    { parcela: 8, intervalo: 240 },
-    { parcela: 9, intervalo: 270 },
+    { parcela: 1,  intervalo: 30  },
+    { parcela: 2,  intervalo: 60  },
+    { parcela: 3,  intervalo: 90  },
+    { parcela: 4,  intervalo: 120 },
+    { parcela: 5,  intervalo: 150 },
+    { parcela: 6,  intervalo: 180 },
+    { parcela: 7,  intervalo: 210 },
+    { parcela: 8,  intervalo: 240 },
+    { parcela: 9,  intervalo: 270 },
     { parcela: 10, intervalo: 300 },
     { parcela: 11, intervalo: 330 },
     { parcela: 12, intervalo: 360 },
@@ -54,6 +54,30 @@ exports.seed = async function (knex) {
 
   await inserirCondicao('dinheiro', 'Dinheiro', 'DIN', [
     { parcela: 1, intervalo: 0 },
+  ]);
+
+  await inserirCondicao('cheque', 'Cheque', 'CHQ', [
+    { parcela: 1,  intervalo: 30  },
+    { parcela: 2,  intervalo: 60  },
+    { parcela: 3,  intervalo: 90  },
+    { parcela: 4,  intervalo: 120 },
+    { parcela: 5,  intervalo: 150 },
+    { parcela: 6,  intervalo: 180 },
+  ]);
+
+  await inserirCondicao('boleto', 'Boleto', 'BOL', [
+    { parcela: 1,  intervalo: 30  },
+    { parcela: 2,  intervalo: 60  },
+    { parcela: 3,  intervalo: 90  },
+    { parcela: 4,  intervalo: 120 },
+    { parcela: 5,  intervalo: 150 },
+    { parcela: 6,  intervalo: 180 },
+    { parcela: 7,  intervalo: 210 },
+    { parcela: 8,  intervalo: 240 },
+    { parcela: 9,  intervalo: 270 },
+    { parcela: 10, intervalo: 300 },
+    { parcela: 11, intervalo: 330 },
+    { parcela: 12, intervalo: 360 },
   ]);
 
   console.log('✅ Seed de payment_terms e installment inserida com sucesso!');
