@@ -1,8 +1,3 @@
-// =============================================================================
-// compra-form.js — Página de cadastro/edição de compra
-// =============================================================================
-
-// ─── Referências DOM 
 const fornecedorSelect2 = $('#id_fornecedor');
 const produtoSelect2 = $('#id_produto');
 const Id = document.getElementById('id');
@@ -14,14 +9,14 @@ const inputUnitPrice = document.getElementById('preco-unitario');
 const inputTotalProduct = document.getElementById('valor-total-produto');
 const productsTbody = document.getElementById('products-table-tbody');
 
-// ─── Funções de Cálculo 
+
 function stringParaFloat(valor) {
     if (!valor) return 0;
     let limpo = valor.toString()
         .replace('R$', '')
         .trim()
-        .replace(/\./g, '')   // remove TODOS os pontos (separador de milhar)
-        .replace(',', '.');   // troca vírgula decimal por ponto
+        .replace(/\./g, '')   
+        .replace(',', '.');   
     return parseFloat(limpo) || 0;
 }
 
@@ -47,22 +42,27 @@ function executarCalculo() {
     }
 }
 
-// ─── Função auxiliar para limpar máscaras
+
 function cleanInput(val) {
     return String(val)
         .replace(/[R$%\s]/g, "")
-        .replace(/\./g, "")       // remove TODOS os pontos (milhar)
-        .replace(/,/, ".");       // troca vírgula decimal por ponto
+        .replace(/\./g, "")       
+        .replace(/,/, ".");       
 }
 
-// ─── Ouvintes de Evento 
+
+function calcPurchaseTotal() {
+    const totalEl = document.getElementById('total_bruto');
+    return stringParaFloat(totalEl ? totalEl.innerText : '0');
+}
+
+
 if (inputUnitPrice && inputQuantity) {
     inputUnitPrice.addEventListener('input', executarCalculo);
     inputQuantity.addEventListener('input', executarCalculo);
     executarCalculo();
 }
 
-// ─── Configuração de Máscaras
 Inputmask("currency", {
     radixPoint: ",",
     groupSeparator: ".",
@@ -87,7 +87,7 @@ Inputmask("currency", {
     },
 }).mask(inputQuantity);
 
-// ─── Select2: Fornecedor 
+
 fornecedorSelect2.select2({
     theme: 'bootstrap-5',
     placeholder: "Selecione um fornecedor",
@@ -112,7 +112,7 @@ fornecedorSelect2.select2({
     }
 });
 
-// ─── Select2: Produto 
+
 produtoSelect2.select2({
     theme: 'bootstrap-5',
     placeholder: "Selecione um produto",
@@ -137,7 +137,7 @@ produtoSelect2.select2({
     }
 });
 
-// ─── Evento ao selecionar Produto
+
 produtoSelect2.on('select2:select', async function (e) {
     const productId = e.params.data.id;
     try {
@@ -151,12 +151,10 @@ produtoSelect2.on('select2:select', async function (e) {
     }
 });
 
-// Focar no campo de busca do Select2 ao abrir
 $(document).on('select2:open', () => {
     document.querySelector('.select2-search__field').focus();
 });
 
-// ─── Função inserir item da compra
 async function InsertItemPurchase() {
     insertItemButton.disabled = true;
     const originalText = insertItemButton.textContent;
@@ -165,46 +163,45 @@ async function InsertItemPurchase() {
     try {
         const data = formToJson(form);
 
-        // Limpa as máscaras dos campos numéricos
+        
         data.inputPreco = cleanInput(data['preco-unitario']);
         data.quantidade = cleanInput(data.quantidade);
 
-        // Recalcula o total na hora, sem depender do campo readonly
+        
         data.inputTotal = (parseFloat(data.inputPreco) * parseFloat(data.quantidade)).toFixed(2);
 
-        // Se for nova compra, insere a compra antes de inserir o item
+       
         if (Action.value === 'c') {
             const response = await api.purchase.insert(data);
             if (!response.status) {
                 toast("error", "Erro", response.msg, null);
                 return;
             }
-            // Atualiza ação e ID após inserção da compra
+           
             Action.value = 'e';
             Id.value = response.id;
         }
 
-        // Garante que o id da compra está no data
+  
         data.id = Id.value;
 
-        // Insere o item na compra
+     
         const responseItem = await api.purchase.insertItem(data);
         if (!responseItem.status) {
             toast("error", "Erro", responseItem.msg, null);
             return;
         }
 
-        // Atualiza os totais no resumo lateral
+      
         document.getElementById('total_liquido').innerHTML = parseFloat(responseItem.data.total_liquido)
             .toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
         document.getElementById('total_bruto').innerHTML = parseFloat(responseItem.data.total_bruto)
             .toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-        // Atualiza a tabela de itens
         await listItemPurchase();
 
-        // Limpa os campos do item
+     
         produtoSelect2.val(null).trigger('change');
         inputUnitPrice.value = 'R$ 0,00';
         inputQuantity.value = '1,00';
@@ -218,7 +215,7 @@ async function InsertItemPurchase() {
     }
 }
 
-// ─── Função listar itens da compra
+
 async function listItemPurchase() {
     try {
         const data = formToJson(form);
@@ -230,7 +227,6 @@ async function listItemPurchase() {
             return;
         }
 
-        // Atualiza os totais
         document.getElementById('total_liquido').innerHTML = parseFloat(response?.purchase?.total_liquido ?? 0)
             .toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -240,7 +236,7 @@ async function listItemPurchase() {
         document.getElementById('preco-unitario').innerHTML = parseFloat(response?.purchase?.preco_unitario ?? 0)
             .toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-        // Monta as linhas da tabela
+       
         let trs = '';
         response.data.forEach(item => {
             trs += `
@@ -276,6 +272,7 @@ async function listItemPurchase() {
     }
 }
 
+
 async function deleteItem(id) {
     const result = await confirmDialog(
         'Excluir item?',
@@ -301,22 +298,30 @@ async function deleteItem(id) {
     }
 }
 
+
+let paymentModalInstance = null;
+
 function openPaymentModal() {
     const total = calcPurchaseTotal();
     const modalEl = document.getElementById('paymentModal');
     if (!modalEl || !window.bootstrap) return;
 
     const modalTotal = document.getElementById('modal-total');
-    if (modalTotal) modalTotal.innerText = formatNumberBR(total);
+    if (modalTotal) modalTotal.innerText = floatParaString(total);
 
     paymentModalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
     paymentModalInstance.show();
 }
 
 window.deleteItem = deleteItem;
+window.openPaymentModal = openPaymentModal;
 
-// ─── Event listener do botão inserir item
+
 insertItemButton.addEventListener("click", async () => {
     await InsertItemPurchase();
 });
 
+
+document.getElementById('finalize-sale').addEventListener('click', () => {
+    openPaymentModal();
+});
