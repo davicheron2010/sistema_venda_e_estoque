@@ -99,3 +99,7 @@ function editSale(id) {
 // Vincula as funções ao objeto window para que os botões (onclick) funcionem no contexto do módulo
 window.deleteSale = deleteSale;
 window.editSale = editSale;
+
+document.getElementById('printBtn')
+  .addEventListener('click', () => window.print());
+  

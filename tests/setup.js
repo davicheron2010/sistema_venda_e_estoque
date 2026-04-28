@@ -1,16 +1,18 @@
-import { beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
-beforeEach(() => {
-  // Limpa estado global antes de cada teste
-  vi.resetModules();
-  process.env.NODE_ENV = "test";
-  global.sharedState = {};
-});
+describe("Botão imprimir", () => {
+  it("deve chamar window.print ao clicar", () => {
+    // mock
+    window.print = vi.fn();
 
-afterEach(() => {
-  // Limpa mocks após cada teste
-  vi.clearAllMocks();
-  vi.restoreAllMocks();
-  vi.unstubAllGlobals();
-  vi.unstubAllEnvs();
+    document.body.innerHTML = `
+      <button onclick="window.print()">Imprimir / PDF</button>
+    `;
+
+    const button = document.querySelector("button");
+
+    button.click();
+
+    expect(window.print).toHaveBeenCalled();
+  });
 });

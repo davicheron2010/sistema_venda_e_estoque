@@ -40,7 +40,7 @@ export default defineConfig({
         test: {
           name: "feature",
           include: ["tests/feature/**/*.test.js"],
-          environment: "node",
+          environment: "jsdom",
           testTimeout: 30000,
         },
       },
