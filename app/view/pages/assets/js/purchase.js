@@ -3,16 +3,16 @@
 // =============================================================================
 
 // ─── Referências DOM 
-const fornecedorSelect2     = $('#id_fornecedor');
-const produtoSelect2        = $('#id_produto');
-const Id                    = document.getElementById('id');
-const Action                = document.getElementById('acao');
-const form                  = document.getElementById('form');
-const inputQuantity         = document.getElementById('quantidade');
-const insertItemButton      = document.getElementById('insert-item');
-const inputUnitPrice        = document.getElementById('preco-unitario');
-const inputTotalProduct     = document.getElementById('valor-total-produto');
-const productsTbody         = document.getElementById('products-table-tbody');
+const fornecedorSelect2 = $('#id_fornecedor');
+const produtoSelect2 = $('#id_produto');
+const Id = document.getElementById('id');
+const Action = document.getElementById('acao');
+const form = document.getElementById('form');
+const inputQuantity = document.getElementById('quantidade');
+const insertItemButton = document.getElementById('insert-item');
+const inputUnitPrice = document.getElementById('preco-unitario');
+const inputTotalProduct = document.getElementById('valor-total-produto');
+const productsTbody = document.getElementById('products-table-tbody');
 
 // ─── Funções de Cálculo 
 function stringParaFloat(valor) {
@@ -300,9 +300,23 @@ async function deleteItem(id) {
         toast("error", "Falha", "Erro interno: " + err.message);
     }
 }
+
+function openPaymentModal() {
+    const total = calcPurchaseTotal();
+    const modalEl = document.getElementById('paymentModal');
+    if (!modalEl || !window.bootstrap) return;
+
+    const modalTotal = document.getElementById('modal-total');
+    if (modalTotal) modalTotal.innerText = formatNumberBR(total);
+
+    paymentModalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+    paymentModalInstance.show();
+}
+
 window.deleteItem = deleteItem;
 
 // ─── Event listener do botão inserir item
 insertItemButton.addEventListener("click", async () => {
     await InsertItemPurchase();
 });
+

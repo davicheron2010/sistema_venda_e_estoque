@@ -158,27 +158,6 @@
                         </div>
                     </div>
 
-                    <!-- Condição de pagamento -->
-                    <div class="card shadow-sm mb-4">
-                        <div class="card-header fw-semibold">Condição de Pagamento</div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label for="payment-terms" class="form-label">Escolha a condição</label>
-                                <select id="payment-terms" class="form-select">
-                                    <option value="avista">À vista (1x)</option>
-                                    <option value="parcelado2">Parcelado (2x)</option>
-                                    <option value="parcelado3">Parcelado (3x)</option>
-                                    <option value="parcelado4">Parcelado (4x)</option>
-                                </select>
-                            </div>
-                            <div id="installment-list"></div>
-                            <div class="mt-3 d-flex align-items-center gap-2">
-                                <span class="fw-semibold small">Diferença:</span>
-                                <span id="installment-difference" class="badge bg-secondary">R$ 0,00</span>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Ações finais -->
                     <div class="card shadow-sm">
                         <div class="card-body d-grid gap-2">
@@ -194,6 +173,69 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-credit-card me-2 text-primary"></i>Forma de Pagamento
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body pt-3">
+                    <div class="alert alert-primary border-0 d-flex justify-content-between align-items-center mb-4">
+                        <span class="small fw-bold text-uppercase">Total da Compra</span>
+                        <span class="fs-4 fw-bold">R$ <span id="modal-total">0,00</span></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted text-uppercase">Forma de Pagamento</label>
+                        <div id="payment-terms-buttons" class="btn-group w-100 flex-wrap gap-2" role="group"
+                            aria-label="Formas de pagamento"></div>
+                    </div>
+
+                    <div id="payment-split-wrap" class="mb-3 d-none">
+                        <label class="form-label fw-bold small text-muted text-uppercase">Divisão do Pagamento</label>
+                        <div id="payment-split-list" class="row g-2"></div>
+                    </div>
+
+                    <div id="card-installments-wrap" class="mb-3 d-none">
+                        <label for="payment-installments"
+                            class="form-label fw-bold small text-muted text-uppercase">Parcelas</label>
+                        <select id="payment-installments" class="form-select form-select-lg">
+                            <option value="">Selecione...</option>
+                            <option value="1">1x</option>
+                            <option value="2">2x</option>
+                            <option value="3">3x</option>
+                            <option value="4">4x</option>
+                            <option value="5">5x</option>
+                            <option value="6">6x</option>
+                            <option value="7">7x</option>
+                            <option value="8">8x</option>
+                            <option value="9">9x</option>
+                            <option value="10">10x</option>
+                            <option value="11">11x</option>
+                            <option value="12">12x</option>
+                        </select>
+                    </div>
+
+                    <div id="installment-list" class="row g-2 mb-3"></div>
+
+                    <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded">
+                        <span class="small text-muted">Ajuste de Diferença:</span>
+                        <span id="installment-difference" class="badge bg-secondary fs-6">0,00</span>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary px-4" id="confirm-payment" disabled>
+                        Confirmar e Salvar
+                    </button>
+                </div>
+            </div>
+        </div>
 </form>
 
 {% endblock %}
