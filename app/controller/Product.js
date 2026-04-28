@@ -54,7 +54,7 @@ export default class Product {
     }
     static async insert(data) {
         if (!data.nome || data.nome.trim() === '') {
-            return { status: false, msg: 'O campo nome é obrigatório' };
+            return { status: false, msg: 'O campo nome é obrigatório', id: null, data: [] };
         }
         try {
             const clean = Product.#sanitize(data);

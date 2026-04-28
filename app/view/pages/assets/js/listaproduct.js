@@ -87,3 +87,56 @@ document.getElementById('btn-save-stock').addEventListener('click', async () => 
         $("#btn-save-stock").prop("disabled", false);
     }
 });
+async function deleteProduct(id) {
+    const result = await Swal.fire({
+        title: 'Tem certeza?',
+        text: 'Esta ação não pode ser desfeita.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sim, excluir',
+        cancelButtonText: 'Cancelar',
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+        const response = await api.product.delete(id);
+
+        if (!response.status) {
+            toast('error', 'Erro', response.msg);
+            return;
+        }
+
+        toast('success', 'Excluído', response.msg);
+        $('#table-products').DataTable().ajax.reload();
+
+    } catch (err) {
+        toast('error', 'Falha', err.message);
+    }
+}
+
+async function editProduct(id) {
+    try {
+        // 1. Busca os dados completos do produto
+        const product = await api.product.findById(id);
+        if (!product) {
+            toast('error', 'Erro', 'Produto não encontrado.');
+            return;
+        }
+        // 2. Salva no temp store com a ação 'e' (editar)
+        await api.temp.set('product:edit', {
+            action: 'e',
+            ...product,
+        });
+        // 3. Abre a modal
+        api.window.openModal('pages/product', {
+            width: 900,
+            height: 600,
+            title: 'Editar Produto',
+        });
+    } catch (err) {
+        toast('error', 'Falha', 'Erro: ' + err.message);
+    }
+}
+window.deleteProduct = deleteProduct;
+window.editProduct = editProduct;
