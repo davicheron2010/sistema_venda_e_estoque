@@ -5,6 +5,7 @@ import Company from '../controller/Company.js';
 import Customer from '../controller/Customer.js';
 import PaymentTerms from '../controller/PaymentTerms.js';
 import Sale from '../controller/Sale.js';
+import { Print } from '../mixin/Print.js';
 import Supplier from '../controller/Supplier.js';
 import Purchase from '../controller/Purchase.js';
 import Stock from '../controller/Stock.js'; // Verifique se criou esse controller
@@ -22,9 +23,8 @@ function broadcastReload(channel) {
     }
 }
 
-// --- IMPRESSÃO ---
+//Imprimir PDF
 ipcMain.handle('print', async (_e, stringHtml, args = {}) => {
-    // Verifique se o import do Print está presente no topo do arquivo
     await Print.create().stringHTML(stringHtml).print();
 });
 
@@ -303,4 +303,13 @@ ipcMain.handle('paymentTerms:findAll', async () => {
 
 ipcMain.handle('paymentTerms:findInstallments', async (_e, id_pagamento) => {
     return await PaymentTerms.findInstallments(id_pagamento);
+});
+ipcMain.handle('purchase:finalize', async (_e, data) => {
+    try {
+        const result = await Purchase.finalize(data);
+        if (result.status) broadcastReload('purchase:reload');
+        return result;
+    } catch (error) {
+        return { status: false, msg: 'Erro ao finalizar compra: ' + error.message };
+    }
 });

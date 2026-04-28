@@ -33,6 +33,7 @@ contextBridge.exposeInMainWorld('api', {
         find(where) { return ipcRenderer.invoke('purchase:find', where); },
         findById(id) { return ipcRenderer.invoke('purchase:findById', id); },
         update(id, data) { return ipcRenderer.invoke('purchase:update', id, data); },
+        finalize(data) { return ipcRenderer.invoke('purchase:finalize', data); },
         delete(id) { return ipcRenderer.invoke('purchase:delete', id); },
         deleteItem(id) { return ipcRenderer.invoke('purchase:deleteItem', id); },
         onReload(callback) {
