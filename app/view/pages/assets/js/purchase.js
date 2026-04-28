@@ -3,25 +3,25 @@
 // =============================================================================
 
 // ─── Referências DOM 
-const fornecedorSelect2 = $('#id_fornecedor');
-const produtoSelect2 = $('#id_produto');
-const Id = document.getElementById('id');
-const Action = document.getElementById('acao');
-const form = document.getElementById('form');
-const inputQuantity = document.getElementById('quantidade');
-const insertItemButton = document.getElementById('insert-item');
-const inputUnitPrice = document.getElementById('preco-unitario');
-const inputTotalProduct = document.getElementById('valor-total-produto');
-const productsTbody = document.getElementById('products-table-tbody');
+const fornecedorSelect2     = $('#id_fornecedor');
+const produtoSelect2        = $('#id_produto');
+const Id                    = document.getElementById('id');
+const Action                = document.getElementById('acao');
+const form                  = document.getElementById('form');
+const inputQuantity         = document.getElementById('quantidade');
+const insertItemButton      = document.getElementById('insert-item');
+const inputUnitPrice        = document.getElementById('preco-unitario');
+const inputTotalProduct     = document.getElementById('valor-total-produto');
+const productsTbody         = document.getElementById('products-table-tbody');
 
 // ─── Funções de Cálculo 
 function stringParaFloat(valor) {
     if (!valor) return 0;
     let limpo = valor.toString()
         .replace('R$', '')
-        .replace('R$ ', '')
-        .replace('.', '')
-        .replace(',', '.');
+        .trim()
+        .replace(/\./g, '')   // remove TODOS os pontos (separador de milhar)
+        .replace(',', '.');   // troca vírgula decimal por ponto
     return parseFloat(limpo) || 0;
 }
 
@@ -45,6 +45,14 @@ function executarCalculo() {
     } catch (e) {
         console.error("Erro ao calcular total:", e);
     }
+}
+
+// ─── Função auxiliar para limpar máscaras
+function cleanInput(val) {
+    return String(val)
+        .replace(/[R$%\s]/g, "")
+        .replace(/\./g, "")       // remove TODOS os pontos (milhar)
+        .replace(/,/, ".");       // troca vírgula decimal por ponto
 }
 
 // ─── Ouvintes de Evento 
@@ -148,14 +156,6 @@ $(document).on('select2:open', () => {
     document.querySelector('.select2-search__field').focus();
 });
 
-// ─── Função auxiliar para limpar máscaras
-function cleanInput(val) {
-    return String(val)
-        .replace(/[R$%\s]/g, "")
-        .replace(/\./g, "")
-        .replace(",", ".");
-}
-
 // ─── Função inserir item da compra
 async function InsertItemPurchase() {
     insertItemButton.disabled = true;
@@ -167,9 +167,10 @@ async function InsertItemPurchase() {
 
         // Limpa as máscaras dos campos numéricos
         data.inputPreco = cleanInput(data['preco-unitario']);
-        data.inputQuantidade = cleanInput(data.quantidade);
-        data.inputTotal = cleanInput(data['valor-total-produto']);
-        data.pesquisa = data.id_produto; // model espera 'pesquisa'
+        data.quantidade = cleanInput(data.quantidade);
+
+        // Recalcula o total na hora, sem depender do campo readonly
+        data.inputTotal = (parseFloat(data.inputPreco) * parseFloat(data.quantidade)).toFixed(2);
 
         // Se for nova compra, insere a compra antes de inserir o item
         if (Action.value === 'c') {
@@ -220,12 +221,9 @@ async function InsertItemPurchase() {
 // ─── Função listar itens da compra
 async function listItemPurchase() {
     try {
-        const id = Id.value;
         const data = formToJson(form);
-       
 
         const response = await api.purchase.listItem(data);
-
 
         if (!response.status) {
             toast("error", "Erro", response.msg || 'Não foi possível listar os itens da compra', null);
@@ -239,11 +237,12 @@ async function listItemPurchase() {
         document.getElementById('total_bruto').innerHTML = parseFloat(response?.purchase?.total_bruto ?? 0)
             .toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
+        document.getElementById('preco-unitario').innerHTML = parseFloat(response?.purchase?.preco_unitario ?? 0)
+            .toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
         // Monta as linhas da tabela
         let trs = '';
         response.data.forEach(item => {
-            const total = parseFloat(item?.total_liquido)
-                .toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             trs += `
                 <tr id="tritem${item.id}">
                     <td>${item.id}</td>
@@ -251,10 +250,10 @@ async function listItemPurchase() {
                     <td>${item.fornecedor ?? '-'}</td>
                     <td>${item.grupo ?? '-'}</td>
                     <td class="text-end">${parseFloat(item.quantidade).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-                    <td class="text-end">${parseFloat(item.total_bruto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                    <td class="text-end">${parseFloat(item.preco_unitario).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                     <td class="text-end">${parseFloat(item.total_liquido).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                     <td class="text-center">
-                        <button class="btn btn-danger btn-sm" data-id="${item.id}" data-action="delete-item">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteItem(${item.id});">
                             <i class="bi bi-trash"></i> Excluir
                         </button>
                     </td>
@@ -301,13 +300,9 @@ async function deleteItem(id) {
         toast("error", "Falha", "Erro interno: " + err.message);
     }
 }
+window.deleteItem = deleteItem;
 
 // ─── Event listener do botão inserir item
 insertItemButton.addEventListener("click", async () => {
-    await InsertItemPurchase(); // ← era chamado duas vezes antes, corrigido
-});
-productsTbody.addEventListener('click', async (e) => {
-    const btn = e.target.closest('[data-action="delete-item"]');
-    if (!btn) return;
-    await deleteItem(btn.dataset.id);
+    await InsertItemPurchase();
 });

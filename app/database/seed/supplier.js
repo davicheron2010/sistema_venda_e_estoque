@@ -2,7 +2,7 @@ import { fakerPT_BR as faker } from '@faker-js/faker';
 
 export async function seed(knex) {
   await knex('supplier').del();
-  const total = 1000;
+  const total = 1;
   const batchSize = 100;
 
   for (let i = 0; i < total; i += batchSize) {

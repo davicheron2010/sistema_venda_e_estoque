@@ -51,8 +51,7 @@ export default class Purchase {
             .first();
         return row || null;
     }
-
-    // Busca os itens de uma compra pelo ID da compra
+    
     static async listItem(data = {}) {
         const id = data.id ?? null;
 
@@ -143,7 +142,8 @@ export default class Purchase {
 
     static async insertItem(data) {
         const id = data.id ?? null;
-        const id_produto = data.pesquisa ?? null;
+        const id_produto = data.id_produto ?? null;
+        const quantidade = data.quantidade ?? null;
 
         if (id === null || id === undefined) {
             return {
@@ -174,17 +174,22 @@ export default class Purchase {
                 };
             }
 
+            const qtd = parseFloat(data.quantidade) || 1;
+            const preco = parseFloat(data.inputPreco) || parseFloat(produto.preco_compra) || 0;
+            const preco_unit = parseFloat(data.inputPreco) || 0;
+            const total = parseFloat(data.inputTotal) || (preco * qtd);
+
             const clean = {
                 id_compra: id,
                 id_produto: id_produto,
-                quantidade: 1,
-                total_bruto: produto.preco_compra,
-                total_liquido: produto.preco_compra,
+                quantidade: qtd,
+                total_bruto: total,
+                total_liquido: total,
+                preco_unitario: preco_unit,
                 desconto: 0,
                 acrescimo: 0,
                 nome: produto.nome
             };
-
             const isInserted = await connection('item_purchase')
                 .insert(clean)
                 .returning('id');
@@ -243,7 +248,7 @@ export default class Purchase {
     }
 
     static async deleteItem(id) {
-      
+
         if (!id) {
             return {
                 status: false,
