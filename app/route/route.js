@@ -194,6 +194,10 @@ ipcMain.handle('supplier:insert', async (_e, data) => {
     return result;
 });
 
+ipcMain.handle('sale:insertInstallmentSale', async (_e, data) => {
+    return await Sale.insertInstallmentSale(data);
+});
+
 ipcMain.handle('supplier:find', async (_e, where = {}) => {
     return await Supplier.find(where);
 });

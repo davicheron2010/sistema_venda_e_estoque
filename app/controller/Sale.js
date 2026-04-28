@@ -101,7 +101,7 @@ export default class Sale {
         const id = data['id'] ?? null;
         const id_produto = data['id_produto'] ?? null;
         const quantidade = parseFloat(data['quantidade']) || 1;
-        const preco_unitario = parseFloat(data['preco_unitario']) || 0;
+        const preco_unitario = parseFloat(data['preco_unitario'] ?? data['unitario_liquido'] ?? data['unitario_bruto']) || 0;
 
         // Verifica se o id da venda está vazio ou nulo
         if (!id) {
@@ -192,5 +192,28 @@ export default class Sale {
                 id: 0
             };
         }
+        
     }
+    static async insertInstallmentSale(data) {
+    try {
+        await connection('installment_sale_purchase').insert({
+            id_sale:          data.id_sale,
+            id_purchase:      data.id_purchase      || 0,
+            id_installment:   data.id_installment   || 0,
+            id_payment_terms: data.id_payment_terms,
+            total_parcelas:   data.total_parcelas,
+            numero_parcela:   data.numero_parcela,
+            valor_parcela:    data.valor_parcela,
+            valor_total:      data.valor_total,
+            status:           data.status           || 'aberto',
+            data_vencimento:  data.data_vencimento
+        });
+        return { status: true };
+    } catch (error) {
+        return { status: false, error: error.message };
+    }
+}
+
+
+// 
 }

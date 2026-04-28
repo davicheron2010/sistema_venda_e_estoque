@@ -155,13 +155,124 @@
 <div class="modal fade" id="finalizeSaleModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5">Finalizar Venda</h1>
+
+            <!-- HEADER -->
+            <div class="modal-header bg-light">
+                <div>
+                    <h5 class="modal-title fw-bold mb-0">
+                        <i class="bi bi-bag-check me-2 text-success"></i>Finalizar Venda
+                    </h5>
+                    <small class="text-muted" id="fsm-cliente-nome">—</small>
+                </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
-            <div class="modal-body">
-                <!-- Conteúdo será adicionado aqui -->
+
+            <!-- BARRA DE TOTAIS -->
+            <div class="border-bottom border-top bg-light px-4 py-3">
+                <div class="row text-center g-0">
+                    <div class="col-4">
+                        <div class="text-muted small mb-1">Total da Venda</div>
+                        <div class="fw-bold fs-5" id="fsm-total-venda">R$ 0,00</div>
+                    </div>
+                    <div class="col-4 border-start border-end">
+                        <div class="text-muted small mb-1">Total Pago</div>
+                        <div class="fw-bold fs-5 text-success" id="fsm-total-pago">R$ 0,00</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="text-muted small mb-1">Diferença</div>
+                        <div class="fw-bold fs-5 text-warning" id="fsm-diferenca">R$ 0,00</div>
+                    </div>
+                </div>
             </div>
+
+            <div class="modal-body p-4">
+
+                <!-- FORM: ADICIONAR PAGAMENTO -->
+                <h6 class="text-muted text-uppercase fw-bold small mb-3">
+                    <i class="bi bi-credit-card me-1"></i>Adicionar Pagamento
+                </h6>
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="row g-3 align-items-end">
+
+                            <!-- Forma de Pagamento -->
+                            <div class="col-md-5">
+                                <label class="form-label small fw-bold">Forma de Pagamento</label>
+                                <select class="form-select" id="fsm-payment-term">
+                                    <option value="">Selecione...</option>
+                                </select>
+                            </div>
+
+                            <!-- Parcelas (oculto por padrão — só aparece quando a forma tem parcelas) -->
+                            <div class="col-md-3" id="fsm-parcelas-col" style="display:none;">
+                                <label class="form-label small fw-bold">Parcelas</label>
+                                <select class="form-select" id="fsm-parcela">
+                                    <option value="">Selecione...</option>
+                                </select>
+                            </div>
+
+                            <!-- Valor -->
+                            <div class="col" id="fsm-valor-col">
+                                <label class="form-label small fw-bold">Valor (R$)</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="fsm-valor"
+                                       placeholder="0,00"
+                                       autocomplete="off">
+                            </div>
+
+                            <!-- Botão -->
+                            <div class="col-auto">
+                                <button class="btn btn-primary" id="fsm-add-payment" type="button">
+                                    <i class="bi bi-plus-lg me-1"></i>Adicionar
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LISTA DE PAGAMENTOS ADICIONADOS -->
+                <h6 class="text-muted text-uppercase fw-bold small mb-3">
+                    <i class="bi bi-list-check me-1"></i>Pagamentos Adicionados
+                </h6>
+                <div class="card shadow-sm">
+                    <div class="card-body p-0">
+
+                        <div id="fsm-empty-payments" class="text-center text-muted py-4">
+                            <i class="bi bi-inbox d-block fs-4 mb-1"></i>
+                            Nenhum pagamento adicionado.
+                        </div>
+
+                        <table class="table table-hover align-middle mb-0"
+                               id="fsm-payments-table"
+                               style="display:none;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Forma</th>
+                                    <th>Parcelas</th>
+                                    <th class="text-end">Valor</th>
+                                    <th class="text-center" style="width:60px;">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fsm-payments-tbody"></tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-success" id="fsm-conclude-btn" disabled>
+                    <i class="bi bi-check-circle me-1"></i>Concluir Venda
+                </button>
+            </div>
+
         </div>
     </div>
 </div>
